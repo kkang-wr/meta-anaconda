@@ -70,7 +70,7 @@ index 6d196e2..8cad37b 100644
  
 +        self.requiredPackages += ['base-files', 'base-passwd', 'shadow']
 +        # Support grub-mkconfig
-+        self.requiredPackages += ['sed', 'coreutils', 'busybox']
++        self.requiredPackages += ['sed', 'coreutils']
 +        # The extra packages make sure lvm initramfs generation
 +        #self.requiredPackages += ['ldd', 'gzip', 'iputils']
 +        # Support create new user

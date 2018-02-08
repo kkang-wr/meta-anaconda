@@ -22,6 +22,5 @@ RDEPENDS_${PN} = " \
     dosfstools \
     e2fsprogs \
     btrfs-tools \
-    busybox \
 "
 
