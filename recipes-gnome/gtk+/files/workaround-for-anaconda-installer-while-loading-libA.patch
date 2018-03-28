@@ -1,8 +1,7 @@
-From a99480777c259c1ef0db3ac972abae348d930b41 Mon Sep 17 00:00:00 2001
+From 1e579c886506039b2a9eb19e1a344c4849c3c5c8 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 9 Oct 2015 07:12:36 -0400
-Subject: [PATCH] workaround for anaconda installer while loading
- libAnacondaWidgets
+Subject: [PATCH] workaround for anaconda installer while loading libAnacondaWidgets
 
 Here is easy way to reproduce the failure:
 ...
@@ -38,10 +37,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 24 insertions(+)
 
 diff --git a/gtk/gtkbuilder.c b/gtk/gtkbuilder.c
-index f9599ab..8315638 100644
+index 619aa07..f4ab291 100644
 --- a/gtk/gtkbuilder.c
 +++ b/gtk/gtkbuilder.c
-@@ -398,6 +398,27 @@ type_name_mangle (const gchar *name)
+@@ -402,6 +402,27 @@ type_name_mangle (const gchar *name)
  }
  
  static GType
@@ -69,7 +68,7 @@ index f9599ab..8315638 100644
  _gtk_builder_resolve_type_lazily (const gchar *name)
  {
    static GModule *module = NULL;
-@@ -405,6 +426,9 @@ _gtk_builder_resolve_type_lazily (const gchar *name)
+@@ -409,6 +430,9 @@ _gtk_builder_resolve_type_lazily (const gchar *name)
    gchar *symbol;
    GType gtype = G_TYPE_INVALID;
  
@@ -78,7 +77,7 @@ index f9599ab..8315638 100644
 +
    if (!module)
      module = g_module_open (NULL, 0);
-   
+ 
 -- 
-1.9.1
+1.8.3.1
 
