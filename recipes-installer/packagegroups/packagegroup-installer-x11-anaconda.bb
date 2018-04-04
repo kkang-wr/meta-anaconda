@@ -20,7 +20,6 @@ RDEPENDS_packagegroup-installer-x11-anaconda = "\
     xrandr \
     libsdl \
     metacity \
-    gnome-themes \
     adwaita-icon-theme \
     pango \
     pango-modules \
