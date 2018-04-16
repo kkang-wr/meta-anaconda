@@ -13,6 +13,7 @@ RDEPENDS_${PN} = " \
     kmod \
     lvm2 \
     util-linux-mount \
+    util-linux-switch-root \
     init-ifupdown \
     libuser \
     dracut \
