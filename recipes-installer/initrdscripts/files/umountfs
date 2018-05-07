@@ -1,0 +1,10 @@
+umountfs_enabled() {
+    return 0
+}
+
+umountfs_run() {
+    # Umount other media for anaconda
+    for dir in `awk '/\/dev.* \/run\/media/{print $2}' /proc/mounts`; do
+        umount $dir
+    done
+}
