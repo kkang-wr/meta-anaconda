@@ -25,7 +25,7 @@ class TestAnacondaOE(OESelftestTestCase):
 
         self.anaconda_distro = "anaconda"
         self.target_recipe = "core-image-minimal"
-        self.anaconda_recipe = 'core-image-minimal'
+        self.anaconda_recipe = "core-image-anaconda"
         self.topdir = get_bb_var('TOPDIR')
         self.vdisk = '%s/hd0.vdisk' % self.topdir
         self.cmd_common = "runqemu slirp qemuparams='-smp 8 -drive file=%s,if=virtio,format=qcow -m 1024 -vnc :4'" % self.vdisk
