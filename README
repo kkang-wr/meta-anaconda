@@ -374,6 +374,37 @@ Building the target installer
              Then target_build1 will use /my/target1.conf and /my/target1.ks,
              target_build2 and target_build3 will work similarly.
 
+10. OE QA: Selftest
+    10.1 Clone away
+         $ mkdir <installer-project>
+         $ cd <installer-project>
+         $ git clone git://git.yoctoproject.org/meta-anaconda
+         $ git clone git://git.openembedded.org/meta-openembedded
+         $ git clone git://git.openembedded.org/openembedded-core oe-core
+         $ cd oe-core
+         $ git clone git://git.openembedded.org/bitbake
+
+    10.2 Prepare target build
+         $ . <installer-project>/oe-core/oe-init-build-env <target_build>
+
+         Edit conf/bblayers.conf to include other layers
+         BBLAYERS ?= " \
+            <installer-project>/oe-core/meta \
+            <installer-project>/meta-openembedded/meta-python \
+            <installer-project>/meta-openembedded/meta-gnome \
+            <installer-project>/meta-openembedded/meta-filesystems \
+            <installer-project>/meta-openembedded/meta-oe \
+            <installer-project>/meta-openembedded/meta-networking \
+            <installer-project>/meta-openembedded/meta-initramfs \
+            <installer-project>/meta-anaconda \
+         "
+
+    10.3 Run test case
+         $ oe-selftest -r anaconda_oe.TestAnacondaOE
+
+    10.4 Monitor anaconda installation
+         $ vncviewer  <build-host-ip-address>:4
+         $ ssh -p 2222 root@<build-host-ip-address>
 
 License
 -------
