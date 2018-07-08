@@ -1,5 +1,5 @@
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var, runqemu
+from oeqa.utils.commands import runCmd, bitbake, get_bb_vars, runqemu
 from oeqa.utils.sshcontrol import SSHControl
 import os
 import time
@@ -23,15 +23,17 @@ class TestAnacondaOE(OESelftestTestCase):
         self.write_config(features)
         self.logger.info('local.conf:\n%s' % features)
 
+        bbvars = get_bb_vars(['TOPDIR', 'DEPLOY_DIR_IMAGE', 'BBLAYERS', 'STAGING_BINDIR_NATIVE'], 'qemu-helper-native')
+
         self.anaconda_distro = "anaconda"
         self.target_recipe = "core-image-minimal"
         self.anaconda_recipe = "core-image-anaconda"
-        self.topdir = get_bb_var('TOPDIR')
+        self.topdir = bbvars['TOPDIR']
         self.vdisk = '%s/hd0.vdisk' % self.topdir
         self.cmd_common = "runqemu slirp qemuparams='-smp 8 -drive file=%s,if=virtio,format=qcow -m 1024 -vnc :4'" % self.vdisk
         self.install_timeout = 14400
-        self.target_deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
-        for d in get_bb_var('BBLAYERS').split():
+        self.target_deploy_dir_image = bbvars['DEPLOY_DIR_IMAGE']
+        for d in bbvars['BBLAYERS'].split():
             if d.endswith('/meta-anaconda'):
                 self.layer_path = d
                 break
@@ -44,7 +46,7 @@ class TestAnacondaOE(OESelftestTestCase):
                 self.logger.error("Command failed: %s", str(err))
                 sys.exit(1)
 
-            bindir_native = get_bb_var('STAGING_BINDIR_NATIVE', "qemu-helper-native")
+            bindir_native = bbvars['STAGING_BINDIR_NATIVE']
             try:
                 runCmd("%s/qemu-img create -f qcow %s 5000M" % (bindir_native, self.vdisk))
             except AssertionError as err:
