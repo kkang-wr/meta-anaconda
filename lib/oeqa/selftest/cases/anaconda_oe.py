@@ -106,8 +106,8 @@ class TestAnacondaOE(OESelftestTestCase):
         res = runCmd("ls %s -al" % self.target_deploy_dir_image, ignore_status=True)
         self.logger.info("ls %s -al\n%s" % (self.target_deploy_dir_image, res.output))
 
-    @OETestDepends(['test_testanaconda_create_target_disk', 'test_testanaconda_build_target_image'])
-    def test_testanaconda_pkg_install(self):
+    @OETestDepends(['test_testanaconda_build_target_image'])
+    def test_testanaconda_build_pkg_installer_image(self):
         # The 2nd host build with kickstart
         ks_file = os.path.join(self.layer_path, 'example/ks-pkg.cfg')
         features = 'TMPDIR .= "_host"\n'
@@ -125,10 +125,19 @@ class TestAnacondaOE(OESelftestTestCase):
             self.logger.error("Command failed: %s", str(err))
             sys.exit(1)
 
+    @OETestDepends(['test_testanaconda_create_target_disk', 'test_testanaconda_build_pkg_installer_image'])
+    def test_testanaconda_pkg_install(self):
+        features = 'TMPDIR .= "_host"\n'
+        features += 'DISTRO = "%s"\n' % self.anaconda_distro
+        features += 'INSTALLER_TARGET_BUILD = "%s"\n' % self.topdir
+        features += 'INSTALLER_TARGET_IMAGE = "%s"\n' % self.target_recipe
+        self.logger.info('extra local.conf:\n%s' % features)
+        self.append_config(features)
+
         self._start_runqemu()
 
-    @OETestDepends(['test_testanaconda_create_target_disk', 'test_testanaconda_build_target_image'])
-    def test_testanaconda_imagecopy_install(self):
+    @OETestDepends(['test_testanaconda_pkg_install'])
+    def test_testanaconda_build_imagecopy_installer_image(self):
         # The 2nd host build with kickstart
         ks_file = os.path.join(self.layer_path, 'example/ks-imagecopy.cfg')
         features = 'TMPDIR .= "_host"\n'
@@ -145,6 +154,14 @@ class TestAnacondaOE(OESelftestTestCase):
         except AssertionError as err:
             self.logger.error("Command failed: %s", str(err))
             sys.exit(1)
+
+    @OETestDepends(['test_testanaconda_build_imagecopy_installer_image'])
+    def test_testanaconda_imagecopy_install(self):
+        features = 'TMPDIR .= "_host"\n'
+        features += 'DISTRO = "%s"\n' % self.anaconda_distro
+        features += 'INSTALLER_TARGET_BUILD = "%s/%s-%s.ext4"\n' % (self.target_deploy_dir_image, self.target_recipe, self.machine)
+        self.logger.info('extra local.conf:\n%s' % features)
+        self.append_config(features)
 
         self._start_runqemu()
 
