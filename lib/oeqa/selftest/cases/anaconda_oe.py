@@ -1,5 +1,6 @@
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import runCmd, bitbake, get_bb_vars, runqemu
+from oeqa.core.decorator.depends import OETestDepends
+from oeqa.utils.commands import runCmd, bitbake, get_bb_vars, get_bb_var, runqemu
 from oeqa.utils.sshcontrol import SSHControl
 import os
 import time
@@ -7,7 +8,6 @@ import sys
 
 class TestAnacondaOE(OESelftestTestCase):
 
-    target_image_is_ready = False
     # We only want to print runqemu stdout/stderr if there is a test case failure
     buffer = True
 
@@ -16,7 +16,6 @@ class TestAnacondaOE(OESelftestTestCase):
         self.machine =  'qemux86-64'
         features = 'MACHINE = "%s"\n' % self.machine
         features += 'PACKAGE_CLASSES = "package_rpm"\n'
-        features += 'DISTRO_FEATURES_append = " anaconda-support"\n'
         features += 'VIRTUAL-RUNTIME_init_manager = "systemd"\n'
         features += 'DISTRO_FEATURES_append = " systemd"\n'
         features += 'DISTRO_FEATURES_BACKFILL_CONSIDERED_append = " sysvinit"\n'
@@ -37,35 +36,6 @@ class TestAnacondaOE(OESelftestTestCase):
             if d.endswith('/meta-anaconda'):
                 self.layer_path = d
                 break
-
-        if not TestAnacondaOE.target_image_is_ready:
-            # Provide qemu-img
-            try:
-                bitbake("qemu-helper-native")
-            except AssertionError as err:
-                self.logger.error("Command failed: %s", str(err))
-                sys.exit(1)
-
-            bindir_native = bbvars['STAGING_BINDIR_NATIVE']
-            try:
-                runCmd("%s/qemu-img create -f qcow %s 5000M" % (bindir_native, self.vdisk))
-            except AssertionError as err:
-                self.logger.error("Command failed: %s", str(err))
-                runCmd("find %s" % bindir_native)
-                sys.exit(1)
-            self.logger.info("Create qemu image %s successfully" % self.vdisk)
-
-            # The 1st target build
-            try:
-                bitbake(self.target_recipe)
-            except AssertionError as err:
-                self.logger.error("Command failed: %s", str(err))
-                sys.exit(1)
-
-            self.logger.info("Build %s successfully" % self.target_recipe)
-            res = runCmd("ls %s -al" % self.target_deploy_dir_image, ignore_status=True)
-            self.logger.info("ls %s -al\n%s" % (self.target_deploy_dir_image, res.output))
-            TestAnacondaOE.target_image_is_ready = True
 
     def __start_qemu_shutdown_check_if_shutdown_succeeded(self, qemu, timeout):
         # Stop thread will stop the LoggingThread instance used for logging
@@ -102,8 +72,42 @@ class TestAnacondaOE(OESelftestTestCase):
             with open(qemu.qemurunnerlog) as f:
                 self.assertTrue('media=cdrom' in f.read(), "Failed: %s" % cmd)
 
+    def test_testanaconda_create_target_disk(self):
+        # Provide qemu-img
+        try:
+            bitbake("qemu-helper-native")
+        except AssertionError as err:
+            self.logger.error("Command failed: %s", str(err))
+            sys.exit(1)
+
+        bindir_native = get_bb_var('STAGING_BINDIR_NATIVE', 'qemu-helper-native')
+        try:
+            runCmd("%s/qemu-img create -f qcow %s 5000M" % (bindir_native, self.vdisk))
+        except AssertionError as err:
+            self.logger.error("Command failed: %s", str(err))
+            runCmd("find %s" % bindir_native)
+            sys.exit(1)
+        self.logger.info("Create qemu image %s successfully" % self.vdisk)
+
+
+    def test_testanaconda_build_target_image(self):
+        features = 'DISTRO_FEATURES_append = " anaconda-support"\n'
+        self.logger.info('extra local.conf:\n%s' % features)
+        self.append_config(features)
+
+        # The 1st target build
+        try:
+            bitbake(self.target_recipe)
+        except AssertionError as err:
+            self.logger.error("Command failed: %s", str(err))
+            sys.exit(1)
+
+        self.logger.info("Build %s successfully" % self.target_recipe)
+        res = runCmd("ls %s -al" % self.target_deploy_dir_image, ignore_status=True)
+        self.logger.info("ls %s -al\n%s" % (self.target_deploy_dir_image, res.output))
+
+    @OETestDepends(['test_testanaconda_create_target_disk', 'test_testanaconda_build_target_image'])
     def test_testanaconda_pkg_install(self):
-        self.remove_config('DISTRO_FEATURES_append = " anaconda-support"')
         # The 2nd host build with kickstart
         ks_file = os.path.join(self.layer_path, 'example/ks-pkg.cfg')
         features = 'TMPDIR .= "_host"\n'
@@ -123,8 +127,8 @@ class TestAnacondaOE(OESelftestTestCase):
 
         self._start_runqemu()
 
+    @OETestDepends(['test_testanaconda_create_target_disk', 'test_testanaconda_build_target_image'])
     def test_testanaconda_imagecopy_install(self):
-        self.remove_config('DISTRO_FEATURES_append = " anaconda-support"')
         # The 2nd host build with kickstart
         ks_file = os.path.join(self.layer_path, 'example/ks-imagecopy.cfg')
         features = 'TMPDIR .= "_host"\n'
