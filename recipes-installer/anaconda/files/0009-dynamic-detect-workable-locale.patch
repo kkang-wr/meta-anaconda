@@ -1,0 +1,80 @@
+From 05ff77f3916c14877ccdda3fa329f368a5c4ef50 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 24 Jul 2018 10:19:03 +0800
+Subject: [PATCH 09/65] dynamic detect workable locale
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ pyanaconda/localization.py                          | 19 ++++++++++++++++++-
+ pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py |  2 ++
+ pyanaconda/ui/tui/spokes/language_support.py        |  5 +++--
+ 3 files changed, 23 insertions(+), 3 deletions(-)
+
+diff --git a/pyanaconda/localization.py b/pyanaconda/localization.py
+index c4ca9f6..ce460a1 100644
+--- a/pyanaconda/localization.py
++++ b/pyanaconda/localization.py
+@@ -28,7 +28,7 @@ import sys
+ import io
+ 
+ from pyanaconda.core import constants
+-from pyanaconda.core.util import upcase_first_letter, setenv, execWithRedirect
++from pyanaconda.core.util import upcase_first_letter, setenv, execWithRedirect, execReadlines
+ 
+ from pyanaconda.anaconda_loggers import get_module_logger
+ log = get_module_logger(__name__)
+@@ -770,3 +770,20 @@ def setup_locale_environment(locale=None, text_mode=False, prefer_environment=Fa
+     for varname in ("LANGUAGE", "LC_ALL", "LC_MESSAGES"):
+         if varname in os.environ:
+             del os.environ[varname]
++
++_all_locales = []
++def list_all_locales():
++    global _all_locales
++
++    if _all_locales == []:
++        for lang in execReadlines("locale", ["-a"]):
++            parts= parse_langcode(lang)
++            locales = langtable.list_locales(languageId=parts["language"],
++                                             territoryId=parts.get("territory", ""),
++                                             scriptId=parts.get("script", ""))
++            _all_locales += locales
++
++        log.info("all locales: %s" % _all_locales)
++
++    return _all_locales
++
+diff --git a/pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py b/pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py
+index 5d81d31..972dd02 100644
+--- a/pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py
++++ b/pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py
+@@ -166,6 +166,8 @@ class LangLocaleHandler(object):
+         locales = localization.get_language_locales(lang)
+         locales = self._filter_locales(lang, locales)
+         for locale in locales:
++            if locale not in localization.list_all_locales():
++                continue
+             self._add_locale(self._localeStore,
+                              localization.get_native_name(locale),
+                              locale)
+diff --git a/pyanaconda/ui/tui/spokes/language_support.py b/pyanaconda/ui/tui/spokes/language_support.py
+index 2ea68c7..8dfcbad 100644
+--- a/pyanaconda/ui/tui/spokes/language_support.py
++++ b/pyanaconda/ui/tui/spokes/language_support.py
+@@ -97,8 +97,9 @@ class LangSpoke(FirstbootSpokeMixIn, NormalTUISpoke):
+         if args:
+             self.window.add(TextWidget(_("Available locales")))
+             for locale in args:
+-                widget = TextWidget(localization.get_english_name(locale))
+-                self._container.add(widget, self._set_locales_callback, locale)
++                if locale in localization.list_all_locales():
++                    widget = TextWidget(localization.get_english_name(locale))
++                    self._container.add(widget, self._set_locales_callback, locale)
+         else:
+             self.window.add(TextWidget(_("Available languages")))
+             for lang in self._langs:
+-- 
+2.7.4
+

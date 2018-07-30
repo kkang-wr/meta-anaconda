@@ -1,0 +1,71 @@
+From d723a1e3c209c87789587cb1a43c7a0c6b3a7e5a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 24 Jul 2018 15:05:25 +0800
+Subject: [PATCH 29/65] support user account creation
+
+- Do not support user accout advanced setting
+
+- Add main for debugging test
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ pyanaconda/ui/gui/spokes/user.py |  7 +------
+ pyanaconda/users.py              | 13 +++++++++++++
+ 2 files changed, 14 insertions(+), 6 deletions(-)
+
+diff --git a/pyanaconda/ui/gui/spokes/user.py b/pyanaconda/ui/gui/spokes/user.py
+index bfe63e1..247c2f5 100644
+--- a/pyanaconda/ui/gui/spokes/user.py
++++ b/pyanaconda/ui/gui/spokes/user.py
+@@ -268,6 +268,7 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+         self._password_required_checkbox = self.builder.get_object("password_required_checkbox")
+         # advanced user configration dialog button
+         self._advanced_button = self.builder.get_object("advanced_button")
++        self._advanced_button.set_sensitive(False)
+         # password checking status bar & label
+         self._password_bar = self.builder.get_object("password_bar")
+         self._password_label = self.builder.get_object("password_label")
+@@ -503,12 +504,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+         """Called by Gtk on all username changes."""
+         new_username = editable.get_text()
+ 
+-        # Disable the advanced user dialog button when no username is set
+-        if editable.get_text():
+-            self._advanced_button.set_sensitive(True)
+-        else:
+-            self._advanced_button.set_sensitive(False)
+-
+         # update the username in checker
+         self.checker.username = new_username
+ 
+diff --git a/pyanaconda/users.py b/pyanaconda/users.py
+index 3db06dd..7139d5f 100644
+--- a/pyanaconda/users.py
++++ b/pyanaconda/users.py
+@@ -200,6 +200,7 @@ class Users(object):
+                           homedir will be interpreted relative to this. Defaults
+                           to util.getSysroot().
+         """
++        log.info("kwargs %s" % kwargs)
+         root = kwargs.get("root", util.getSysroot())
+ 
+         if self._getgrnam(group_name, root):
+@@ -431,3 +432,15 @@ class Users(object):
+         if not authfile_existed:
+             os.chown(authfile, int(uid), int(gid))
+             util.execWithRedirect("restorecon", ["-r", sshdir])
++
++# For testing
++if __name__ == "__main__":
++    from pyanaconda import anaconda_logging
++    anaconda_logging.init()
++    anaconda_logging.logger.setupVirtio()
++
++    from pyanaconda.anaconda_loggers import get_anaconda_root_logger
++    log = get_anaconda_root_logger()
++
++    users = Users()
++    users.createUser("test", password="123456", shell="/bin/bash", groups=["wheel"])
+-- 
+2.7.4
+

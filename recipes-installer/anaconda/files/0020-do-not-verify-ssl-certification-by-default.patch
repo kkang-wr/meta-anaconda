@@ -1,0 +1,44 @@
+From 8d9e5b9eeeff0aa3bb8257c203618899a684ac9a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 24 Jul 2018 14:09:02 +0800
+Subject: [PATCH 20/65] do not verify ssl certification by default
+
+It is helpful for development that use private certification.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ pyanaconda/argument_parsing.py | 2 +-
+ pyanaconda/flags.py            | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pyanaconda/argument_parsing.py b/pyanaconda/argument_parsing.py
+index 38c1601..b4c4315 100644
+--- a/pyanaconda/argument_parsing.py
++++ b/pyanaconda/argument_parsing.py
+@@ -446,7 +446,7 @@ def getArgumentParser(version_string, boot_cmdline=None):
+                     help=help_parser.help_text("repo"))
+     ap.add_argument("--stage2", dest="stage2", default=None, metavar="STAGE2_URL",
+                     help=help_parser.help_text("stage2"))
+-    ap.add_argument("--noverifyssl", action="store_true", default=False,
++    ap.add_argument("--noverifyssl", action="store_true", default=True,
+                     help=help_parser.help_text("noverifyssl"))
+     ap.add_argument("--liveinst", action="store_true", default=False,
+                     help=help_parser.help_text("liveinst"))
+diff --git a/pyanaconda/flags.py b/pyanaconda/flags.py
+index 2566d46..d797d2c 100644
+--- a/pyanaconda/flags.py
++++ b/pyanaconda/flags.py
+@@ -54,7 +54,7 @@ class Flags(object):
+         self.debug = False
+         self.armPlatform = None
+         self.preexisting_x11 = False
+-        self.noverifyssl = False
++        self.noverifyssl = True
+         self.imageInstall = False
+         self.automatedInstall = False
+         self.dirInstall = False
+-- 
+2.7.4
+

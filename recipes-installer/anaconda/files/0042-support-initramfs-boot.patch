@@ -1,0 +1,48 @@
+From 25b8364155b53be7b5d4befd5f9a955173c6cc2b Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 1 Jun 2017 14:27:48 +0800
+Subject: [PATCH 42/65] support initramfs boot
+
+- Create fake initramfs to cheat grub-mkconfig which
+  could generate grub.cfg that have initrd setting.
+
+- Make sure temp dir existed which required by dracut while live install.
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ pyanaconda/bootloader.py       | 3 +++
+ pyanaconda/payload/__init__.py | 4 ++++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
+index acfce0a..71a48de 100644
+--- a/pyanaconda/bootloader.py
++++ b/pyanaconda/bootloader.py
+@@ -2492,6 +2492,9 @@ def writeSysconfigKernel(storage, version, instClass):
+ def writeBootLoaderFinal(storage, payload, instClass, ksdata):
+     """ Do the final write of the bootloader. """
+ 
++    for kernel in payload.kernelVersionList:
++        open(util.getSysroot()+"/boot/initramfs-%s.img" % kernel, "w").write("\n")
++
+     # set up dracut/fips boot args
+     # XXX FIXME: do this from elsewhere?
+     storage.bootloader.set_boot_args(storage=storage,
+diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
+index ebdae09..c3a74d5 100644
+--- a/pyanaconda/payload/__init__.py
++++ b/pyanaconda/payload/__init__.py
+@@ -851,6 +851,10 @@ class Payload(object):
+             log.error("new-kernel-pkg does not exist - grubby wasn't installed?  skipping")
+             return
+ 
++        # Make sure temp dir existed, dracut requires it while live install
++        for subdir in ["log", "tmp"]:
++            util.mkdirChain(util.getSysroot() + "/var/volatile/%s" % subdir)
++
+         for kernel in self.kernelVersionList:
+             log.info("recreating initrd for %s", kernel)
+             if not flags.imageInstall:
+-- 
+2.7.4
+

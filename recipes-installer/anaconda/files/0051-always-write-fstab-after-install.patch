@@ -1,0 +1,32 @@
+From 7e7d9ac3f238303e71060d47ccdd87aeba96cf96 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 25 Jul 2018 17:35:33 +0800
+Subject: [PATCH 51/65] always write fstab after install
+
+Override writeStorageEarly with pass, and run writeStorageLate
+always writes fstab after instal, make sure the generated
+/etc/fstab not overwritten by the one from package install.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ pyanaconda/payload/dnfpayload.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyanaconda/payload/dnfpayload.py b/pyanaconda/payload/dnfpayload.py
+index afff294..342c878 100644
+--- a/pyanaconda/payload/dnfpayload.py
++++ b/pyanaconda/payload/dnfpayload.py
+@@ -1361,7 +1361,7 @@ class DNFPayload(payload.PackagePayload):
+                               ["-a"],
+                               root=util.getSysroot())
+ 
+-    def writeStorageLate(self):
++    def writeStorageEarly(self):
+         pass
+ 
+ 
+-- 
+2.7.4
+

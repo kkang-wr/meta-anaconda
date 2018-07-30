@@ -1,0 +1,52 @@
+From 1575a0c1df617d366bb7c23c55f7aef973e1c6cd Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 24 Jul 2018 14:06:58 +0800
+Subject: [PATCH 19/65] support UEFI boot
+
+- tweak grub efi package name based on oe-core
+
+- tweak efi_dir according to oe-core's EFI layout
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ pyanaconda/bootloader.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
+index 4093011..59922ce 100644
+--- a/pyanaconda/bootloader.py
++++ b/pyanaconda/bootloader.py
+@@ -1843,7 +1843,7 @@ class EFIGRUB1(EFIBase, GRUB):
+ 
+ 
+ class EFIGRUB(EFIBase, GRUB2):
+-    _packages32 = [ "grub2-efi-ia32", "shim-ia32" ]
++    _packages32 = [ "grub-efi" ]
+     _packages_common = [ "efibootmgr" ]
+     can_dual_boot = False
+     stage2_is_valid_stage1 = False
+@@ -1854,7 +1854,7 @@ class EFIGRUB(EFIBase, GRUB2):
+     def __init__(self):
+         super().__init__()
+         self.efi_dir = 'BOOT'
+-        self._packages64 = [ "grub2-efi-x64", "shim-x64" ]
++        self._packages64 = [ "grub-efi" ]
+ 
+         try:
+             f = open("/sys/firmware/efi/fw_platform_size", "r")
+@@ -1868,8 +1868,8 @@ class EFIGRUB(EFIBase, GRUB2):
+     @property
+     def _efi_binary(self):
+         if self._is_32bit_firmware:
+-            return "\\shimia32.efi"
+-        return "\\shimx64.efi"
++            return "\\bootia32.efi"
++        return "\\bootx64.efi"
+ 
+     @property
+     def packages(self):
+-- 
+2.7.4
+

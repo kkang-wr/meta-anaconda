@@ -1,0 +1,33 @@
+From dc81c748f528cf9bb68c9ef1cd016b4091e8c543 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 25 Jul 2018 10:20:08 +0800
+Subject: [PATCH 41/65] live install supports kickstart
+
+While live install, WRLinux does not support harddrive,
+use cdrom to replace
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ pyanaconda/installation.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/pyanaconda/installation.py b/pyanaconda/installation.py
+index f600595..2fbcb11 100644
+--- a/pyanaconda/installation.py
++++ b/pyanaconda/installation.py
+@@ -75,6 +75,10 @@ def _writeKS(ksdata):
+     # Do not support network configuration
+     ksdata.network.network = []
+ 
++    # Correct method of live install, use cdrom to replace
++    if ksdata.method.method == "harddrive":
++        ksdata.method.method = "cdrom"
++
+     # Make it so only root can read - could have passwords
+     with util.open_with_perm(path, "w", 0o600) as f:
+         f.write(str(ksdata))
+-- 
+2.7.4
+
