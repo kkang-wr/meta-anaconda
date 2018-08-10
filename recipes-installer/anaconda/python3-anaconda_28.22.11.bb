@@ -112,6 +112,8 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f28-relea
            file://0061-Tweak-label-name.patch \
            file://0062-Mount-var-volatile-during-install.patch \
            file://0063-update-fstab-by-appending.patch \
+           file://0064-users.py-Fix-multilib-user-creation-error.patch \
+           file://0065-bootloader.py-fix-UEFI-multilib-installation.patch \
           "
 
 SRCREV = "0b0d2f86b4323e6ee7a186bc8181ffe7553c9235"
