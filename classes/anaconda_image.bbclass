@@ -104,7 +104,7 @@ wrl_installer_copy_pkgs() {
             | sed -e 's/=/=\"/' -e 's/$/\"/' > ${BB_LOGFILE}.distro_vals"
 
         eval "cat $target_build/installersupport_$target_image | \
-            grep -e 'DEPLOY_DIR_RPM=.*' >> ${BB_LOGFILE}.distro_vals"
+            grep -e '^WORKDIR=.*' >> ${BB_LOGFILE}.distro_vals"
 
         eval `cat ${BB_LOGFILE}.distro_vals`
         if [ $? -ne 0 ]; then
@@ -115,7 +115,7 @@ wrl_installer_copy_pkgs() {
         fi
     else
         eval "cat $target_build/installersupport_$target_image | \
-            grep $common_grep -e '^PN=.*' -e '^SUMMARY=.*' -e 'DEPLOY_DIR_RPM=.*'\
+            grep $common_grep -e '^PN=.*' -e '^SUMMARY=.*' -e '^WORKDIR=.*'\
             -e '^DESCRIPTION=.*' -e '^export PACKAGE_INSTALL=.*' > ${BB_LOGFILE}.distro_vals"
 
         eval `cat ${BB_LOGFILE}.distro_vals`
@@ -161,11 +161,11 @@ IMAGE_LINGUAS=${IMAGE_LINGUAS}
 _EOF
     fi
 
-    if [ -d "$DEPLOY_DIR_RPM" ]; then
+    if [ -d "$WORKDIR/oe-rootfs-repo/rpm" ]; then
         # Copy local repos while the image is not initramfs
         bpn=${BPN}
         if [ "${bpn##*initramfs}" = "${bpn%%initramfs*}" ]; then
-            wrl_installer_copy_local_repos $DEPLOY_DIR_RPM
+            wrl_installer_copy_local_repos $WORKDIR/oe-rootfs-repo/rpm
         fi
         echo "$DISTRO::$prj_name::$DISTRO_NAME::$DISTRO_VERSION" >> ${IMAGE_ROOTFS}/.target_build_list
     fi
