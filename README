@@ -428,6 +428,19 @@ Building the target installer
     12.2 Currently, we support basic/digest authentication, which decided by
          your web server.
 
+13. How to add the http repository mirror list
+    1. Create the mirror list file, the format is the same with fedora/redhat
+    which based on dnf. The following mirror list contains two repodata.
+    ...
+    http://origin1.url/path_to_repodata1/
+    http://origin2.url/path_to_repodata2/
+    ...
+
+    2. Next, place the mirror list file on the web server.
+
+    3. When starting anaconda, choose to add an http repository, select mirrorlist
+    from `URL type'.
+
 License
 -------
 
