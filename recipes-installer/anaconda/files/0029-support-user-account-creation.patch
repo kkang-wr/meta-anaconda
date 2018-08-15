@@ -7,6 +7,8 @@ Subject: [PATCH 29/65] support user account creation
 
 - Add main for debugging test
 
+Upstream-Status: Inappropriate [oe specific]
+
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  pyanaconda/ui/gui/spokes/user.py |  7 +------

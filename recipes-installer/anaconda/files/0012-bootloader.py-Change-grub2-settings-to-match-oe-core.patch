@@ -9,6 +9,7 @@ files, as necessary -- create the directories required.
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 
+Upstream-Status: Inappropriate [oe specific]
 Rebase to f28-release
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
