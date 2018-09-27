@@ -240,6 +240,9 @@ Building the target installer
        Add "-boot menu=on" to qemuparams and run vncviewer to connect,
        press ESC key, manually choose "2. Virtio disk" "to boot from hard disk.
 
+       Add kvm to runqemu could speed up the installation, if add failed, please refer
+       https://wiki.yoctoproject.org/wiki/How_to_enable_KVM_for_Poky_qemu
+
    4.3 Use virtualbox for testing
        4.3.1 Prepare virtualbox
              Take Ubuntu 16.04 for example, the virtualbox is 5.0.40
