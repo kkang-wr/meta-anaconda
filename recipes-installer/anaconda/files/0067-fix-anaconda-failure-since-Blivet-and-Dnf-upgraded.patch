@@ -1,0 +1,142 @@
+From ec922edb5b1bd52d0c627ef59712dbbe37ccf83a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 18 Dec 2018 15:06:56 +0800
+Subject: [PATCH] fix anaconda failure since Blivet and Dnf upgraded
+
+Backport two commits from upstream anaconda
+[2ae4063 Don't set Anaconda-specific flags in Blivet]
+[55a7b4d DNF 3: config substitutions moved from dnf to libdnf]
+
+Refine according to one commit from upstream dnf4
+[b21f197 Not report scriplets errors as non-fatal]
+
+Upstream-Status: Backport
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ pyanaconda/payload/dnfpayload.py | 23 ++++++++++++-----------
+ pyanaconda/storage/osinstall.py  |  5 +----
+ 2 files changed, 13 insertions(+), 15 deletions(-)
+
+diff --git a/pyanaconda/payload/dnfpayload.py b/pyanaconda/payload/dnfpayload.py
+index 342c878..11f7728 100644
+--- a/pyanaconda/payload/dnfpayload.py
++++ b/pyanaconda/payload/dnfpayload.py
+@@ -60,7 +60,8 @@ import dnf.logging
+ import dnf.exceptions
+ import dnf.repo
+ import dnf.callback
+-import dnf.conf.parser
++import dnf.transaction
++import libdnf.conf
+ import dnf.conf.substitutions
+ import dnf.const
+ import rpm
+@@ -183,7 +184,7 @@ class PayloadRPMDisplay(dnf.callback.TransactionProgress):
+         # Process DNF actions, communicating with anaconda via the queue
+         # A normal installation consists of 'install' messages followed by
+         # the 'post' message.
+-        if action == self.PKG_INSTALL and ti_done == 0:
++        if action == dnf.transaction.PKG_INSTALL and ti_done == 0:
+             # do not report same package twice
+             if self._last_ts == ts_done:
+                 return
+@@ -199,13 +200,13 @@ class PayloadRPMDisplay(dnf.callback.TransactionProgress):
+             log_msg = "Installed: %s %s %s" % (nevra, package.buildtime, package.returnIdSum()[1])
+             self._queue.put(('log', log_msg))
+ 
+-        elif action == self.TRANS_POST:
++        elif action == dnf.transaction.TRANS_POST:
+             self._queue.put(('post', None))
+             log_msg = "Post installation setup phase started."
+             self._queue.put(('log', log_msg))
+             self._postinst_phase = True
+ 
+-        elif action == self.PKG_SCRIPTLET:
++        elif action == dnf.transaction.PKG_SCRIPTLET:
+             # Log the exact package nevra, build time and checksum
+             nevra = "%s-%s.%s" % (package.name, package.evr, package.arch)
+             log_msg = "Configuring (running scriptlet for): %s %s %s" % (nevra, package.buildtime, package.returnIdSum()[1])
+@@ -217,7 +218,7 @@ class PayloadRPMDisplay(dnf.callback.TransactionProgress):
+                 #self.cnt += 1
+                 self._queue.put(('configure', msg))
+ 
+-        elif action == self.PKG_VERIFY:
++        elif action == dnf.transaction.PKG_VERIFY:
+             msg = '%s.%s (%d/%d)' % (package.name, package.arch, ts_done, ts_total)
+             self._queue.put(('verify', msg))
+ 
+@@ -235,7 +236,7 @@ class PayloadRPMDisplay(dnf.callback.TransactionProgress):
+         string which describes the error.
+         """
+         token = "error"
+-        if message.startswith("Non-fatal"):
++        if message.startswith("Error in POSTIN scriptlet in rpm package"):
+             token = "warn"
+         self._queue.put((token, message))
+         log.info("error: %s" % message)
+@@ -362,7 +363,7 @@ class DNFPayload(payload.PackagePayload):
+         Currently supports $releasever and $basearch.
+         """
+         if url:
+-            return dnf.conf.parser.substitute(url, self._base.conf.substitutions)
++            return libdnf.conf.ConfigParser.substitute(url, self._base.conf.substitutions)
+ 
+         return None
+ 
+@@ -637,7 +638,7 @@ class DNFPayload(payload.PackagePayload):
+         if transaction is None:
+             return Size(0)
+ 
+-        size = sum(tsi.installed.downloadsize for tsi in transaction)
++        size = sum(tsi.pkg.downloadsize for tsi in transaction)
+         # reserve extra
+         return Size(size) + Size("150 MB")
+ 
+@@ -844,9 +845,9 @@ class DNFPayload(payload.PackagePayload):
+         files_nm = 0
+         for tsi in transaction:
+             # space taken by all files installed by the packages
+-            size += tsi.installed.installsize
++            size += tsi.pkg.installsize
+             # number of files installed on the system
+-            files_nm += len(tsi.installed.files)
++            files_nm += len(tsi.pkg.files)
+ 
+         # append bonus size depending on number of files
+         bonus_size = files_nm * BONUS_SIZE_ON_FILE
+@@ -1078,7 +1079,7 @@ class DNFPayload(payload.PackagePayload):
+                 msg = ("Payload error - DNF installation has ended up abruptly: %s" % msg)
+                 raise payload.PayloadError(msg)
+             elif token == 'warn':
+-                if msg.startswith("Non-fatal POSTIN scriptlet failure in rpm package"):
++                if msg.startswith("Error in POSTIN scriptlet in rpm package"):
+                     failed_scriptlets_pkgnames[msg.split()[-1]] = True
+             elif token == 'error':
+                 exc = payload.PayloadInstallError("DNF error: %s" % msg)
+diff --git a/pyanaconda/storage/osinstall.py b/pyanaconda/storage/osinstall.py
+index 5160fee..6ea650d 100644
+--- a/pyanaconda/storage/osinstall.py
++++ b/pyanaconda/storage/osinstall.py
+@@ -75,7 +75,7 @@ def enable_installer_mode():
+ 
+     # We don't want image installs writing backups of the *image* metadata
+     # into the *host's* /etc/lvm. This can get real messy on build systems.
+-    if blivet_flags.image_install:
++    if flags.imageInstall:
+         blivet_flags.lvm_metadata_backup = False
+ 
+     blivet_flags.auto_dev_updates = True
+@@ -112,9 +112,6 @@ def update_blivet_flags(blivet_flags, anaconda_flags):  # pylint: disable=redefi
+     :type anaconda_flags: :class:`pyanaconda.flags.Flags`
+     """
+     blivet_flags.testing = anaconda_flags.testing
+-    blivet_flags.automated_install = anaconda_flags.automatedInstall
+-    blivet_flags.live_install = anaconda_flags.livecdInstall
+-    blivet_flags.image_install = anaconda_flags.imageInstall
+ 
+     blivet_flags.selinux = anaconda_flags.selinux
+ 
+-- 
+2.7.4
+
