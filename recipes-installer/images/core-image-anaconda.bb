@@ -26,8 +26,7 @@ IMAGE_LINGUAS = "en-us en-gb"
 
 # Generate live image
 IMAGE_FSTYPES_remove = "wic wic.bmap"
-IMAGE_FSTYPES_append = " live"
-NOHDD = "1"
+IMAGE_FSTYPES_append = " iso"
 
 IMAGE_ROOTFS_EXTRA_SPACE =" + 102400"
 
