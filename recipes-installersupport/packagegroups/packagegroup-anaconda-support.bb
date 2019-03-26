@@ -12,6 +12,7 @@ RDEPENDS_${PN} = " \
     efibootmgr \
     kmod \
     lvm2 \
+    lvm2-udevrules \
     util-linux-mount \
     util-linux-switch-root \
     init-ifupdown \
