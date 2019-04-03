@@ -21,6 +21,7 @@ IMAGE_INSTALL = "\
     ${CUSTOMIZE_LOGOS} \
     dhcp-client \
     ldd \
+    rng-tools \
     "
 IMAGE_LINGUAS = "en-us en-gb"
 
