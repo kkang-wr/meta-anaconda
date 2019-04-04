@@ -1,6 +1,9 @@
 RPM_POSTPROCESS_COMMANDS_append = "wrl_installer;"
 do_rootfs[vardeps] += "INSTALLER_TARGET_BUILD INSTALLER_TARGET_IMAGE"
 
+# Fix system-shutdown hang at ratelimiting
+APPEND_append = " printk.devkmsg=on"
+
 INSTPRODUCT ?= "${DISTRO_NAME}"
 INSTVER     ?= "${DISTRO_VERSION}"
 INSTBUGURL  ?= "http://www.windriver.com/"
