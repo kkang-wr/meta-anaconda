@@ -1,8 +1,6 @@
 FILESEXTRAPATHS_prepend_anaconda := "${THISDIR}/files:"
 
 do_install_append_anaconda() {
-    # Remove tty1
-    rm ${D}${sysconfdir}/systemd/system/getty.target.wants/getty@tty1.service
     # Explicitly enable tty2
     ln -nsf ${systemd_unitdir}/system/getty@.service \
         ${D}${sysconfdir}/systemd/system/getty.target.wants/getty@tty2.service
