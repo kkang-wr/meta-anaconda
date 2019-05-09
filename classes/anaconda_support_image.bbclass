@@ -1,5 +1,5 @@
 FEATURE_PACKAGES_anaconda-support = "packagegroup-anaconda-support"
-IMAGE_FEATURES_append = " anaconda-support"
+IMAGE_FEATURES_append = " anaconda-support package-management"
 
 # Generate filesystem images for image copy install
 IMAGE_FSTYPES += "ext4"
