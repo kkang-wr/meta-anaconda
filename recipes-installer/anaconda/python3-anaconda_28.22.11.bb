@@ -119,6 +119,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f28-relea
            file://0001-Make-pyanaconda.dbus.typing-work-with-Python-3.7-159.patch \
            file://0068-disable-chronyd.patch \
            file://0069-disable-location-detection-based-on-IP-address.patch \
+           file://0001-pyanaconda-payload-Fix-xserver-detection.patch \
           "
 
 SRCREV = "0b0d2f86b4323e6ee7a186bc8181ffe7553c9235"

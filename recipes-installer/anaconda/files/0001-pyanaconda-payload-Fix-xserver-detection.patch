@@ -1,0 +1,35 @@
+From f35925543f8b19c7b39cef4679cc0bc74bfa5253 Mon Sep 17 00:00:00 2001
+From: Ovidiu Panait <ovidiu.panait@windriver.com>
+Date: Thu, 9 May 2019 09:04:44 +0000
+Subject: [PATCH] pyanaconda: payload: Fix xserver detection
+
+When installing an image that has graphical interface,
+/etc/systemd/system/default.target will point to multi-user.target
+instead of graphical.target.
+
+To fix this, use the right rpm query to detect the presence of xserver.
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+---
+ pyanaconda/payload/__init__.py | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
+index f67a4cd94..7929407e7 100644
+--- a/pyanaconda/payload/__init__.py
++++ b/pyanaconda/payload/__init__.py
+@@ -897,8 +897,7 @@ class Payload(object):
+             ts = rpm.TransactionSet(util.getSysroot())
+ 
+             # XXX one day this might need to account for anaconda's display mode
+-            if ts.dbMatch("provides", 'service(graphical-login)').count() and \
+-               ts.dbMatch('provides', 'xorg-x11-server-Xorg').count() and \
++            if ts.dbMatch('provides', 'xserver-xorg').count() and \
+                not flags.usevnc:
+                 # We only manipulate the ksdata.  The symlink is made later
+                 # during the config write out.
+-- 
+2.18.1
+
