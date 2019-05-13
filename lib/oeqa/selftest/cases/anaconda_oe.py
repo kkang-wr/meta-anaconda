@@ -90,7 +90,7 @@ class TestAnacondaOE(OESelftestTestCase):
             sys.exit(1)
         self.logger.info("Create qemu image %s successfully" % self.vdisk)
 
-
+    @OETestDepends(['anaconda_oe.TestAnacondaOE.test_testanaconda_create_target_disk'])
     def test_testanaconda_build_target_image(self):
         features = 'DISTRO_FEATURES_append = " anaconda-support"\n'
         self.logger.info('extra local.conf:\n%s' % features)
@@ -107,7 +107,7 @@ class TestAnacondaOE(OESelftestTestCase):
         res = runCmd("ls %s -al" % self.target_deploy_dir_image, ignore_status=True)
         self.logger.info("ls %s -al\n%s" % (self.target_deploy_dir_image, res.output))
 
-    @OETestDepends(['test_testanaconda_build_target_image'])
+    @OETestDepends(['anaconda_oe.TestAnacondaOE.test_testanaconda_build_target_image'])
     def test_testanaconda_build_pkg_installer_image(self):
         # The 2nd host build with kickstart
         ks_file = os.path.join(self.layer_path, 'example/ks-pkg.cfg')
@@ -126,7 +126,7 @@ class TestAnacondaOE(OESelftestTestCase):
             self.logger.error("Command failed: %s", str(err))
             sys.exit(1)
 
-    @OETestDepends(['test_testanaconda_create_target_disk', 'test_testanaconda_build_pkg_installer_image'])
+    @OETestDepends(['anaconda_oe.TestAnacondaOE.test_testanaconda_build_pkg_installer_image'])
     def test_testanaconda_pkg_install(self):
         features = 'TMPDIR .= "_host"\n'
         features += 'DISTRO = "%s"\n' % self.anaconda_distro
@@ -137,7 +137,7 @@ class TestAnacondaOE(OESelftestTestCase):
 
         self._start_runqemu()
 
-    @OETestDepends(['test_testanaconda_pkg_install'])
+    @OETestDepends(['anaconda_oe.TestAnacondaOE.test_testanaconda_pkg_install'])
     def test_testanaconda_build_imagecopy_installer_image(self):
         # The 2nd host build with kickstart
         ks_file = os.path.join(self.layer_path, 'example/ks-imagecopy.cfg')
@@ -156,7 +156,7 @@ class TestAnacondaOE(OESelftestTestCase):
             self.logger.error("Command failed: %s", str(err))
             sys.exit(1)
 
-    @OETestDepends(['test_testanaconda_build_imagecopy_installer_image'])
+    @OETestDepends(['anaconda_oe.TestAnacondaOE.test_testanaconda_build_imagecopy_installer_image'])
     def test_testanaconda_imagecopy_install(self):
         features = 'TMPDIR .= "_host"\n'
         features += 'DISTRO = "%s"\n' % self.anaconda_distro
