@@ -30,7 +30,8 @@ class TestAnacondaOE(OESelftestTestCase):
         self.anaconda_recipe = "core-image-anaconda"
         self.topdir = bbvars['TOPDIR']
         self.vdisk = '%s/hd0.vdisk' % self.topdir
-        self.cmd_common = "runqemu slirp qemuparams='-smp 8 -drive file=%s,if=virtio,format=qcow -m 1024 -vnc :4'" % self.vdisk
+        self.cmd_common = "runqemu slirp"
+        self.qemuparams = "-smp 8 -drive file=%s,if=virtio,format=qcow -m 1024 -vnc :4" % self.vdisk
         self.install_timeout = 14400
         self.target_deploy_dir_image = bbvars['DEPLOY_DIR_IMAGE']
         for d in bbvars['BBLAYERS'].split():
@@ -58,7 +59,7 @@ class TestAnacondaOE(OESelftestTestCase):
         # Test runqemu machine iso
         self.logger.info("start runqemu")
         cmd = "%s %s iso" % (self.cmd_common, self.machine)
-        with runqemu(self.anaconda_recipe, ssh=False, launch_cmd=cmd) as qemu:
+        with runqemu(self.anaconda_recipe, ssh=False, launch_cmd=cmd, qemuparams=self.qemuparams) as qemu:
             self.logger.info("runqemu as qemu")
             qemu_shutdown_succeeded = self.__start_qemu_shutdown_check_if_shutdown_succeeded(qemu, self.install_timeout)
             if not qemu_shutdown_succeeded:
