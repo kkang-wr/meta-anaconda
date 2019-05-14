@@ -118,6 +118,7 @@ class TestAnacondaOE(OESelftestTestCase):
         features += 'INSTALLER_TARGET_IMAGE = "%s"\n' % self.target_recipe
         features += 'KICKSTART_FILE = "%s"\n' % ks_file
         features += 'SYSLINUX_TIMEOUT = "10"\n'
+        features += 'INSTALLER_SERIAL = ""\n'
         self.logger.info('extra local.conf:\n%s' % features)
         self.append_config(features)
 
@@ -148,6 +149,7 @@ class TestAnacondaOE(OESelftestTestCase):
         features += 'KICKSTART_FILE = "%s"\n' % ks_file
         features += 'SYSLINUX_TIMEOUT = "10"\n'
         features += 'APPEND_append = " textinst"\n'
+        features += 'INSTALLER_SERIAL = ""\n'
         self.logger.info('extra local.conf:\n%s' % features)
         self.append_config(features)
 
