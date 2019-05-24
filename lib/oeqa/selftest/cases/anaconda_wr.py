@@ -24,7 +24,7 @@ class TestAnaconda(TestAnacondaOE):
 
     @OETestDepends(['anaconda_wr.TestAnaconda.test_testanaconda_pkg_install'])
     def test_testanaconda_build_imagecopy_installer_image(self):
-        super(TestAnaconda, self).test_testanaconda_build_imagecopy_installer_image()
+        pass
 
     @OETestDepends(['anaconda_wr.TestAnaconda.test_testanaconda_build_imagecopy_installer_image'])
     def test_testanaconda_imagecopy_install(self):
