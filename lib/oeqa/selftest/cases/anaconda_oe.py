@@ -19,6 +19,7 @@ class TestAnacondaOE(OESelftestTestCase):
         features += 'VIRTUAL-RUNTIME_init_manager = "systemd"\n'
         features += 'DISTRO_FEATURES_append = " systemd"\n'
         features += 'DISTRO_FEATURES_append = " pam"\n'
+        features += 'DISTRO_FEATURES_append = " ldconfig"\n'
         features += 'DISTRO_FEATURES_BACKFILL_CONSIDERED_append = " sysvinit"\n'
         self.write_config(features)
         self.logger.info('local.conf:\n%s' % features)
