@@ -323,3 +323,6 @@ python __anonymous() {
 
 }
 
+systemd_preset_all () {
+    :
+} 
