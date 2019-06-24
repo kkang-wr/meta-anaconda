@@ -51,7 +51,6 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-relea
            file://81-edit-sudoers.ks \
            file://81-systemd-preset-all.ks \
            file://0001-do-not-build-po-and-doc.patch \
-           file://0003-pyanaconda-flags.py-drop-selinux-module.patch \
            file://0004-add-package-site-dir-for-installclass-searching.patch \
            file://0005-do-not-load-the-system-wide-Xresources.patch \
            file://0006-tweak-iso-mount-dir-and-kernel-name.patch \
