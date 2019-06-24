@@ -46,7 +46,7 @@ RDEPENDS_${PN} += "networkmanager \
                    network-manager-applet \
 "
 
-SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f28-release \
+SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-release \
            file://wrlinux.py \
            file://81-edit-sudoers.ks \
            file://81-systemd-preset-all.ks \
@@ -123,7 +123,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f28-relea
            file://0001-pyanaconda-payload-Fix-xserver-detection.patch \
           "
 
-SRCREV = "0b0d2f86b4323e6ee7a186bc8181ffe7553c9235"
+SRCREV = "5c492721676257d239ebc38fbacafc96f944f856"
 
 FILES_${PN}-dbg += "${libexecdir}/anaconda/.debug ${PYTHON_SITEPACKAGES_DIR}/pyanaconda/.debug"
 FILES_${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/pyanaconda/_isys.a"
