@@ -51,7 +51,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-relea
            file://81-systemd-preset-all.ks \
            file://0001-do-not-build-po-and-doc.patch \
            file://0002-do-not-load-the-system-wide-Xresources.patch \
-           file://0006-tweak-iso-mount-dir-and-kernel-name.patch \
+           file://0003-tweak-iso-mount-dir-and-kernel-name.patch \
            file://0007-dnfpayload.py-customize-for-OE.patch \
            file://0008-Remove-unnecessary-noverifyssl-for-http-ftp-protocol.patch \
            file://0009-dynamic-detect-workable-locale.patch \
