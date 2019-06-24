@@ -47,11 +47,9 @@ RDEPENDS_${PN} += "networkmanager \
 "
 
 SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-release \
-           file://wrlinux.py \
            file://81-edit-sudoers.ks \
            file://81-systemd-preset-all.ks \
            file://0001-do-not-build-po-and-doc.patch \
-           file://0004-add-package-site-dir-for-installclass-searching.patch \
            file://0005-do-not-load-the-system-wide-Xresources.patch \
            file://0006-tweak-iso-mount-dir-and-kernel-name.patch \
            file://0007-dnfpayload.py-customize-for-OE.patch \
@@ -152,11 +150,6 @@ do_install_append() {
     install -m 644 ${WORKDIR}/81-systemd-preset-all.ks ${D}${datadir}/anaconda/post-scripts
     install -m 644 ${S}/widgets/src/resources/*.svg ${D}${datadir}/anaconda/pixmaps
     install -m 644 ${S}/widgets/src/resources/*.png ${D}${datadir}/anaconda/pixmaps
-}
-
-addtask do_setupdistro after do_patch before do_configure
-do_setupdistro() {
-    cp ${WORKDIR}/wrlinux.py ${S}/pyanaconda/installclasses/
 }
 
 python __anonymous () {
