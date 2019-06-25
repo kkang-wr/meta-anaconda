@@ -57,7 +57,6 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-relea
            file://0011-disable-audit.patch \
            file://0012-bootloader.py-Change-grub2-settings-to-match-oe-core.patch \
            file://0013-tweak-detect-kernel-version.patch \
-           file://0015-Revert-Use-time.tzset-to-apply-timezone-changes-when.patch \
            file://0016-kickstart-not-support-Authselect-Firewall-Firstboot.patch \
            file://0017-invisible-help-button.patch \
            file://0018-disable-non-implemented-functions.patch \
