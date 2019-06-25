@@ -1,7 +1,7 @@
-From 92843de2055cf45379e3f7e5b4834cb9c14f694d Mon Sep 17 00:00:00 2001
-From: Mark Hatle <mark.hatle@windriver.com>
-Date: Tue, 24 Jul 2018 10:49:10 +0800
-Subject: [PATCH 12/65] bootloader.py: Change 'grub2' settings to match oe-core
+From 421cbf9165aa212174bdaca4419049abfaeea74e Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 25 Jun 2019 14:41:55 +0800
+Subject: [PATCH] bootloader.py: Change 'grub2' settings to match oe-core
 
 There is no 'grub2' package in oe-core, it's called 'grub'.  Adjust settings
 to match this naming.  Also before writing out a variety of configuration
@@ -10,17 +10,19 @@ files, as necessary -- create the directories required.
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 
 Upstream-Status: Inappropriate [oe specific]
-Rebase to f28-release
+Rebase to f30-release
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- pyanaconda/bootloader.py | 31 +++++++++++++++++++++++++------
- 1 file changed, 25 insertions(+), 6 deletions(-)
+ pyanaconda/bootloader/base.py         |  4 ++++
+ pyanaconda/bootloader/grub2.py        | 22 +++++++++++++++-------
+ pyanaconda/bootloader/installation.py |  3 +++
+ 3 files changed, 22 insertions(+), 7 deletions(-)
 
-diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
-index fbf35bb..0c36e8e 100644
---- a/pyanaconda/bootloader.py
-+++ b/pyanaconda/bootloader.py
-@@ -951,6 +951,10 @@ class BootLoader(object):
+diff --git a/pyanaconda/bootloader/base.py b/pyanaconda/bootloader/base.py
+index 447dd05..0550745 100644
+--- a/pyanaconda/bootloader/base.py
++++ b/pyanaconda/bootloader/base.py
+@@ -869,6 +869,10 @@ class BootLoader(object):
              raise BootLoaderError("no config file defined for this boot loader")
  
          config_path = os.path.normpath(util.getSysroot() + self.config_file)
@@ -31,18 +33,11 @@ index fbf35bb..0c36e8e 100644
          if os.access(config_path, os.R_OK):
              os.rename(config_path, config_path + ".anacbak")
  
-@@ -1221,6 +1225,10 @@ class GRUB(BootLoader):
-     def write_device_map(self):
-         """ Write out a device map containing all supported devices. """
-         map_path = os.path.normpath(util.getSysroot() + self.device_map_file)
-+        map_dir = os.path.dirname(map_path)
-+        if not os.path.isdir(map_dir):
-+            os.mkdir(map_dir, 755)
-+
-         if os.access(map_path, os.R_OK):
-             os.rename(map_path, map_path + ".anacbak")
- 
-@@ -1408,9 +1416,9 @@ class GRUB2(GRUB):
+diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
+index 600d2c0..7025b76 100644
+--- a/pyanaconda/bootloader/grub2.py
++++ b/pyanaconda/bootloader/grub2.py
+@@ -98,9 +98,9 @@ class GRUB2(BootLoader):
      name = "GRUB2"
      # grub2 is a virtual provides that's provided by grub2-pc, grub2-ppc64le,
      # and all of the primary grub components that aren't grub2-efi-${EFIARCH}
@@ -54,9 +49,9 @@ index fbf35bb..0c36e8e 100644
      _passwd_file = "user.cfg"
      defaults_file = "/etc/default/grub"
      terminal_type = "console"
-@@ -1470,6 +1478,10 @@ class GRUB2(GRUB):
+@@ -226,6 +226,10 @@ class GRUB2(BootLoader):
      def write_device_map(self):
-         """ Write out a device map containing all supported devices. """
+         """Write out a device map containing all supported devices."""
          map_path = os.path.normpath(util.getSysroot() + self.device_map_file)
 +        map_dir = os.path.dirname(map_path)
 +        if not os.path.isdir(map_dir):
@@ -65,7 +60,7 @@ index fbf35bb..0c36e8e 100644
          if os.access(map_path, os.R_OK):
              os.rename(map_path, map_path + ".anacbak")
  
-@@ -1527,7 +1539,7 @@ class GRUB2(GRUB):
+@@ -290,7 +294,7 @@ class GRUB2(BootLoader):
          passwords = "%s\n%s\n" % (self.password, self.password)
          os.write(pwrite, passwords.encode("utf-8"))
          os.close(pwrite)
@@ -74,7 +69,7 @@ index fbf35bb..0c36e8e 100644
                                     stdin=pread,
                                     root=util.getSysroot())
          os.close(pread)
-@@ -1540,6 +1552,10 @@ class GRUB2(GRUB):
+@@ -303,6 +307,10 @@ class GRUB2(BootLoader):
              return
  
          users_file = "%s%s/%s" % (util.getSysroot(), self.config_dir, self._passwd_file)
@@ -85,14 +80,24 @@ index fbf35bb..0c36e8e 100644
          header = util.open_with_perm(users_file, "w", 0o700)
          # XXX FIXME: document somewhere that the username is "root"
          self._encrypt_password()
-@@ -1572,12 +1588,12 @@ class GRUB2(GRUB):
-                 log.warning("Failed to find default image (%s), defaulting to 0", self.default.label)
-                 default_index = 0
+@@ -336,21 +344,21 @@ class GRUB2(BootLoader):
+                 machine_id = fd.readline().strip()
  
--            rc = util.execInSysroot("grub2-set-default", [str(default_index)])
-+            rc = util.execInSysroot("grub-set-default", [str(default_index)])
+             default_entry = "%s-%s" % (machine_id, self.default.version)
+-            rc = util.execInSysroot("grub2-set-default", [default_entry])
++            rc = util.execInSysroot("grub-set-default", [default_entry])
              if rc:
                  log.error("failed to set default menu entry to %s", productName)
+ 
+         # set menu_auto_hide grubenv variable if we should enable menu_auto_hide
+         # set boot_success so that the menu is hidden on the boot after install
+         if conf.bootloader.menu_auto_hide:
+-            rc = util.execInSysroot("grub2-editenv",
++            rc = util.execInSysroot("grub-editenv",
+                                     ["-", "set", "menu_auto_hide=1",
+                                      "boot_success=1"])
+             if rc:
+                 log.error("failed to set menu_auto_hide=1")
  
          # now tell grub2 to generate the main configuration file
 -        rc = util.execInSysroot("grub2-mkconfig",
@@ -100,7 +105,7 @@ index fbf35bb..0c36e8e 100644
                                  ["-o", self.config_file])
          if rc:
              raise BootLoaderError("failed to write boot loader configuration")
-@@ -1604,7 +1620,7 @@ class GRUB2(GRUB):
+@@ -420,7 +428,7 @@ class GRUB2(BootLoader):
                  else:
                      log.info("bootloader.py: mbr will be updated for grub2")
  
@@ -109,14 +114,18 @@ index fbf35bb..0c36e8e 100644
                                         root=util.getSysroot(),
                                         env_prune=['MALLOC_PERTURB_'])
              if rc:
-@@ -2445,6 +2461,9 @@ def writeSysconfigKernel(storage, version, instClass):
+diff --git a/pyanaconda/bootloader/installation.py b/pyanaconda/bootloader/installation.py
+index 71b18b2..8f6d999 100644
+--- a/pyanaconda/bootloader/installation.py
++++ b/pyanaconda/bootloader/installation.py
+@@ -154,6 +154,9 @@ def _write_sysconfig_kernel(sysroot, storage):
  
      kernel = h.name.decode()
  
 +    if not os.path.isdir(util.getSysroot() + "/etc/sysconfig"):
 +        os.mkdir(util.getSysroot() + "/etc/sysconfig", 755)
 +
-     f = open(util.getSysroot() + "/etc/sysconfig/kernel", "w+")
+     f = open(sysroot + "/etc/sysconfig/kernel", "w+")
      f.write("# UPDATEDEFAULT specifies if new-kernel-pkg should make\n"
              "# new kernels the default\n")
 -- 
