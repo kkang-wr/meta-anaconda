@@ -1,4 +1,4 @@
-From 421cbf9165aa212174bdaca4419049abfaeea74e Mon Sep 17 00:00:00 2001
+From 3dfed14d879e3e42aa988c410c0b5628cfa8ded6 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 25 Jun 2019 14:41:55 +0800
 Subject: [PATCH] bootloader.py: Change 'grub2' settings to match oe-core
@@ -9,14 +9,16 @@ files, as necessary -- create the directories required.
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 
+- tweak grub config file for OE
+
 Upstream-Status: Inappropriate [oe specific]
 Rebase to f30-release
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  pyanaconda/bootloader/base.py         |  4 ++++
- pyanaconda/bootloader/grub2.py        | 22 +++++++++++++++-------
+ pyanaconda/bootloader/grub2.py        | 26 +++++++++++++++++---------
  pyanaconda/bootloader/installation.py |  3 +++
- 3 files changed, 22 insertions(+), 7 deletions(-)
+ 3 files changed, 24 insertions(+), 9 deletions(-)
 
 diff --git a/pyanaconda/bootloader/base.py b/pyanaconda/bootloader/base.py
 index 447dd05..0550745 100644
@@ -34,7 +36,7 @@ index 447dd05..0550745 100644
              os.rename(config_path, config_path + ".anacbak")
  
 diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
-index 600d2c0..7025b76 100644
+index 600d2c0..352ad72 100644
 --- a/pyanaconda/bootloader/grub2.py
 +++ b/pyanaconda/bootloader/grub2.py
 @@ -98,9 +98,9 @@ class GRUB2(BootLoader):
@@ -60,6 +62,18 @@ index 600d2c0..7025b76 100644
          if os.access(map_path, os.R_OK):
              os.rename(map_path, map_path + ".anacbak")
  
+@@ -253,9 +257,9 @@ class GRUB2(BootLoader):
+         defaults_file = "%s%s" % (util.getSysroot(), self.defaults_file)
+         defaults = open(defaults_file, "w+")
+         defaults.write("GRUB_TIMEOUT=%d\n" % self.timeout)
+-        defaults.write("GRUB_DISTRIBUTOR=\"$(sed 's, release .*$,,g' /etc/system-release)\"\n")
++        defaults.write("GRUB_DISTRIBUTOR=\"%s\"\n" % productName)
+         defaults.write("GRUB_DEFAULT=saved\n")
+-        defaults.write("GRUB_DISABLE_SUBMENU=true\n")
++        defaults.write("GRUB_DISABLE_SUBMENU=y\n")
+         if self.console and self.has_serial_console:
+             defaults.write("GRUB_TERMINAL=\"serial console\"\n")
+             defaults.write("GRUB_SERIAL_COMMAND=\"%s\"\n" % self.serial_command)
 @@ -290,7 +294,7 @@ class GRUB2(BootLoader):
          passwords = "%s\n%s\n" % (self.password, self.password)
          os.write(pwrite, passwords.encode("utf-8"))
