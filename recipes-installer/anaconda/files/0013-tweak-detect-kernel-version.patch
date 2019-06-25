@@ -1,7 +1,7 @@
-From d4a9721d71133a5376d45b5406234dff5cbcc12b Mon Sep 17 00:00:00 2001
+From a6ea1bfa11c05082ee061ba1d766f79fbfc77938 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Tue, 24 Jul 2018 11:01:51 +0800
-Subject: [PATCH 13/65] tweak detect kernel version
+Date: Tue, 25 Jun 2019 15:40:11 +0800
+Subject: [PATCH] tweak detect kernel version
 
 According kernel layout in oe-core, tweak the detection
 rather than using redhat's.
@@ -10,88 +10,65 @@ Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- pyanaconda/bootloader.py          | 33 ++++++++++++++++++---------------
- pyanaconda/payload/livepayload.py |  9 +++++++--
- 2 files changed, 25 insertions(+), 17 deletions(-)
+ pyanaconda/bootloader/installation.py | 21 +++++++++++++--------
+ pyanaconda/payload/livepayload.py     | 12 +++++++++---
+ 2 files changed, 22 insertions(+), 11 deletions(-)
 
-diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
-index 0c36e8e..3238b61 100644
---- a/pyanaconda/bootloader.py
-+++ b/pyanaconda/bootloader.py
-@@ -2434,16 +2434,23 @@ def get_bootloader():
+diff --git a/pyanaconda/bootloader/installation.py b/pyanaconda/bootloader/installation.py
+index 8f6d999..b620ab3 100644
+--- a/pyanaconda/bootloader/installation.py
++++ b/pyanaconda/bootloader/installation.py
+@@ -129,14 +129,19 @@ def _write_sysconfig_kernel(sysroot, storage):
+     log.debug("Writing to /etc/sysconfig/kernel.")
  
- def writeSysconfigKernel(storage, version, instClass):
      # get the name of the default kernel package based on the version
--    kernel_basename = "vmlinuz-" + version
+-    kernel_basename = "vmlinuz-" + storage.bootloader.default.version
 -    kernel_file = "/boot/%s" % kernel_basename
--    if not os.path.isfile(util.getSysroot() + kernel_file):
--        efi_dir = instClass.efi_dir
--        if flags.cmdline.get("force_efi_dir") is not None:
--            efi_dir = flags.cmdline.get("force_efi_dir")
+-    if not os.path.isfile(sysroot + kernel_file):
+-        efi_dir = conf.bootloader.efi_dir
 -        kernel_file = "/boot/efi/EFI/%s/%s" % (efi_dir, kernel_basename)
--        if not os.path.isfile(util.getSysroot() + kernel_file):
+-        if not os.path.isfile(sysroot + kernel_file):
 -            log.error("failed to recreate path to default kernel image")
 -            return
-+    for kernel_basename in ["vmlinux", "bzImage"]:
-+        kernel_file = "/boot/%s" % kernel_basename
-+        if os.path.isfile(util.getSysroot() + kernel_file):
-+            break
-+        else:
-+            efi_dir = instClass.efi_dir
-+            if flags.cmdline.get("force_efi_dir") is not None:
-+                efi_dir = flags.cmdline.get("force_efi_dir")
-+            kernel_file = "/boot/efi/EFI/%s/%s" % (efi_dir, kernel_basename)
-+            if not os.path.isfile(util.getSysroot() + kernel_file):
-+                break
++    def _get_kernel_file(kernel_basename):
++        _kernel_file = "/boot/%s" % kernel_basename
++        if not os.path.isfile(sysroot + _kernel_file):
++            efi_dir = conf.bootloader.efi_dir
++            _kernel_file = "/boot/efi/EFI/%s/%s" % (efi_dir, kernel_basename)
++            if not os.path.isfile(sysroot + _kernel_file):
++                return None
++        return _kernel_file
 +
-+        kernel_file = None
-+
++    kernel_file = _get_kernel_file("vmlinux") or _get_kernel_file("bzImage")
 +    if kernel_file is None:
 +        log.error("failed to recreate path to default kernel image")
 +        return
  
      try:
          import rpm
-@@ -2451,6 +2458,7 @@ def writeSysconfigKernel(storage, version, instClass):
-         log.error("failed to import rpm python module")
-         return
- 
-+    log.debug("kernel_file %s" % kernel_file)
-     ts = rpm.TransactionSet(util.getSysroot())
-     mi = ts.dbMatch('basenames', kernel_file)
-     try:
-@@ -2524,11 +2532,6 @@ def writeBootLoader(storage, payload, instClass, ksdata):
-     # add whatever rescue kernels we can find to the end
-     kernel_versions = list(payload.kernelVersionList)
- 
--    rescue_versions = glob(util.getSysroot() + "/boot/vmlinuz-*-rescue-*")
--    rescue_versions += glob(
--        util.getSysroot() + "/boot/efi/EFI/%s/vmlinuz-*-rescue-*" % instClass.efi_dir)
--    kernel_versions += (f.split("/")[-1][8:] for f in rescue_versions)
--
-     if not kernel_versions:
-         log.warning("no kernel was installed -- boot loader config unchanged")
-         return
 diff --git a/pyanaconda/payload/livepayload.py b/pyanaconda/payload/livepayload.py
-index 56f112c..4861887 100644
+index aaafa20..235a3b5 100644
 --- a/pyanaconda/payload/livepayload.py
 +++ b/pyanaconda/payload/livepayload.py
-@@ -191,8 +191,13 @@ class LiveImagePayload(ImagePayload):
+@@ -211,9 +211,15 @@ class LiveImagePayload(Payload):
          return Size(util.getDirSize("/") * 1024)
  
-     def _updateKernelVersionList(self):
+     def _update_kernel_version_list(self):
 -        files = glob.glob(INSTALL_TREE + "/boot/vmlinuz-*")
--        files.extend(glob.glob(INSTALL_TREE + "/boot/efi/EFI/%s/vmlinuz-*" % self.instclass.efi_dir))
+-        files.extend(glob.glob(INSTALL_TREE + "/boot/efi/EFI/%s/vmlinuz-*" %
+-                               conf.bootloader.efi_dir))
 +        for kernel in ["vmlinux", "bzImage"]:
 +            files = glob.glob(INSTALL_TREE + "/boot/%s-*" % kernel)
-+            files.extend(glob.glob(INSTALL_TREE + "/boot/efi/EFI/%s/%s-*" % (self.instclass.efi_dir, kernel)))
++            files.extend(glob.glob(INSTALL_TREE + "/boot/efi/EFI/%s/%s-*" %
++                                   (conf.bootloader.efi_dir, kernel)))
++
 +            versions = sorted((f.split("/")[-1][8:] for f in files if os.path.isfile(f)))
 +            if versions:
 +                log.info("kernel versions: %s", versions)
 +                break
  
-         self._kernelVersionList = sorted((f.split("/")[-1][8:] for f in files
-            if os.path.isfile(f) and "-rescue-" not in f), key=functools.cmp_to_key(versionCmp))
+         self._kernel_version_list = sorted((f.split("/")[-1][8:] for f in files
+                                            if os.path.isfile(f) and "-rescue-" not in f),
 -- 
 2.7.4
 
