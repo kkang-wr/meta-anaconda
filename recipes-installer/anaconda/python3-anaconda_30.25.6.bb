@@ -35,7 +35,7 @@ RDEPENDS_${PN} = "e2fsprogs e2fsprogs-e2fsck e2fsprogs-mke2fs \
                    xrandr glibc-charmaps glibc-localedatas \
                    python3-pytz python3-langtable libpwquality \
                    python3-ntplib libgnomekbd libtimezonemap \
-                   procps python3-prctl rsync glibc-utils python3-pid \
+                   procps rsync glibc-utils python3-pid \
                    python3-ordered-set python3-wrapt python3-coverage \
                    python3-requests-file python3-requests-ftp \
                    python3-blivetgui librsvg librsvg-gtk bash \
@@ -54,7 +54,6 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-relea
            file://0003-tweak-iso-mount-dir-and-kernel-name.patch \
            file://0007-dnfpayload.py-customize-for-OE.patch \
            file://0009-dynamic-detect-workable-locale.patch \
-           file://0010-improve-thread-monitor.patch \
            file://0011-disable-audit.patch \
            file://0012-bootloader.py-Change-grub2-settings-to-match-oe-core.patch \
            file://0013-tweak-detect-kernel-version.patch \
