@@ -42,7 +42,7 @@ RDEPENDS_${PN} = "e2fsprogs e2fsprogs-e2fsck e2fsprogs-mke2fs \
                    python3-systemd python3-pydbus python3-simpleline \
                 "
 
-RDEPENDS_${PN} += "networkmanager libnmutil libnmglib libnmglib-vpn \
+RDEPENDS_${PN} += "networkmanager \
                    network-manager-applet \
 "
 
