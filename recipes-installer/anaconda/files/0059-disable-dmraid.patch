@@ -1,37 +1,24 @@
-From 74ae82bb287a6521a972cd85f41327e064c2541a Mon Sep 17 00:00:00 2001
+From f6bf0fc76221574afcbb2a80aece929bf2ab8a85 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Mon, 30 Jul 2018 14:54:53 +0800
-Subject: [PATCH 59/65] disable dmraid
+Date: Sat, 29 Jun 2019 17:18:42 +0800
+Subject: [PATCH] disable dmraid
 
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- anaconda.py                     | 1 -
- pyanaconda/argument_parsing.py  | 4 ----
- pyanaconda/flags.py             | 1 -
- pyanaconda/storage/osinstall.py | 2 +-
- 4 files changed, 1 insertion(+), 7 deletions(-)
+ pyanaconda/argument_parsing.py            | 4 ----
+ pyanaconda/core/configuration/anaconda.py | 2 +-
+ pyanaconda/storage/initialization.py      | 2 +-
+ 3 files changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/anaconda.py b/anaconda.py
-index 125c2b6..c9e1632 100755
---- a/anaconda.py
-+++ b/anaconda.py
-@@ -448,7 +448,6 @@ if __name__ == "__main__":
-     flags.mpathFriendlyNames = opts.mpathfriendlynames
-     flags.debug = opts.debug
-     flags.askmethod = opts.askmethod
--    flags.dmraid = opts.dmraid
-     flags.mpath = opts.mpath
-     flags.ibft = opts.ibft
-     flags.selinux = opts.selinux
 diff --git a/pyanaconda/argument_parsing.py b/pyanaconda/argument_parsing.py
-index b4c4315..4b5e18c 100644
+index bd1eda8..d4b0b70 100644
 --- a/pyanaconda/argument_parsing.py
 +++ b/pyanaconda/argument_parsing.py
-@@ -500,10 +500,6 @@ def getArgumentParser(version_string, boot_cmdline=None):
-                     help=help_parser.help_text("nompath"))
-     ap.add_argument("--mpath", action="store_true", help=help_parser.help_text("mpath"))
+@@ -520,10 +520,6 @@ def getArgumentParser(version_string, boot_cmdline=None):
+ 
+     ap.add_argument("--gpt", action="store_true", default=False, help=help_parser.help_text("gpt"))
  
 -    ap.add_argument("--nodmraid", dest="dmraid", action="store_false", default=True,
 -                    help=help_parser.help_text("nodmraid"))
@@ -40,31 +27,32 @@ index b4c4315..4b5e18c 100644
      ap.add_argument("--noibft", dest="ibft", action="store_false", default=True,
                      help=help_parser.help_text("noibft"))
      ap.add_argument("--ibft", action="store_true", help=help_parser.help_text("ibft"))
-diff --git a/pyanaconda/flags.py b/pyanaconda/flags.py
-index 2e516f4..eeaf413 100644
---- a/pyanaconda/flags.py
-+++ b/pyanaconda/flags.py
-@@ -49,7 +49,6 @@ class Flags(object):
-         self.usevnc = False
-         self.vncquestion = True
-         self.mpath = True
--        self.dmraid = True
-         self.selinux = SELINUX_DEFAULT
-         self.debug = False
-         self.armPlatform = None
-diff --git a/pyanaconda/storage/osinstall.py b/pyanaconda/storage/osinstall.py
-index d1b2e29..c2036ad 100644
---- a/pyanaconda/storage/osinstall.py
-+++ b/pyanaconda/storage/osinstall.py
-@@ -125,7 +125,7 @@ def update_blivet_flags(blivet_flags, anaconda_flags):  # pylint: disable=redefi
-     blivet_flags.allow_imperfect_devices = anaconda_flags.rescue_mode
+diff --git a/pyanaconda/core/configuration/anaconda.py b/pyanaconda/core/configuration/anaconda.py
+index 71e6e41..b61b634 100644
+--- a/pyanaconda/core/configuration/anaconda.py
++++ b/pyanaconda/core/configuration/anaconda.py
+@@ -228,7 +228,7 @@ class AnacondaConfiguration(Configuration):
+         self.bootloader._set_option("nonibft_iscsi_boot", opts.nonibftiscsiboot)
  
-     blivet_flags.ibft = anaconda_flags.ibft
--    blivet_flags.dmraid = anaconda_flags.dmraid
+         # Set the storage flags.
+-        self.storage._set_option("dmraid", opts.dmraid)
++        self.storage._set_option("dmraid", False)
+         self.storage._set_option("ibft", opts.ibft)
+         self.storage._set_option("gpt", opts.gpt)
+         self.storage._set_option("multipath_friendly_names", opts.multipath_friendly_names)
+diff --git a/pyanaconda/storage/initialization.py b/pyanaconda/storage/initialization.py
+index 729b442..264ebb9 100644
+--- a/pyanaconda/storage/initialization.py
++++ b/pyanaconda/storage/initialization.py
+@@ -58,7 +58,7 @@ def enable_installer_mode():
+     blivet_flags.keep_empty_ext_partitions = False
+     blivet_flags.discard_new = True
+     blivet_flags.selinux = conf.security.selinux
+-    blivet_flags.dmraid = conf.storage.dmraid
 +    blivet_flags.dmraid = False
- 
- 
- def release_from_redhat_release(fn):
+     blivet_flags.ibft = conf.storage.ibft
+     blivet_flags.multipath_friendly_names = conf.storage.multipath_friendly_names
+     blivet_flags.allow_imperfect_devices = conf.storage.allow_imperfect_devices
 -- 
 2.7.4
 
