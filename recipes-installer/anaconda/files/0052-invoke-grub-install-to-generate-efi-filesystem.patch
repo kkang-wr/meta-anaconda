@@ -1,7 +1,7 @@
-From 62ab9a1219ef8b2e38fb8122c54509f849348380 Mon Sep 17 00:00:00 2001
+From 0cc17f41dc2950dedf3c37b72c94c61a278ae5ca Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Tue, 6 Jun 2017 15:40:55 +0800
-Subject: [PATCH 52/65] invoke grub-install to generate efi filesystem
+Date: Sat, 29 Jun 2019 16:42:50 +0800
+Subject: [PATCH] invoke grub-install to generate efi filesystem
 
 Previously, the efi filesystem was from package grub-efi
 which generated at build time.
@@ -12,26 +12,14 @@ Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- pyanaconda/bootloader.py | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ pyanaconda/bootloader/efi.py | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
-index 71a48de..738527b 100644
---- a/pyanaconda/bootloader.py
-+++ b/pyanaconda/bootloader.py
-@@ -1708,6 +1708,11 @@ class EFIBase(object):
-             efi_dir = flags.cmdline.get("force_efi_dir")
-         return "efi/EFI/%s" % (efi_dir,)
- 
-+    @property
-+    def config_file(self):
-+        """ Full path to configuration file. """
-+        return "%s/grub/%s" % (self.config_dir, self._config_file)
-+
-     def efibootmgr(self, *args, **kwargs):
-         if flags.imageInstall or flags.dirInstall:
-             log.info("Skipping efibootmgr for image/directory install.")
-@@ -1797,6 +1802,23 @@ class EFIBase(object):
+diff --git a/pyanaconda/bootloader/efi.py b/pyanaconda/bootloader/efi.py
+index 73d348b..6199b51 100644
+--- a/pyanaconda/bootloader/efi.py
++++ b/pyanaconda/bootloader/efi.py
+@@ -129,6 +129,22 @@ class EFIBase(object):
              self.remove_efi_boot_target()
          self.add_efi_boot_target()
  
@@ -51,10 +39,9 @@ index 71a48de..738527b 100644
 +                                                 ])
 +        if rc:
 +            raise BootLoaderError("boot loader install failed")
-+
  
- class EFIGRUB1(EFIBase, GRUB):
-     packages = ["efibootmgr"]
+ class EFIGRUB(EFIBase, GRUB2):
+     """EFI GRUBv2"""
 -- 
 2.7.4
 
