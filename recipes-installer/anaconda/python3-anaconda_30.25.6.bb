@@ -52,6 +52,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-relea
            file://0001-do-not-build-po-and-doc.patch \
            file://0002-do-not-load-the-system-wide-Xresources.patch \
            file://0003-tweak-iso-mount-dir-and-kernel-name.patch \
+           file://0004-customize-default-option-for-OE.patch \
            file://0007-dnfpayload.py-customize-for-OE.patch \
            file://0009-dynamic-detect-workable-locale.patch \
            file://0011-disable-audit.patch \
@@ -61,7 +62,6 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-relea
            file://0017-invisible-help-button.patch \
            file://0018-disable-non-implemented-functions.patch \
            file://0019-support-UEFI-boot.patch \
-           file://0020-do-not-verify-ssl-certification-by-default.patch \
            file://0021-tweak-default-nfs-mount-point.patch \
            file://0022-fix-quoted-empty-string-failed.patch \
            file://0023-do-not-support-ISO-hold-by-hard-drive-partitions.patch \
