@@ -1,7 +1,7 @@
-From 557f48ab5b08afcb461f3a94891f4ed010da7eea Mon Sep 17 00:00:00 2001
+From 39f89277054a1fde00583299a7fc854f0cba24d1 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Thu, 26 Jul 2018 17:15:14 +0800
-Subject: [PATCH 54/65] tweak MAX_TREEINFO_DOWNLOAD_RETRIES
+Date: Sat, 29 Jun 2019 16:57:15 +0800
+Subject: [PATCH] tweak MAX_TREEINFO_DOWNLOAD_RETRIES
 
 Do not need to retry so many times.
 
@@ -11,26 +11,18 @@ Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- pyanaconda/payload/__init__.py | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ pyanaconda/payload/__init__.py              | 4 ++--
+ pyanaconda/payload/install_tree_metadata.py | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
-index 88a2685..f67a4cd 100644
+index 8b48625..cbe2154 100644
 --- a/pyanaconda/payload/__init__.py
 +++ b/pyanaconda/payload/__init__.py
-@@ -75,7 +75,7 @@ USER_AGENT = "%s (anaconda)/%s" % (productName, productVersion)
+@@ -428,9 +428,9 @@ class Payload(metaclass=ABCMeta):
  
- from distutils.version import LooseVersion
- 
--MAX_TREEINFO_DOWNLOAD_RETRIES = 6
-+MAX_TREEINFO_DOWNLOAD_RETRIES = 1
- 
- 
- def versionCmp(v1, v2):
-@@ -710,9 +710,9 @@ class Payload(object):
-                 version = "rawhide"
-             except configparser.Error:
-                 pass
+         if self._install_tree_metadata:
+             version = self._install_tree_metadata.get_release_version()
 -            log.debug("using treeinfo release version of %s", version)
 +            log.info("using treeinfo release version of %s", version)
          else:
@@ -39,6 +31,19 @@ index 88a2685..f67a4cd 100644
  
          return version
  
+diff --git a/pyanaconda/payload/install_tree_metadata.py b/pyanaconda/payload/install_tree_metadata.py
+index 30abfd6..04799ce 100644
+--- a/pyanaconda/payload/install_tree_metadata.py
++++ b/pyanaconda/payload/install_tree_metadata.py
+@@ -27,7 +27,7 @@ from pyanaconda.core import util, constants
+ from pyanaconda.anaconda_loggers import get_packaging_logger
+ log = get_packaging_logger()
+ 
+-MAX_TREEINFO_DOWNLOAD_RETRIES = 6
++MAX_TREEINFO_DOWNLOAD_RETRIES = 1
+ 
+ 
+ class InstallTreeMetadata(object):
 -- 
 2.7.4
 
