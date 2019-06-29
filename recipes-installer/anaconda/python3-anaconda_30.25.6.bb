@@ -55,6 +55,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-relea
            file://0004-customize-default-option-for-OE.patch \
            file://0007-dnfpayload.py-customize-for-OE.patch \
            file://0009-dynamic-detect-workable-locale.patch \
+           file://0010-reboot-unconditionally.patch \
            file://0011-disable-audit.patch \
            file://0012-bootloader.py-Change-grub2-settings-to-match-oe-core.patch \
            file://0013-tweak-detect-kernel-version.patch \
@@ -72,7 +73,6 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-relea
            file://0029-support-user-account-creation.patch \
            file://0030-detect-existence-of-Xorg.patch \
            file://0031-fix-write-network-conf-failed-while-liveinst.patch \
-           file://0032-revert-commits-to-support-reboot-for-live-installs.patch \
            file://0033-text-repository-setting-do-not-support-local-ISO-fil.patch \
            file://0034-text-repository-setting-support-http-proxy.patch \
            file://0035-set-keyboard-xlayouts-with-us-by-default.patch \
