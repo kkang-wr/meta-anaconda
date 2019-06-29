@@ -1,7 +1,7 @@
-From ef2025d840d75d0bb76fe2d4818f191d4d28234e Mon Sep 17 00:00:00 2001
+From 6ed8ae98a2b2263a83a2c0933772d69b53e96e70 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Mon, 30 Jul 2018 14:47:46 +0800
-Subject: [PATCH 55/65] tweak time setting
+Date: Sat, 29 Jun 2019 17:01:53 +0800
+Subject: [PATCH] tweak time setting
 
 - Unify the gui and tui with the same default timezone setting
 
@@ -17,23 +17,23 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  3 files changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/pyanaconda/core/constants.py b/pyanaconda/core/constants.py
-index f706fc0..cd83920 100644
+index cdf5ef6..5e3cd7b 100644
 --- a/pyanaconda/core/constants.py
 +++ b/pyanaconda/core/constants.py
-@@ -71,6 +71,8 @@ DEFAULT_KEYBOARD = "us"
+@@ -82,6 +82,8 @@ DEFAULT_KEYBOARD = "us"
  
  DRACUT_SHUTDOWN_EJECT = "/run/initramfs/usr/lib/dracut/hooks/shutdown/99anaconda-eject.sh"
  
 +DEFAULT_TZ = "America/New_York"
 +
- # VNC questions
- USEVNC = N_("Start VNC")
- USETEXT = N_("Use text mode")
+ # Help.
+ HELP_DIR = "/usr/share/anaconda/help"
+ HELP_MAIN_PAGE_GUI = "Installation_Guide.xml"
 diff --git a/pyanaconda/ui/gui/spokes/datetime_spoke.py b/pyanaconda/ui/gui/spokes/datetime_spoke.py
-index ab744bd..3850992 100644
+index 98652cf..b312e05 100644
 --- a/pyanaconda/ui/gui/spokes/datetime_spoke.py
 +++ b/pyanaconda/ui/gui/spokes/datetime_spoke.py
-@@ -64,7 +64,7 @@ SERVER_POOL = 1
+@@ -65,7 +65,7 @@ SERVER_POOL = 1
  SERVER_WORKING = 2
  SERVER_USE = 3
  
@@ -43,10 +43,10 @@ index ab744bd..3850992 100644
  SPLIT_NUMBER_SUFFIX_RE = re.compile(r'([^0-9]*)([-+])([0-9]+)')
  
 diff --git a/pyanaconda/ui/tui/spokes/time_spoke.py b/pyanaconda/ui/tui/spokes/time_spoke.py
-index a05316b..593dd51 100644
+index e232344..411186b 100644
 --- a/pyanaconda/ui/tui/spokes/time_spoke.py
 +++ b/pyanaconda/ui/tui/spokes/time_spoke.py
-@@ -202,7 +202,7 @@ class TimeSpoke(FirstbootSpokeMixIn, NormalTUISpoke):
+@@ -201,7 +201,7 @@ class TimeSpoke(FirstbootSpokeMixIn, NormalTUISpoke):
          if kickstart_timezone:
              return _("%s timezone") % kickstart_timezone
          else:
@@ -55,7 +55,7 @@ index a05316b..593dd51 100644
  
      def _summary_text(self):
          """Return summary of current timezone & NTP configuration.
-@@ -246,7 +246,6 @@ class TimeSpoke(FirstbootSpokeMixIn, NormalTUISpoke):
+@@ -245,7 +245,6 @@ class TimeSpoke(FirstbootSpokeMixIn, NormalTUISpoke):
          self._container = ListColumnContainer(1, columns_width=78, spacing=1)
  
          self._container.add(TextWidget(timezone_option), callback=self._timezone_callback)
