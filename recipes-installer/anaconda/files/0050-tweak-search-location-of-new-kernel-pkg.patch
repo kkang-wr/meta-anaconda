@@ -1,7 +1,7 @@
-From e83469b188f500490b6a15cac76e7fa92641bf34 Mon Sep 17 00:00:00 2001
+From 8359a3ebd9fcb5324a645fe147030482f35437b4 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Thu, 1 Jun 2017 17:01:39 +0800
-Subject: [PATCH 50/65] tweak search location of new-kernel-pkg
+Date: Sat, 29 Jun 2019 16:15:14 +0800
+Subject: [PATCH] tweak search location of new-kernel-pkg
 
 In OE, it locates /sbin rather than /usr/sbin
 
@@ -9,22 +9,36 @@ Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- pyanaconda/payload/__init__.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ pyanaconda/payload/__init__.py    | 2 +-
+ pyanaconda/payload/livepayload.py | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
-index bdeb7b8..88a2685 100644
+index 4fb40cb..8b48625 100644
 --- a/pyanaconda/payload/__init__.py
 +++ b/pyanaconda/payload/__init__.py
-@@ -847,7 +847,7 @@ class Payload(object):
+@@ -563,7 +563,7 @@ class Payload(metaclass=ABCMeta):
  
          :returns: None
          """
--        if not os.path.exists(util.getSysroot() + "/usr/sbin/new-kernel-pkg"):
-+        if not os.path.exists(util.getSysroot() + "/sbin/new-kernel-pkg"):
-             log.error("new-kernel-pkg does not exist - grubby wasn't installed?  skipping")
-             return
+-        if os.path.exists(util.getSysroot() + "/usr/sbin/new-kernel-pkg"):
++        if os.path.exists(util.getSysroot() + "/sbin/new-kernel-pkg"):
+             use_dracut = False
+         else:
+             log.warning("new-kernel-pkg does not exist - grubby wasn't installed? "
+diff --git a/pyanaconda/payload/livepayload.py b/pyanaconda/payload/livepayload.py
+index 235a3b5..6a8d345 100644
+--- a/pyanaconda/payload/livepayload.py
++++ b/pyanaconda/payload/livepayload.py
+@@ -200,7 +200,7 @@ class LiveImagePayload(Payload):
+             util.execInSysroot("systemd-machine-id-setup", [])
  
+         for kernel in self.kernel_version_list:
+-            if not os.path.exists(util.getSysroot() + "/usr/sbin/new-kernel-pkg"):
++            if not os.path.exists(util.getSysroot() + "/sbin/new-kernel-pkg"):
+                 log.info("Regenerating BLS info for %s", kernel)
+                 util.execInSysroot("kernel-install", ["add",
+                                                       kernel,
 -- 
 2.7.4
 
