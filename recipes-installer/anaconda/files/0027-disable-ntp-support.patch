@@ -1,7 +1,7 @@
-From 754f8b04817bf4c5b6cb8584c918b1b852717f9b Mon Sep 17 00:00:00 2001
+From 0fad2179c0b760157abcf2ae5ceca7c8f396fadd Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Tue, 24 Jul 2018 14:51:05 +0800
-Subject: [PATCH 27/65] disable ntp support
+Date: Sat, 29 Jun 2019 12:13:28 +0800
+Subject: [PATCH] disable ntp support
 
 The upstream RHEL7 use chrony.service to support ntp,
 it did not exist in oe-core, so remove it.
@@ -18,16 +18,16 @@ Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- pyanaconda/kickstart.py                       | 56 +----------------
+ pyanaconda/kickstart.py                       | 54 +---------------
  pyanaconda/ui/gui/spokes/datetime_spoke.glade | 74 ----------------------
  pyanaconda/ui/gui/spokes/datetime_spoke.py    | 89 ---------------------------
- 3 files changed, 1 insertion(+), 218 deletions(-)
+ 3 files changed, 1 insertion(+), 216 deletions(-)
 
 diff --git a/pyanaconda/kickstart.py b/pyanaconda/kickstart.py
-index e8c5734..d39d121 100644
+index 88d552d..5b69ebb 100644
 --- a/pyanaconda/kickstart.py
 +++ b/pyanaconda/kickstart.py
-@@ -1892,37 +1892,7 @@ class Timezone(RemovedCommand):
+@@ -760,35 +760,7 @@ class Timezone(RemovedCommand):
          return timezone_proxy.GenerateKickstart()
  
      def setup(self, ksdata):
@@ -39,8 +39,7 @@ index e8c5734..d39d121 100644
 -
 -        # do not install and use NTP package
 -        if not timezone_proxy.NTPEnabled or NTP_PACKAGE in ksdata.packages.excludedList:
--            if util.service_running(NTP_SERVICE) and \
--                    can_touch_runtime_system("stop NTP service"):
+-            if util.service_running(NTP_SERVICE) and conf.system.can_set_time_synchronization:
 -                ret = util.stop_service(NTP_SERVICE)
 -                if ret != 0:
 -                    timezone_log.error("Failed to stop NTP service")
@@ -50,8 +49,7 @@ index e8c5734..d39d121 100644
 -                services_proxy.SetDisabledServices(disabled_services)
 -        # install and use NTP package
 -        else:
--            if not util.service_running(NTP_SERVICE) and \
--                    can_touch_runtime_system("start NTP service"):
+-            if not util.service_running(NTP_SERVICE) and conf.system.can_set_time_synchronization:
 -                ret = util.start_service(NTP_SERVICE)
 -                if ret != 0:
 -                    timezone_log.error("Failed to start NTP service")
@@ -64,9 +62,9 @@ index e8c5734..d39d121 100644
 -                services_proxy.SetEnabledServices(enabled_services)
 +        pass
  
-     def execute(self, *args):
+     def execute(self):
          # get the DBus proxies
-@@ -1939,30 +1909,6 @@ class Timezone(RemovedCommand):
+@@ -805,30 +777,6 @@ class Timezone(RemovedCommand):
  
          timezone.write_timezone_config(timezone_proxy, util.getSysroot())
  
@@ -94,8 +92,8 @@ index e8c5734..d39d121 100644
 -                except ntp.NTPconfigError as ntperr:
 -                    timezone_log.warning("Failed to save NTP configuration without chrony package: %s", ntperr)
 -
- class User(commands.user.F24_User):
-     def execute(self, storage, ksdata, instClass, users):
+ class User(COMMANDS.User):
+     def execute(self, storage, ksdata, users):
  
 diff --git a/pyanaconda/ui/gui/spokes/datetime_spoke.glade b/pyanaconda/ui/gui/spokes/datetime_spoke.glade
 index 37c7c6e..875cfea 100644
@@ -183,10 +181,10 @@ index 37c7c6e..875cfea 100644
                          </child>
                        </object>
 diff --git a/pyanaconda/ui/gui/spokes/datetime_spoke.py b/pyanaconda/ui/gui/spokes/datetime_spoke.py
-index 73055d1..e8a47b7 100644
+index 9ce853d..a83c2c9 100644
 --- a/pyanaconda/ui/gui/spokes/datetime_spoke.py
 +++ b/pyanaconda/ui/gui/spokes/datetime_spoke.py
-@@ -497,8 +497,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+@@ -500,8 +500,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
          self._year_format, suffix = formats[widgets.index(year_box)]
          year_label.set_text(suffix)
  
@@ -195,9 +193,9 @@ index 73055d1..e8a47b7 100644
          self._regions_zones = get_all_regions_and_timezones()
  
          # Set the initial sensitivity of the AM/PM toggle based on the time-type selected
-@@ -507,9 +505,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
-         if not flags.can_touch_runtime_system("modify system time and date"):
-             self._set_date_time_setting_sensitive(False)
+@@ -510,9 +508,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+         if not conf.system.can_set_system_clock:
+             self._hide_date_time_setting()
  
 -        self._config_dialog = NTPconfigDialog(self.data, self._timezone_module)
 -        self._config_dialog.initialize()
@@ -205,7 +203,7 @@ index 73055d1..e8a47b7 100644
          threadMgr.add(AnacondaThread(name=constants.THREAD_DATE_TIME,
                                       target=self._initialize))
  
-@@ -597,8 +592,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+@@ -600,8 +595,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
              # TODO: seen should be set from the module
              self._kickstarted = False
  
@@ -214,18 +212,18 @@ index 73055d1..e8a47b7 100644
      def execute(self):
          if self._update_datetime_timer is not None:
              self._update_datetime_timer.cancel()
-@@ -635,20 +628,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+@@ -639,20 +632,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
  
          self._update_datetime()
  
--        has_active_network = nm.nm_is_connected()
+-        has_active_network = self._network_module.proxy.Connected
 -        if not has_active_network:
 -            self._show_no_network_warning()
 -        else:
 -            self.clear_info()
 -            gtk_call_once(self._config_dialog.refresh_servers_state)
 -
--        if flags.can_touch_runtime_system("get NTP service state"):
+-        if conf.system.can_set_time_synchronization:
 -            ntp_working = has_active_network and util.service_running(NTP_SERVICE)
 -        else:
 -            ntp_working = self._timezone_module.proxy.NTPEnabled
@@ -235,10 +233,11 @@ index 73055d1..e8a47b7 100644
      @async_action_wait
      def _set_timezone(self, timezone):
          """
-@@ -1100,71 +1079,3 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+@@ -1111,71 +1090,3 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+         #contains all date/time setting widgets
          footer_alignment = self.builder.get_object("footerAlignment")
          footer_alignment.set_sensitive(sensitive)
- 
+-
 -    def _show_no_network_warning(self):
 -        self.set_warning(_("You need to set up networking first if you "\
 -                           "want to use NTP"))
@@ -249,11 +248,11 @@ index 73055d1..e8a47b7 100644
 -    def on_ntp_switched(self, switch, *args):
 -        if switch.get_active():
 -            #turned ON
--            if not flags.can_touch_runtime_system("start NTP service"):
+-            if not conf.system.can_set_time_synchronization:
 -                #cannot touch runtime system, not much to do here
 -                return
 -
--            if not nm.nm_is_connected():
+-            if not self._network_module.proxy.Connected:
 -                self._show_no_network_warning()
 -                switch.set_active(False)
 -                return
@@ -278,7 +277,7 @@ index 73055d1..e8a47b7 100644
 -
 -        else:
 -            #turned OFF
--            if not flags.can_touch_runtime_system("stop NTP service"):
+-            if not conf.system.can_set_time_synchronization:
 -                #cannot touch runtime system, nothing to do here
 -                return
 -
@@ -306,7 +305,6 @@ index 73055d1..e8a47b7 100644
 -                self._show_no_ntp_server_warning()
 -            else:
 -                self.clear_info()
--
 -- 
 2.7.4
 
