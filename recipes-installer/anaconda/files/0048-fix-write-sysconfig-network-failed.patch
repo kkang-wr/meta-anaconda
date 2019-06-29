@@ -1,7 +1,7 @@
-From e7cd81f9fb98e09749469b9998362d74142b1c37 Mon Sep 17 00:00:00 2001
+From 1fca80cf33e1564295cbb38c62bd4c7738bc6d02 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Mon, 24 Oct 2016 05:28:01 -0400
-Subject: [PATCH 48/65] fix write sysconfig network failed
+Date: Sat, 29 Jun 2019 16:07:56 +0800
+Subject: [PATCH] fix write sysconfig network failed
 
 While target does not have sysconfig, the anaconda should not
 write sysconfig network.
@@ -10,23 +10,23 @@ Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- pyanaconda/network.py | 3 +++
+ pyanaconda/modules/network/installation.py | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/pyanaconda/network.py b/pyanaconda/network.py
-index 6eb08d4..e409b70 100644
---- a/pyanaconda/network.py
-+++ b/pyanaconda/network.py
-@@ -1356,6 +1356,9 @@ def usedByFCoE(iface, storage):
- 
- def write_sysconfig_network(rootpath, overwrite=False):
- 
-+    if (not os.path.isdir(rootpath + sysconfigDir)):
-+        return False
+diff --git a/pyanaconda/modules/network/installation.py b/pyanaconda/modules/network/installation.py
+index c063c4e..bf9b931 100644
+--- a/pyanaconda/modules/network/installation.py
++++ b/pyanaconda/modules/network/installation.py
+@@ -114,6 +114,9 @@ Name={}
+         :param overwrite: overwrite existing configuration file
+         :type overwrite: bool
+         """
++        if (not os.path.isdir(root + "/etc/sysconfig")):
++            return False
 +
-     cfgfile = os.path.normpath(rootpath + networkConfFile)
-     if (os.path.isfile(cfgfile) and not overwrite):
-         return False
+         return self._write_config_file(root, self.SYSCONF_NETWORK_FILE_PATH,
+                                        "# Created by anaconda\n",
+                                        "Cannot write {} configuration file".format(
 -- 
 2.7.4
 
