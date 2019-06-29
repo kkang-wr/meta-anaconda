@@ -1,25 +1,27 @@
-From 9a5284a3de79cfe9bceb6daf434b4cc0cb7dbdf4 Mon Sep 17 00:00:00 2001
+From 367fc710a94d802ace273c7aebb8f5f96647370b Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 24 Jun 2019 14:45:50 +0800
-Subject: [PATCH 3/3] tweak iso mount dir and kernel name
+Subject: [PATCH] tweak iso mount dir and kernel name
 
 - Tweak iso mount dir based on WRLinux
 
 - Tweak kernel name based on OE
 
+- Tweak nfs mount point of base repository to "/media/source"
+
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- pyanaconda/core/constants.py   |  4 ++--
+ pyanaconda/core/constants.py   |  6 +++---
  pyanaconda/payload/__init__.py | 18 +++++++++++-------
- 2 files changed, 13 insertions(+), 9 deletions(-)
+ 2 files changed, 14 insertions(+), 10 deletions(-)
 
 diff --git a/pyanaconda/core/constants.py b/pyanaconda/core/constants.py
-index 8910d48..5322a82 100644
+index 8910d48..cdf5ef6 100644
 --- a/pyanaconda/core/constants.py
 +++ b/pyanaconda/core/constants.py
-@@ -52,8 +52,8 @@ TRANSLATIONS_UPDATE_DIR = "/tmp/updates/po"
+@@ -52,12 +52,12 @@ TRANSLATIONS_UPDATE_DIR = "/tmp/updates/po"
  VIRTIO_PORT = "/dev/virtio-ports/org.fedoraproject.anaconda.log.0"
  
  ANACONDA_CLEANUP = "anaconda-cleanup"
@@ -30,6 +32,11 @@ index 8910d48..5322a82 100644
  DRACUT_ISODIR = "/run/install/source"
  ISO_DIR = MOUNT_DIR + "/isodir"
  IMAGE_DIR = MOUNT_DIR + "/image"
+-INSTALL_TREE = MOUNT_DIR + "/source"
++INSTALL_TREE = "/media/source"
+ BASE_REPO_NAME = "anaconda"
+ 
+ # Get list of repo names witch should be used as base repo
 diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
 index 849b424..7c65d29 100644
 --- a/pyanaconda/payload/__init__.py
