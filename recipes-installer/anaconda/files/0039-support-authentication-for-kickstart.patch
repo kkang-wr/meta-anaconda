@@ -1,7 +1,7 @@
-From f32223cf278a49c8a89e0b9df8d2cac2fd12def5 Mon Sep 17 00:00:00 2001
+From 0a8021958ea816fcc033da01ed5a4d882f39086c Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Tue, 24 Jul 2018 17:31:41 +0800
-Subject: [PATCH 39/65] support authentication for kickstart
+Date: Sat, 29 Jun 2019 14:46:57 +0800
+Subject: [PATCH] support authentication for kickstart
 
 We add option 'ksuser' and 'kspasswd' in /proc/cmdline to support
 authentication while downloading kickstart from web server.
@@ -10,54 +10,41 @@ Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- pyanaconda/flags.py                                | 11 +++++++
+ pyanaconda/flags.py                                |  5 +++
  pyanaconda/kickstart.py                            | 37 +++++++++++++++++++---
  .../modules/boss/kickstart_manager/parser.py       | 10 +++---
- 3 files changed, 48 insertions(+), 10 deletions(-)
+ 3 files changed, 42 insertions(+), 10 deletions(-)
 
 diff --git a/pyanaconda/flags.py b/pyanaconda/flags.py
-index d797d2c..2e516f4 100644
+index 0a98d2c..05442d0 100644
 --- a/pyanaconda/flags.py
 +++ b/pyanaconda/flags.py
-@@ -71,6 +71,11 @@ class Flags(object):
-         self.rescue_mode = False
-         self.noefi = False
-         self.kexec = False
+@@ -59,6 +59,11 @@ class Flags(object):
+         self.environs = [ANACONDA_ENVIRON]
+         # parse the boot commandline
+         self.cmdline = KernelArguments.from_defaults()
 +
 +        # Authentication for downloading kickstart file through http
-+        self.ksuser = None
-+        self.kspasswd = None
++        self.ksuser = self.cmdline.get('ksuser', None)
++        self.kspasswd = self.cmdline.get('kspasswd', None)
 +
-         # nosave options
-         self.nosave_input_ks = False
-         self.nosave_output_ks = False
-@@ -93,6 +98,12 @@ class Flags(object):
-                   "nombr", "gpt", "noefi"):
-             self.set_cmdline_bool(f)
- 
-+        if "ksuser" in self.cmdline:
-+            self.ksuser = self.cmdline['ksuser']
-+
-+        if "kspasswd" in self.cmdline:
-+            self.kspasswd = self.cmdline['kspasswd']
-+
-         if not os.path.exists("/selinux/load"):
-             self.selinux = 0
+         # Lock it down: no more creating new flags!
+         self.__dict__['_in_init'] = False
  
 diff --git a/pyanaconda/kickstart.py b/pyanaconda/kickstart.py
-index d39d121..9ffc685 100644
+index 5b69ebb..5108a5a 100644
 --- a/pyanaconda/kickstart.py
 +++ b/pyanaconda/kickstart.py
-@@ -80,7 +80,7 @@ from pykickstart.options import KSOptionParser
+@@ -60,7 +60,7 @@ from pyanaconda.timezone import NTP_PACKAGE, NTP_SERVICE
+ from pykickstart.base import BaseHandler, KickstartCommand
  from pykickstart.constants import KS_SCRIPT_POST, KS_SCRIPT_PRE, KS_SCRIPT_TRACEBACK, \
-     KS_SCRIPT_PREINSTALL, SELINUX_DISABLED, SELINUX_ENFORCING, SELINUX_PERMISSIVE, \
-     SNAPSHOT_WHEN_POST_INSTALL, SNAPSHOT_WHEN_PRE_INSTALL
+     KS_SCRIPT_PREINSTALL, SELINUX_DISABLED, SELINUX_ENFORCING, SELINUX_PERMISSIVE
 -from pykickstart.errors import KickstartError, KickstartParseError
 +from pykickstart.errors import KickstartError, KickstartParseError, KickstartAuthError
  from pykickstart.parser import KickstartParser
  from pykickstart.parser import Script as KSScript
  from pykickstart.sections import NullSection, PackageSection, PostScriptSection, PreScriptSection, PreInstallScriptSection, \
-@@ -2387,8 +2387,35 @@ class AnacondaKSHandler(superclass):
+@@ -1016,8 +1016,35 @@ class AnacondaKSHandler(superclass):
      def __str__(self):
          return super().__str__() + "\n" + str(self.addons) + str(self.anaconda)
  
@@ -95,7 +82,7 @@ index d39d121..9ffc685 100644
      # sets them up to be run.  All other scripts and commands are ignored.
      def __init__(self, handler, followIncludes=True, errorsAreFatal=True,
                   missingIncludeIsFatal=True):
-@@ -2408,7 +2435,7 @@ class AnacondaPreParser(KickstartParser):
+@@ -1037,7 +1064,7 @@ class AnacondaPreParser(KickstartParser):
          self.registerSection(NullSection(self.handler.anaconda, sectionOpen="%anaconda"))
  
  
@@ -104,7 +91,7 @@ index d39d121..9ffc685 100644
      def __init__(self, handler, followIncludes=True, errorsAreFatal=True,
                   missingIncludeIsFatal=True, scriptClass=AnacondaKSScript):
          self.scriptClass = scriptClass
-@@ -2418,7 +2445,7 @@ class AnacondaKSParser(KickstartParser):
+@@ -1047,7 +1074,7 @@ class AnacondaKSParser(KickstartParser):
          if not self.handler:
              return
  
