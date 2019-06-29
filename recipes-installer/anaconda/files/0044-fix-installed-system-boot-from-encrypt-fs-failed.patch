@@ -1,7 +1,7 @@
-From 69afaedf6462cd19689f743bc26e2ce7968a5f3d Mon Sep 17 00:00:00 2001
+From fc8f50947ecb274ee125fb3e09c3cd947357c34d Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Wed, 25 Jul 2018 10:31:27 +0800
-Subject: [PATCH 44/65] fix installed system boot from encrypt fs failed
+Date: Sat, 29 Jun 2019 15:52:02 +0800
+Subject: [PATCH] fix installed system boot from encrypt fs failed
 
 1. While using cryptsetup to encrypt filesystem, it failed to boot
 installed system.
@@ -28,14 +28,14 @@ Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- pyanaconda/payload/__init__.py | 6 ++++++
- 1 file changed, 6 insertions(+)
+ pyanaconda/payload/__init__.py | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
-index c3a74d5..bdeb7b8 100644
+index 0da743e..4fb40cb 100644
 --- a/pyanaconda/payload/__init__.py
 +++ b/pyanaconda/payload/__init__.py
-@@ -855,6 +855,12 @@ class Payload(object):
+@@ -574,6 +574,11 @@ class Payload(metaclass=ABCMeta):
          for subdir in ["log", "tmp"]:
              util.mkdirChain(util.getSysroot() + "/var/volatile/%s" % subdir)
  
@@ -44,10 +44,9 @@ index c3a74d5..bdeb7b8 100644
 +            f.write('add_drivers+=" aes_x86_64"\n')
 +            f.write('omit_dracutmodules+=" systemd"\n')
 +
-+
-         for kernel in self.kernelVersionList:
+         for kernel in self.kernel_version_list:
              log.info("recreating initrd for %s", kernel)
-             if not flags.imageInstall:
+             if not conf.target.is_image:
 -- 
 2.7.4
 
