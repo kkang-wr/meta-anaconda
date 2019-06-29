@@ -1,7 +1,7 @@
-From 7ce367bf497465e4a6360bd112ffba025e42541d Mon Sep 17 00:00:00 2001
+From 456d86d674863a5697635bcda4e89b3e3411dd51 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Tue, 24 Jul 2018 15:10:57 +0800
-Subject: [PATCH 31/65] fix write network conf failed while liveinst
+Date: Sat, 29 Jun 2019 12:27:35 +0800
+Subject: [PATCH] fix write network conf failed while liveinst
 
 While liveinst, the network conf writing will overwrite copy
 "/etc/resolv.conf" to "/mnt/sysimage/etc/resolv.conf". But in
@@ -12,28 +12,28 @@ Test same file before copy.
 
 Upstream-Status: Pending
 
-Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+iigned-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  pyanaconda/network.py | 7 +++++++
  1 file changed, 7 insertions(+)
 
 diff --git a/pyanaconda/network.py b/pyanaconda/network.py
-index d5b0aa7..6eb08d4 100644
+index c4bc57d..a59e980 100644
 --- a/pyanaconda/network.py
 +++ b/pyanaconda/network.py
-@@ -1214,6 +1214,13 @@ def copyFileToPath(fileName, destPath='', overwrite=False):
-         return False
-     if not os.path.isdir(os.path.dirname(destfile)):
-         util.mkdirChain(os.path.dirname(destfile))
+@@ -282,6 +282,13 @@ def copy_resolv_conf_to_root(root=""):
+     dst_dir = os.path.dirname(dst)
+     if not os.path.isdir(dst_dir):
+         util.mkdirChain(dst_dir)
 +
 +    # Same file test
-+    if os.path.exists(fileName) and os.path.exists(destfile) and \
-+       os.stat(fileName).st_ino == os.stat(destfile).st_ino:
-+        log.info("%s and %s are the same file" % (fileName, destfile))
-+        return False
++    if os.path.exists(src) and os.path.exists(dst) and \
++       os.stat(src).st_ino == os.stat(dst).st_ino:
++        log.info("%s and %s are the same file" % (src, dst))
++        return
 +
-     shutil.copy(fileName, destfile)
-     return True
+     shutil.copyfile(src, dst)
+ 
  
 -- 
 2.7.4
