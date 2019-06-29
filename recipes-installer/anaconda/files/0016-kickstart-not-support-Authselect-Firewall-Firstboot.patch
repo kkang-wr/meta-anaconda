@@ -1,7 +1,7 @@
-From 3b8298c75984cf00dc68bf2582d6683509502bd5 Mon Sep 17 00:00:00 2001
+From 000d48992bc7b9bfc8956f5393dcc83d0126a801 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Tue, 24 Jul 2018 11:25:06 +0800
-Subject: [PATCH 16/65] kickstart: not support Authselect/Firewall/Firstboot
+Date: Sat, 29 Jun 2019 10:55:32 +0800
+Subject: [PATCH] kickstart: not support Authselect/Firewall/Firstboot
 
 We do not support kickstart for now
 
@@ -14,25 +14,25 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  2 files changed, 13 deletions(-)
 
 diff --git a/pyanaconda/installation.py b/pyanaconda/installation.py
-index e6c2b9a..f1cc401 100644
+index da5b4e2..9eb40b3 100644
 --- a/pyanaconda/installation.py
 +++ b/pyanaconda/installation.py
-@@ -86,14 +86,10 @@ def doConfiguration(storage, payload, ksdata, instClass):
+@@ -93,14 +93,10 @@ def doConfiguration(storage, payload, ksdata):
  
      # schedule the execute methods of ksdata that require an installed system to be present
      os_config = TaskQueue("Installed system configuration", N_("Configuring installed system"))
--    os_config.append(Task("Configure authselect", ksdata.authselect.execute, (storage, ksdata, instClass)))
--    os_config.append(Task("Configure SELinux", ksdata.selinux.execute, (storage, ksdata, instClass)))
--    os_config.append(Task("Configure first boot tasks", ksdata.firstboot.execute, (storage, ksdata, instClass)))
-     os_config.append(Task("Configure services", ksdata.services.execute, (storage, ksdata, instClass)))
-     os_config.append(Task("Configure keyboard", ksdata.keyboard.execute, (storage, ksdata, instClass)))
-     os_config.append(Task("Configure timezone", ksdata.timezone.execute, (storage, ksdata, instClass)))
-     os_config.append(Task("Configure language", ksdata.lang.execute, (storage, ksdata, instClass)))
--    os_config.append(Task("Configure firewall", ksdata.firewall.execute, (storage, ksdata, instClass)))
-     os_config.append(Task("Configure X", ksdata.xconfig.execute, (storage, ksdata, instClass)))
+-    os_config.append(Task("Configure authselect", ksdata.authselect.execute))
+-    os_config.append(Task("Configure SELinux", ksdata.selinux.execute))
+-    os_config.append(Task("Configure first boot tasks", ksdata.firstboot.execute))
+     os_config.append(Task("Configure services", ksdata.services.execute))
+     os_config.append(Task("Configure keyboard", ksdata.keyboard.execute))
+     os_config.append(Task("Configure timezone", ksdata.timezone.execute))
+     os_config.append(Task("Configure language", ksdata.lang.execute))
+-    os_config.append(Task("Configure firewall", ksdata.firewall.execute))
+     os_config.append(Task("Configure X", ksdata.xconfig.execute))
      configuration_queue.append(os_config)
  
-@@ -287,8 +283,6 @@ def doInstall(storage, payload, ksdata, instClass):
+@@ -304,8 +300,6 @@ def doInstall(storage, payload, ksdata):
  
      # Check for other possibly needed additional packages.
      pre_install = TaskQueue("Pre install tasks", N_("Running pre-installation tasks"))
@@ -41,7 +41,7 @@ index e6c2b9a..f1cc401 100644
      pre_install.append(Task("Setup network", ksdata.network.setup))
      # Setup timezone and add chrony as package if timezone was set in KS
      # and "-chrony" wasn't in packages section and/or --nontp wasn't set.
-@@ -307,8 +301,6 @@ def doInstall(storage, payload, ksdata, instClass):
+@@ -324,8 +318,6 @@ def doInstall(storage, payload, ksdata):
          # to finish setting up the system.
          payload.requirements.add_packages(storage.packages, reason="storage")
          payload.requirements.add_packages(ksdata.realm.packages, reason="realm")
@@ -51,10 +51,10 @@ index e6c2b9a..f1cc401 100644
          payload.requirements.add_packages(ksdata.timezone.packages, reason="ntp", strong=False)
  
 diff --git a/pyanaconda/kickstart.py b/pyanaconda/kickstart.py
-index 2c398b2..e8c5734 100644
+index 07c3c53..88d552d 100644
 --- a/pyanaconda/kickstart.py
 +++ b/pyanaconda/kickstart.py
-@@ -2349,17 +2349,12 @@ class AnacondaSection(Section):
+@@ -983,17 +983,12 @@ class AnacondaSection(Section):
  # This is just the latest entry from pykickstart.handlers.control with all the
  # classes we're overriding in place of the defaults.
  commandMap = {
@@ -63,10 +63,10 @@ index 2c398b2..e8c5734 100644
 -    "authselect": Authselect,
      "autopart": AutoPart,
      "btrfs": BTRFS,
-     "bootloader": Bootloader,
+     "bootloader": UselessCommand,
      "clearpart": ClearPart,
      "eula": Eula,
-     "fcoe": Fcoe,
+     "fcoe": UselessCommand,
 -    "firewall": Firewall,
 -    "firstboot": Firstboot,
      "group": Group,
