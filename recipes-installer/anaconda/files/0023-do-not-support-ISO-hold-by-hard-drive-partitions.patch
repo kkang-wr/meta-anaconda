@@ -1,7 +1,7 @@
-From da8dfe172f740fdfacf1b4e52fa7a02998d388a1 Mon Sep 17 00:00:00 2001
+From 2b351b588a63bff62c22ee916c7b589c056fdb2f Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Tue, 24 Jul 2018 14:17:37 +0800
-Subject: [PATCH 23/65] do not support ISO hold by hard drive partitions
+Date: Sat, 29 Jun 2019 11:42:47 +0800
+Subject: [PATCH] do not support ISO hold by hard drive partitions
 
 We do not plan to have hard drive partitions to hold an ISO.
 
@@ -13,19 +13,19 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/pyanaconda/ui/gui/spokes/installation_source.py b/pyanaconda/ui/gui/spokes/installation_source.py
-index 50dd7de..89e51b5 100644
+index 74338aa..6fddfd7 100644
 --- a/pyanaconda/ui/gui/spokes/installation_source.py
 +++ b/pyanaconda/ui/gui/spokes/installation_source.py
-@@ -853,7 +853,8 @@ class SourceSpoke(NormalSpoke, GUISpokeInputCheckHandler):
+@@ -939,7 +939,8 @@ class SourceSpoke(NormalSpoke, GUISpokeInputCheckHandler):
              added = True
              idx += 1
  
 -        # Again, only display these widgets if an HDISO source was found.
 +        # Do not support an HDISO source.
 +        added = False
-         self._isoBox.set_no_show_all(not added)
-         self._isoBox.set_visible(added)
-         self._isoButton.set_no_show_all(not added)
+         self._iso_box.set_no_show_all(not added)
+         self._iso_box.set_visible(added)
+         self._iso_button.set_no_show_all(not added)
 -- 
 2.7.4
 
