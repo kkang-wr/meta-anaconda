@@ -1,7 +1,7 @@
-From 3a62734e0695c81f6a82cf1132d3337b2a08442e Mon Sep 17 00:00:00 2001
+From fe670d289e09d807fb760194290fbb35ab6230a5 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Mon, 19 Jun 2017 14:55:45 +0800
-Subject: [PATCH 56/65] Add dracut args for /home to bootloader
+Date: Sat, 29 Jun 2019 17:06:24 +0800
+Subject: [PATCH] Add dracut args for /home to bootloader
 
 When /home is on a separate device like LVM or RAID dracut needs
 to know about this so add the needed rd.* parameters to the cmdline.
@@ -11,14 +11,14 @@ Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- pyanaconda/bootloader.py | 5 +++++
+ pyanaconda/bootloader/base.py | 5 +++++
  1 file changed, 5 insertions(+)
 
-diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
-index 738527b..eb787c5 100644
---- a/pyanaconda/bootloader.py
-+++ b/pyanaconda/bootloader.py
-@@ -805,6 +805,11 @@ class BootLoader(object):
+diff --git a/pyanaconda/bootloader/base.py b/pyanaconda/bootloader/base.py
+index 0550745..d7506ac 100644
+--- a/pyanaconda/bootloader/base.py
++++ b/pyanaconda/bootloader/base.py
+@@ -729,6 +729,11 @@ class BootLoader(object):
          if usr_device:
              dracut_devices.extend([usr_device])
  
@@ -27,9 +27,9 @@ index 738527b..eb787c5 100644
 +        if home_device:
 +            dracut_devices.extend([home_device])
 +
-         netdevs = [d for d in storage.devices if (getattr(d, "complete", True) and
-                    isinstance(d, NetworkStorageDevice))]
-         rootdev = storage.root_device
+         netdevs = [d for d in storage.devices \
+                    if (getattr(d, "complete", True) and
+                        isinstance(d, NetworkStorageDevice))]
 -- 
 2.7.4
 
