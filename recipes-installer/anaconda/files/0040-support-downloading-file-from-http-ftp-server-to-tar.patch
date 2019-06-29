@@ -1,8 +1,7 @@
-From aa5ea48ea8a6f1063c39672227f90a6f20b1d318 Mon Sep 17 00:00:00 2001
+From 7c7a6e75fe96dfcc53f18a90dcd4e3f5ced7cea8 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Tue, 24 Jul 2018 17:39:58 +0800
-Subject: [PATCH 40/65] support downloading file from http/ftp server to target
- image
+Date: Sat, 29 Jun 2019 15:06:40 +0800
+Subject: [PATCH] support downloading file from http/ftp server to target image
 
 Add key in kickstart to support downloading file from http/ftp server to target image,
 'download --dest=[file://dir/filename|/dir/filename] --src=[http url| ftp url]'
@@ -25,23 +24,23 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  2 files changed, 100 insertions(+)
 
 diff --git a/pyanaconda/installation.py b/pyanaconda/installation.py
-index 3672fae..f600595 100644
+index 0423a3d..a7a1d88 100644
 --- a/pyanaconda/installation.py
 +++ b/pyanaconda/installation.py
-@@ -94,6 +94,7 @@ def doConfiguration(storage, payload, ksdata, instClass):
-     os_config.append(Task("Configure timezone", ksdata.timezone.execute, (storage, ksdata, instClass)))
-     os_config.append(Task("Configure language", ksdata.lang.execute, (storage, ksdata, instClass)))
-     os_config.append(Task("Configure X", ksdata.xconfig.execute, (storage, ksdata, instClass)))
-+    os_config.append(Task("Configure download", ksdata.download.execute, (storage, ksdata, instClass)))
+@@ -101,6 +101,7 @@ def doConfiguration(storage, payload, ksdata):
+     os_config.append(Task("Configure timezone", ksdata.timezone.execute))
+     os_config.append(Task("Configure language", ksdata.lang.execute))
+     os_config.append(Task("Configure X", ksdata.xconfig.execute))
++    os_config.append(Task("Configure download", ksdata.download.execute, (ksdata,)))
      configuration_queue.append(os_config)
  
      # schedule network configuration (if required)
 diff --git a/pyanaconda/kickstart.py b/pyanaconda/kickstart.py
-index 9ffc685..3e6505e 100644
+index 5108a5a..5f8a050 100644
 --- a/pyanaconda/kickstart.py
 +++ b/pyanaconda/kickstart.py
-@@ -82,6 +82,8 @@ from pykickstart.constants import KS_SCRIPT_POST, KS_SCRIPT_PRE, KS_SCRIPT_TRACE
-     SNAPSHOT_WHEN_POST_INSTALL, SNAPSHOT_WHEN_PRE_INSTALL
+@@ -62,6 +62,8 @@ from pykickstart.constants import KS_SCRIPT_POST, KS_SCRIPT_PRE, KS_SCRIPT_TRACE
+     KS_SCRIPT_PREINSTALL, SELINUX_DISABLED, SELINUX_ENFORCING, SELINUX_PERMISSIVE
  from pykickstart.errors import KickstartError, KickstartParseError, KickstartAuthError
  from pykickstart.parser import KickstartParser
 +from pykickstart.base import KickstartCommand, BaseData
@@ -49,9 +48,9 @@ index 9ffc685..3e6505e 100644
  from pykickstart.parser import Script as KSScript
  from pykickstart.sections import NullSection, PackageSection, PostScriptSection, PreScriptSection, PreInstallScriptSection, \
                                   OnErrorScriptSection, TracebackScriptSection, Section
-@@ -2190,6 +2192,101 @@ class Upgrade(commands.upgrade.F20_Upgrade):
-         util.ipmi_report(IPMI_ABORTED)
-         sys.exit(1)
+@@ -924,6 +926,101 @@ class AnacondaSection(Section):
+         """Let %anaconda know no additional data will come."""
+         Section.finalize(self)
  
 +class DownloadData(BaseData):
 +    removedKeywords = BaseData.removedKeywords
@@ -92,9 +91,9 @@ index 9ffc685..3e6505e 100644
 +        return retval
 +
 +    def _getParser(self):
-+        op = KSOptionParser(prog="download", version=F28, description="")
-+        op.add_argument("--dest", dest="dest", version=F28, required=True, help="")
-+        op.add_argument("--src", dest="src", version=F28, required=True, help="")
++        op = KSOptionParser(prog="download", version=VERSION, description="")
++        op.add_argument("--dest", dest="dest", version=VERSION, required=True, help="")
++        op.add_argument("--src", dest="src", version=VERSION, required=True, help="")
 +
 +        return op
 +
@@ -118,7 +117,7 @@ index 9ffc685..3e6505e 100644
 +    def dataClass(self):
 +        return self.handler.DownloadData
 +
-+    def execute(self, storage, ksdata, instClass):
++    def execute(self, ksdata):
 +        if not ksdata.download:
 +            return
 +
@@ -149,24 +148,21 @@ index 9ffc685..3e6505e 100644
 +
 +
  ###
- ### %anaconda Section
+ ### HANDLERS
  ###
-@@ -2329,6 +2426,7 @@ commandMap = {
+@@ -965,10 +1062,12 @@ commandMap = {
      "xconfig": XConfig,
      "zerombr": UselessCommand,
-     "zfcp": ZFCP,
+     "zfcp": UselessCommand,
 +    "download": Download,
  }
  
  dataMap = {
-@@ -2340,6 +2438,7 @@ dataMap = {
      "RepoData": RepoData,
-     "SnapshotData": SnapshotData,
-     "VolGroupData": VolGroupData,
 +    "DownloadData": DownloadData,
  }
  
- superclass = returnClassForVersion(version=F28)
+ superclass = returnClassForVersion(VERSION)
 -- 
 2.7.4
 
