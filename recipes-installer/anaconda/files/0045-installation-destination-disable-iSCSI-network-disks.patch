@@ -1,7 +1,7 @@
-From 4d9cd36f387cab04469ccff5487a812341502e02 Mon Sep 17 00:00:00 2001
+From 2f12e1cba5948c0062659b26a9a3faf434abef6f Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Thu, 1 Jun 2017 14:35:52 +0800
-Subject: [PATCH 45/65] installation destination: disable iSCSI network disks
+Date: Sat, 29 Jun 2019 15:55:56 +0800
+Subject: [PATCH] installation destination: disable iSCSI network disks
 
 WRLinux does not support it.
 
@@ -13,17 +13,17 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/pyanaconda/ui/gui/spokes/storage.py b/pyanaconda/ui/gui/spokes/storage.py
-index 63aca8e..3469485 100644
+index 241cfbe..090953e 100644
 --- a/pyanaconda/ui/gui/spokes/storage.py
 +++ b/pyanaconda/ui/gui/spokes/storage.py
-@@ -821,6 +821,7 @@ class StorageSpoke(NormalSpoke, StorageCheckHandler):
-         self.builder.get_object("local_untouched_label_revealer").set_reveal_child(anySelected)
-         self.builder.get_object("special_untouched_label_revealer").set_reveal_child(anySelected)
-         self.builder.get_object("other_options_grid").set_sensitive(anySelected)
+@@ -771,6 +771,7 @@ class StorageSpoke(NormalSpoke, StorageCheckHandler):
+         self.builder.get_object("local_untouched_label_revealer").set_reveal_child(is_selected)
+         self.builder.get_object("special_untouched_label_revealer").set_reveal_child(is_selected)
+         self.builder.get_object("other_options_grid").set_sensitive(is_selected)
 +        self.builder.get_object("addSpecializedButton").set_sensitive(False)
  
-         if len(self.disks) == 0:
-             self.set_warning(_("No disks detected.  Please shut down the computer, connect at least one disk, and restart to complete installation."))
+         if not self._available_disks:
+             self.set_warning(_(WARNING_NO_DISKS_DETECTED))
 -- 
 2.7.4
 
