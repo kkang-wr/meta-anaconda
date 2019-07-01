@@ -106,7 +106,6 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-relea
            file://0063-update-fstab-by-appending.patch \
            file://0064-users.py-Fix-multilib-user-creation-error.patch \
            file://0065-bootloader.py-fix-UEFI-multilib-installation.patch \
-           file://0066-enlarge-timeout-of-wait_for_modules.patch \
            file://0067-fix-anaconda-failure-since-Blivet-and-Dnf-upgraded.patch \
            file://0001-Make-pyanaconda.dbus.typing-work-with-Python-3.7-159.patch \
            file://0068-disable-chronyd.patch \
