@@ -1,7 +1,7 @@
-From 226166f2505b22dbeb32a0f91a673992c0b90e08 Mon Sep 17 00:00:00 2001
+From 2df5d760d88810da16a597c3f95ca8ef3abef2e7 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Mon, 8 Apr 2019 13:48:48 +0800
-Subject: [PATCH 1/2] disable chronyd
+Date: Mon, 1 Jul 2019 11:19:21 +0800
+Subject: [PATCH] disable chronyd
 
 There is no chronyd services provides, the systemd in Yocto
 has its own ntp
@@ -10,31 +10,22 @@ Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- anaconda.py | 11 -----------
- 1 file changed, 11 deletions(-)
+ pyanaconda/core/configuration/system.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/anaconda.py b/anaconda.py
-index c9e1632..766788e 100755
---- a/anaconda.py
-+++ b/anaconda.py
-@@ -743,17 +743,6 @@ if __name__ == "__main__":
-     if geoloc.geoloc.enabled:
-         geoloc.geoloc.refresh()
+diff --git a/pyanaconda/core/configuration/system.py b/pyanaconda/core/configuration/system.py
+index 9b7ef96..9dfbadd 100644
+--- a/pyanaconda/core/configuration/system.py
++++ b/pyanaconda/core/configuration/system.py
+@@ -99,7 +99,7 @@ class SystemSection(Section):
+     @property
+     def can_set_time_synchronization(self):
+         """Can we run the NTP daemon?"""
+-        return self._is_boot_iso or self._is_booted_os
++        return False
  
--    # setup ntp servers and start NTP daemon if not requested otherwise
--    if can_touch_runtime_system("start chronyd"):
--        kickstart_ntpservers = timezone_proxy.NTPServers
--
--        if kickstart_ntpservers:
--            pools, servers = ntp.internal_to_pools_and_servers(kickstart_ntpservers)
--            ntp.save_servers_to_config(pools, servers)
--
--        if timezone_proxy.NTPEnabled:
--            util.start_service("chronyd")
--
-     # Finish the initialization of the setup on boot action.
-     # This should be done sooner and somewhere else once it is possible.
-     from pyanaconda.core.constants import SETUP_ON_BOOT_DEFAULT, SETUP_ON_BOOT_DISABLED
+     @property
+     def can_activate_keyboard(self):
 -- 
 2.7.4
 
