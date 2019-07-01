@@ -1,6 +1,6 @@
-From f35925543f8b19c7b39cef4679cc0bc74bfa5253 Mon Sep 17 00:00:00 2001
-From: Ovidiu Panait <ovidiu.panait@windriver.com>
-Date: Thu, 9 May 2019 09:04:44 +0000
+From 95e60867b3172eb64e3f720a3457923f70ea820c Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 1 Jul 2019 11:24:13 +0800
 Subject: [PATCH] pyanaconda: payload: Fix xserver detection
 
 When installing an image that has graphical interface,
@@ -11,25 +11,24 @@ To fix this, use the right rpm query to detect the presence of xserver.
 
 Upstream-Status: Inappropriate [OE specific]
 
-Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- pyanaconda/payload/__init__.py | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ pyanaconda/payload/__init__.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
-index f67a4cd94..7929407e7 100644
+index cbe2154..6b3e5ff 100644
 --- a/pyanaconda/payload/__init__.py
 +++ b/pyanaconda/payload/__init__.py
-@@ -897,8 +897,7 @@ class Payload(object):
+@@ -631,7 +631,7 @@ class Payload(metaclass=ABCMeta):
              ts = rpm.TransactionSet(util.getSysroot())
  
              # XXX one day this might need to account for anaconda's display mode
 -            if ts.dbMatch("provides", 'service(graphical-login)').count() and \
--               ts.dbMatch('provides', 'xorg-x11-server-Xorg').count() and \
 +            if ts.dbMatch('provides', 'xserver-xorg').count() and \
                 not flags.usevnc:
                  # We only manipulate the ksdata.  The symlink is made later
                  # during the config write out.
 -- 
-2.18.1
+2.7.4
 
