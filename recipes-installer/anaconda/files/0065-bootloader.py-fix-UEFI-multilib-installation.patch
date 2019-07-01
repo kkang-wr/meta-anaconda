@@ -1,7 +1,7 @@
-From c1ddff0b0f2b6f2942d2f2c38b992dced8c4f542 Mon Sep 17 00:00:00 2001
-From: Ovidiu Panait <ovidiu.panait@windriver.com>
-Date: Thu, 9 Aug 2018 17:32:24 +0800
-Subject: [PATCH 65/65] bootloader.py: fix UEFI multilib installation
+From d081c0284d061290b2fe56b78c688a8d133b40b4 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 1 Jul 2019 10:55:12 +0800
+Subject: [PATCH] bootloader.py: fix UEFI multilib installation
 
 Fix the following UEFI installation errors when installing multilib
 images on intel-x86-64:
@@ -20,14 +20,14 @@ Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- pyanaconda/bootloader.py | 15 +++++++++++++++
+ pyanaconda/bootloader/efi.py | 15 +++++++++++++++
  1 file changed, 15 insertions(+)
 
-diff --git a/pyanaconda/bootloader.py b/pyanaconda/bootloader.py
-index 530ff3a..dfce593 100644
---- a/pyanaconda/bootloader.py
-+++ b/pyanaconda/bootloader.py
-@@ -1815,10 +1815,25 @@ class EFIBase(object):
+diff --git a/pyanaconda/bootloader/efi.py b/pyanaconda/bootloader/efi.py
+index 6199b51..b2413a0 100644
+--- a/pyanaconda/bootloader/efi.py
++++ b/pyanaconda/bootloader/efi.py
+@@ -137,10 +137,25 @@ class EFIBase(object):
              f.write('grub-mkimage -c /tmp/load.cfg $@ search_fs_uuid\n')
          os.chmod(util.getSysroot() + "/tmp/grub-mkimage-wrapper.sh", 0o755)
  
