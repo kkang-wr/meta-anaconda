@@ -1,7 +1,7 @@
-From fce95243765de1a1ae23741b4b9ed26a63285600 Mon Sep 17 00:00:00 2001
+From 78b20f8ff0a29492040ee0a3fd03cbb11568dcdc Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Mon, 30 Jul 2018 16:19:27 +0800
-Subject: [PATCH 62/65] Mount /var/volatile during install
+Date: Mon, 1 Jul 2019 10:46:01 +0800
+Subject: [PATCH] Mount /var/volatile during install
 
 The installed system needs /var/volatile clean, otherwise it
 caused systemd's journalctl failed to record boot log.
@@ -10,14 +10,14 @@ Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- pyanaconda/storage/osinstall.py | 9 +++++++++
+ pyanaconda/storage/fsset.py | 9 +++++++++
  1 file changed, 9 insertions(+)
 
-diff --git a/pyanaconda/storage/osinstall.py b/pyanaconda/storage/osinstall.py
-index c2036ad..6eb2f21 100644
---- a/pyanaconda/storage/osinstall.py
-+++ b/pyanaconda/storage/osinstall.py
-@@ -406,6 +406,7 @@ class FSSet(object):
+diff --git a/pyanaconda/storage/fsset.py b/pyanaconda/storage/fsset.py
+index 6aa71a1..2addc56 100644
+--- a/pyanaconda/storage/fsset.py
++++ b/pyanaconda/storage/fsset.py
+@@ -221,6 +221,7 @@ class FSSet(object):
          self._sysfs = None
          self._proc = None
          self._devshm = None
@@ -25,7 +25,7 @@ index c2036ad..6eb2f21 100644
          self._usb = None
          self._selinux = None
          self._run = None
-@@ -447,6 +448,12 @@ class FSSet(object):
+@@ -262,6 +263,12 @@ class FSSet(object):
          return self._devshm
  
      @property
@@ -38,7 +38,7 @@ index c2036ad..6eb2f21 100644
      def usb(self):
          if not self._usb:
              self._usb = NoDevice(fmt=get_format("usbfs", device="usbfs", mountpoint="/proc/bus/usb"))
-@@ -693,6 +700,7 @@ class FSSet(object):
+@@ -510,6 +517,7 @@ class FSSet(object):
          """
          devices = list(self.mountpoints.values()) + self.swap_devices
          devices.extend([self.dev, self.devshm, self.devpts, self.sysfs,
@@ -46,8 +46,8 @@ index c2036ad..6eb2f21 100644
                          self.proc, self.selinux, self.usb, self.run])
          if isinstance(_platform, EFI):
              devices.append(self.efivars)
-@@ -752,6 +760,7 @@ class FSSet(object):
-         """ unmount filesystems, except swap if swapoff == False """
+@@ -572,6 +580,7 @@ class FSSet(object):
+         """
          devices = list(self.mountpoints.values()) + self.swap_devices
          devices.extend([self.dev, self.devshm, self.devpts, self.sysfs,
 +                        self.volatile,
