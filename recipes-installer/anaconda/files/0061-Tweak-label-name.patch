@@ -1,7 +1,7 @@
-From 05da7c284dbdeeea895084b4d6b91d8783a66aae Mon Sep 17 00:00:00 2001
+From 15dd69296c5607aa718feb071d0508c0a5d0ed9f Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Mon, 30 Jul 2018 14:57:38 +0800
-Subject: [PATCH 61/65] Tweak label name
+Date: Mon, 1 Jul 2019 10:38:49 +0800
+Subject: [PATCH] Tweak label name
 
 In yocto, the product name is too long, which enlarge
 the gui window, short them.
@@ -30,19 +30,19 @@ index 9d97dab..5548f99 100644
               {"productName": productName, "productVersion": productVersion}
  
 diff --git a/pyanaconda/ui/gui/spokes/welcome.py b/pyanaconda/ui/gui/spokes/welcome.py
-index dddc83b..71822c8 100644
+index c1ac605..dc8d9e6 100644
 --- a/pyanaconda/ui/gui/spokes/welcome.py
 +++ b/pyanaconda/ui/gui/spokes/welcome.py
-@@ -37,7 +37,7 @@ from pyanaconda import flags
+@@ -39,7 +39,7 @@ from pyanaconda import flags
  from pyanaconda import geoloc
  from pyanaconda.core.i18n import _, C_
- from pyanaconda.core.util import is_unsupported_hw, ipmi_abort
+ from pyanaconda.core.util import ipmi_abort
 -from pyanaconda.core.constants import DEFAULT_LANG, WINDOW_TITLE_TEXT
 +from pyanaconda.core.constants import DEFAULT_LANG, WINDOW_TITLE_TEXT, shortProductName
  from pyanaconda.modules.common.constants.services import TIMEZONE, LOCALIZATION
  
  from pyanaconda.anaconda_loggers import get_module_logger
-@@ -236,7 +236,7 @@ class WelcomeLanguageSpoke(LangLocaleHandler, StandaloneSpoke):
+@@ -238,7 +238,7 @@ class WelcomeLanguageSpoke(LangLocaleHandler, StandaloneSpoke):
          welcomeLabel = self.builder.get_object("welcomeLabel")
  
          welcomeLabel.set_text(_("WELCOME TO %(name)s %(version)s.") %
