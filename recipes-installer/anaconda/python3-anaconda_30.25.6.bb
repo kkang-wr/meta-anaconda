@@ -40,6 +40,7 @@ RDEPENDS_${PN} = "e2fsprogs e2fsprogs-e2fsck e2fsprogs-mke2fs \
                    python3-requests-file python3-requests-ftp \
                    python3-blivetgui librsvg librsvg-gtk bash \
                    python3-systemd python3-pydbus python3-simpleline \
+                   python3-productmd \
                 "
 
 RDEPENDS_${PN} += "networkmanager \
