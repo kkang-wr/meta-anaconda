@@ -1,7 +1,7 @@
-From d723a1e3c209c87789587cb1a43c7a0c6b3a7e5a Mon Sep 17 00:00:00 2001
+From b93bf80525624fd7038b370f35ace90a3b3bdb1b Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 24 Jul 2018 15:05:25 +0800
-Subject: [PATCH 29/65] support user account creation
+Subject: [PATCH] support user account creation
 
 - Do not support user accout advanced setting
 
@@ -12,14 +12,14 @@ Upstream-Status: Inappropriate [oe specific]
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  pyanaconda/ui/gui/spokes/user.py |  7 +------
- pyanaconda/users.py              | 13 +++++++++++++
- 2 files changed, 14 insertions(+), 6 deletions(-)
+ pyanaconda/users.py              | 15 +++++++++++++++
+ 2 files changed, 16 insertions(+), 6 deletions(-)
 
 diff --git a/pyanaconda/ui/gui/spokes/user.py b/pyanaconda/ui/gui/spokes/user.py
-index bfe63e1..247c2f5 100644
+index 2398810..9d7de2a 100644
 --- a/pyanaconda/ui/gui/spokes/user.py
 +++ b/pyanaconda/ui/gui/spokes/user.py
-@@ -268,6 +268,7 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+@@ -267,6 +267,7 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
          self._password_required_checkbox = self.builder.get_object("password_required_checkbox")
          # advanced user configration dialog button
          self._advanced_button = self.builder.get_object("advanced_button")
@@ -27,7 +27,7 @@ index bfe63e1..247c2f5 100644
          # password checking status bar & label
          self._password_bar = self.builder.get_object("password_bar")
          self._password_label = self.builder.get_object("password_label")
-@@ -503,12 +504,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
+@@ -500,12 +501,6 @@ class UserSpoke(FirstbootSpokeMixIn, NormalSpoke, GUISpokeInputCheckHandler):
          """Called by Gtk on all username changes."""
          new_username = editable.get_text()
  
@@ -41,10 +41,19 @@ index bfe63e1..247c2f5 100644
          self.checker.username = new_username
  
 diff --git a/pyanaconda/users.py b/pyanaconda/users.py
-index 3db06dd..7139d5f 100644
+index 3db06dd..edf3469 100644
 --- a/pyanaconda/users.py
 +++ b/pyanaconda/users.py
-@@ -200,6 +200,7 @@ class Users(object):
+@@ -28,6 +28,8 @@ from pyanaconda.errors import errorHandler, PasswordCryptError, ERROR_RAISE
+ from pyanaconda.core.regexes import GROUPLIST_FANCY_PARSE, NAME_VALID, PORTABLE_FS_CHARS, GROUPLIST_SIMPLE_VALID
+ import crypt
+ from pyanaconda.core.i18n import _
++from pyanaconda.core import constants
++
+ import re
+ 
+ from pyanaconda.anaconda_loggers import get_module_logger
+@@ -200,6 +202,7 @@ class Users(object):
                            homedir will be interpreted relative to this. Defaults
                            to util.getSysroot().
          """
@@ -52,7 +61,7 @@ index 3db06dd..7139d5f 100644
          root = kwargs.get("root", util.getSysroot())
  
          if self._getgrnam(group_name, root):
-@@ -431,3 +432,15 @@ class Users(object):
+@@ -431,3 +434,15 @@ class Users(object):
          if not authfile_existed:
              os.chown(authfile, int(uid), int(gid))
              util.execWithRedirect("restorecon", ["-r", sshdir])
@@ -61,7 +70,7 @@ index 3db06dd..7139d5f 100644
 +if __name__ == "__main__":
 +    from pyanaconda import anaconda_logging
 +    anaconda_logging.init()
-+    anaconda_logging.logger.setupVirtio()
++    anaconda_logging.logger.setupVirtio(constants.VIRTIO_PORT)
 +
 +    from pyanaconda.anaconda_loggers import get_anaconda_root_logger
 +    log = get_anaconda_root_logger()
