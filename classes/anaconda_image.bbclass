@@ -62,9 +62,37 @@ wrl_installer_copy_local_repos() {
         echo "Copy rpms from target build to installer image."
         mkdir -p ${IMAGE_ROOTFS}/Packages.$prj_name
 
-        : > ${IMAGE_ROOTFS}/Packages.$prj_name/.treeinfo
-        echo "[general]" >> ${IMAGE_ROOTFS}/Packages.$prj_name/.treeinfo
-        echo "version = ${DISTRO_VERSION}" >> ${IMAGE_ROOTFS}/Packages.$prj_name/.treeinfo
+        cat > ${IMAGE_ROOTFS}/Packages.$prj_name/.treeinfo <<ENDOF
+[header]
+type = productmd.treeinfo
+version = 1.2
+
+[general]
+version = ${DISTRO_VERSION}
+name = ${DISTRO} ${DISTRO_VERSION}
+family = ${DISTRO}
+arch = ${PACKAGE_ARCH}
+
+[release]
+name = ${DISTRO} ${DISTRO_VERSION}
+short = ${DISTRO}
+version = ${DISTRO_VERSION}
+
+[tree]
+arch = ${PACKAGE_ARCH}
+build_timestamp = 1556243906
+platforms = ${DISTRO}
+variants = Server
+
+[variant-Server]
+id = Server
+name = Server
+packages = Packages
+repository = .
+type = variant
+uid = Server
+ENDOF
+
 
         # Determine the max channel priority
         channel_priority=5
