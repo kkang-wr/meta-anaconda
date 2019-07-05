@@ -1,15 +1,12 @@
 FILESEXTRAPATHS_prepend_anaconda := "${THISDIR}/files:"
+SRC_URI_append_anaconda = " \
+    file://0001-set-tty2-as-default-instance.patch \
+"
 
 do_install_append_anaconda() {
     # Explicitly enable tty2
     ln -nsf ${systemd_unitdir}/system/getty@.service \
         ${D}${sysconfdir}/systemd/system/getty.target.wants/getty@tty2.service
 
-    install -d ${D}${sysconfdir}/systemd/logind.conf.d
-    echo "[Login]" >> ${D}${sysconfdir}/systemd/logind.conf.d/anaconda.conf
-    # Disable VT reservation
-    echo "NAutoVTs=0"  >> ${D}${sysconfdir}/systemd/logind.conf.d/anaconda.conf
-    # Disable automatic spawning of "autovt" services
-    echo "ReserveVT=0" >> ${D}${sysconfdir}/systemd/logind.conf.d/anaconda.conf
-
+    rm -f ${D}${systemd_unitdir}/system/autovt@.service
 }
