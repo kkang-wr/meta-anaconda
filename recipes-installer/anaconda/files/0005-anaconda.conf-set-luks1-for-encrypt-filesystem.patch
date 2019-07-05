@@ -1,0 +1,32 @@
+From 411a1878212e813d93b228662d31616ef32ffbe2 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 5 Jul 2019 14:17:50 +0800
+Subject: [PATCH] anaconda.conf: set luks1 for encrypt filesystem
+
+GRUB does not support LUKS2, choose luks1 by default
+
+https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ data/anaconda.conf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/data/anaconda.conf b/data/anaconda.conf
+index 27d046a..703a373 100644
+--- a/data/anaconda.conf
++++ b/data/anaconda.conf
+@@ -124,7 +124,7 @@ default_partitioning = WORKSTATION
+ #   luks1  Use version 1 by default.
+ #   luks2  Use version 2 by default.
+ #
+-luks_version = luks2
++luks_version = luks1
+ 
+ 
+ [User Interface]
+-- 
+2.7.4
+

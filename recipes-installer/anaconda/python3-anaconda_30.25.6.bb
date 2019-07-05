@@ -54,6 +54,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-relea
            file://0002-do-not-load-the-system-wide-Xresources.patch \
            file://0003-tweak-iso-mount-dir-and-kernel-name.patch \
            file://0004-customize-default-option-for-OE.patch \
+           file://0005-anaconda.conf-set-luks1-for-encrypt-filesystem.patch \
            file://0007-dnfpayload.py-customize-for-OE.patch \
            file://0009-dynamic-detect-workable-locale.patch \
            file://0010-reboot-unconditionally.patch \
