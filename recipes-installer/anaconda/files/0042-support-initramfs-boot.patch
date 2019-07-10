@@ -1,4 +1,4 @@
-From 1db96277f77da61f3b771a8c0fc7be898d7dca42 Mon Sep 17 00:00:00 2001
+From cedfb60b4cea33edcc6308875a5c8b2aa255bc20 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Sat, 29 Jun 2019 15:46:45 +0800
 Subject: [PATCH] support initramfs boot
@@ -12,20 +12,22 @@ Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- pyanaconda/bootloader/installation.py | 3 +++
+ pyanaconda/bootloader/installation.py | 5 +++++
  pyanaconda/payload/__init__.py        | 4 ++++
- 2 files changed, 7 insertions(+)
+ 2 files changed, 9 insertions(+)
 
 diff --git a/pyanaconda/bootloader/installation.py b/pyanaconda/bootloader/installation.py
-index b620ab3..c28564f 100644
+index b620ab3..c2c097f 100644
 --- a/pyanaconda/bootloader/installation.py
 +++ b/pyanaconda/bootloader/installation.py
-@@ -50,6 +50,9 @@ def write_boot_loader(storage, payload):
+@@ -50,6 +50,11 @@ def write_boot_loader(storage, payload):
  
      # Install the boot loader.
      if not storage.bootloader.skip_bootloader:
 +        for kernel in payload.kernel_version_list:
-+            open(util.getSysroot()+"/boot/initramfs-%s.img" % kernel, "w").write("\n")
++            initrd = util.getSysroot()+"/boot/initramfs-%s.img" % kernel
++            if not os.path.exists(initrd):
++                open(initrd, "w").write("\n")
 +
          install_boot_loader(storage)
  
