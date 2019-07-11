@@ -249,6 +249,7 @@ _EOF
 	        bpn=${BPN}
 	        # Do not copy image for initramfs
 	        if [ "${bpn##*initramfs}" != "${bpn%%initramfs*}" ]; then
+	            echo "::$prj_name::" >> ${IMAGE_ROOTFS}/.target_build_list
 	            continue
 	        elif [ "x$extension" = "xext2" -o "x$extension" = "xext3" -o "x$extension" = "xext4" ]; then
 	            echo "Image based target install selected."
