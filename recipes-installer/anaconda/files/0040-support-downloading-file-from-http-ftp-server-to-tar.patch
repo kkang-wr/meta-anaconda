@@ -1,4 +1,4 @@
-From 7c7a6e75fe96dfcc53f18a90dcd4e3f5ced7cea8 Mon Sep 17 00:00:00 2001
+From 4c891449e324d3a78ddf7722fd7805bae2e1cbfb Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Sat, 29 Jun 2019 15:06:40 +0800
 Subject: [PATCH] support downloading file from http/ftp server to target image
@@ -24,17 +24,17 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  2 files changed, 100 insertions(+)
 
 diff --git a/pyanaconda/installation.py b/pyanaconda/installation.py
-index 0423a3d..a7a1d88 100644
+index 0423a3d..fa5bfc8 100644
 --- a/pyanaconda/installation.py
 +++ b/pyanaconda/installation.py
-@@ -101,6 +101,7 @@ def doConfiguration(storage, payload, ksdata):
-     os_config.append(Task("Configure timezone", ksdata.timezone.execute))
-     os_config.append(Task("Configure language", ksdata.lang.execute))
-     os_config.append(Task("Configure X", ksdata.xconfig.execute))
-+    os_config.append(Task("Configure download", ksdata.download.execute, (ksdata,)))
-     configuration_queue.append(os_config)
+@@ -122,6 +122,7 @@ def doConfiguration(storage, payload, ksdata):
+     # Anaconda addon configuration
+     addon_config = TaskQueue("Anaconda addon configuration", N_("Configuring addons"))
+     addon_config.append(Task("Configure Anaconda addons", ksdata.addons.execute, (storage, ksdata, u, payload)))
++    addon_config.append(Task("Configure download", ksdata.download.execute, (ksdata,)))
+     configuration_queue.append(addon_config)
  
-     # schedule network configuration (if required)
+     # Initramfs generation
 diff --git a/pyanaconda/kickstart.py b/pyanaconda/kickstart.py
 index 5108a5a..5f8a050 100644
 --- a/pyanaconda/kickstart.py
