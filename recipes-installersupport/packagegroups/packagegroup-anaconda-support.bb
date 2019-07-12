@@ -7,6 +7,7 @@ inherit packagegroup
 RDEPENDS_${PN} = " \
     sudo \
     kernel-image \
+    kernel-modules \
     grubby \
     shadow \
     efibootmgr \
