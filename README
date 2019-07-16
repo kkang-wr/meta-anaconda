@@ -224,7 +224,7 @@ Building the target installer
        Build target installer with machine of qemux86
 
        Create the qemu disk:
-       $ <installer_build>/tmp-glibc/sysroots-components/x86_64/qemu-native/usr/bin/qemu-img create -f qcow hd0.vdisk 5000M
+       $ <installer_build>/tmp-glibc/sysroots-components/x86_64/qemu-system-native/usr/bin/qemu-img create -f qcow hd0.vdisk 5000M
 
        Start qemu with installer image:
        $ runqemu qemux86 core-image-anaconda iso slirp kvm qemuparams="-drive file=hd0.vdisk,if=virtio,format=qcow"
