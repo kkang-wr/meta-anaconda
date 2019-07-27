@@ -4,7 +4,7 @@ do_rootfs[vardeps] += "INSTALLER_TARGET_BUILD INSTALLER_TARGET_IMAGE"
 # Fix system-shutdown hang at ratelimiting
 APPEND_append = " printk.devkmsg=on"
 
-INSTPRODUCT ?= "${DISTRO_NAME}"
+INSTPRODUCT ?= "${@d.getVar('DISTRO_NAME')[:40]}"
 INSTVER     ?= "${DISTRO_VERSION}"
 INSTBUGURL  ?= "http://www.windriver.com/"
 
