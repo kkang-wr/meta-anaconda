@@ -18,7 +18,7 @@ RDEPENDS_packagegroup-installer-x11-anaconda = "\
     xset \
     settings-daemon \
     xrandr \
-    libsdl \
+    libsdl2 \
     metacity \
     adwaita-icon-theme \
     pango \
