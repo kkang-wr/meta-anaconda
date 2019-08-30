@@ -20,7 +20,7 @@ RDEPENDS_${PN} = "e2fsprogs e2fsprogs-e2fsck e2fsprogs-mke2fs \
                    e2fsprogs-tune2fs e2fsprogs-resize2fs \
                    ntfsprogs xfsprogs btrfs-tools nfs-utils-client \
                    parted dosfstools gzip libarchive lvm2 \
-                   squashfs-tools openssh python3 python3-misc \
+                   squashfs-tools openssh python3-core python3-misc \
                    python3-modules  python3-dbus python3-pyparted \
                    python3-pykickstart \
                    dmidecode python3-meh python3-libreport localedef \
