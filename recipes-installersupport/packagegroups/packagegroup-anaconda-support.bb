@@ -17,7 +17,7 @@ RDEPENDS_${PN} = " \
     util-linux-mount \
     util-linux-switch-root \
     init-ifupdown \
-    libuser \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libuser', '', d)} \
     dracut \
     cryptsetup \
     sed \
