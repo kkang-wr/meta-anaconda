@@ -1,0 +1,86 @@
+From cc5272a2946aa99d0442059581336c08d042bf8e Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sat, 31 Aug 2019 13:20:26 +0800
+Subject: [PATCH] remove unsupported icon from main page and tweak icon layout
+
+Since the pages of Keyboard, Language Support, Network & Host Name
+is not supported, remove icons from main page
+
+Exchange column SYSTEM and column LOCALIZATION, then the icon will
+have enough space to layout correctly
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ pyanaconda/ui/categories/localization.py     | 2 +-
+ pyanaconda/ui/categories/system.py           | 2 +-
+ pyanaconda/ui/gui/spokes/keyboard.py         | 4 ++++
+ pyanaconda/ui/gui/spokes/language_support.py | 4 ++++
+ pyanaconda/ui/gui/spokes/network.py          | 4 ++++
+ 5 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/pyanaconda/ui/categories/localization.py b/pyanaconda/ui/categories/localization.py
+index 016f7d2..c6ff272 100644
+--- a/pyanaconda/ui/categories/localization.py
++++ b/pyanaconda/ui/categories/localization.py
+@@ -25,5 +25,5 @@ __all__ = ["LocalizationCategory"]
+ class LocalizationCategory(SpokeCategory):
+     displayOnHubGUI = "SummaryHub"
+     displayOnHubTUI = "SummaryHub"
+-    sortOrder = 100
++    sortOrder = 300
+     title = N_("LOCALIZATION")
+diff --git a/pyanaconda/ui/categories/system.py b/pyanaconda/ui/categories/system.py
+index df3a0d9..75e8fff 100644
+--- a/pyanaconda/ui/categories/system.py
++++ b/pyanaconda/ui/categories/system.py
+@@ -25,5 +25,5 @@ __all__ = ["SystemCategory"]
+ class SystemCategory(SpokeCategory):
+     displayOnHubGUI = "SummaryHub"
+     displayOnHubTUI = "SummaryHub"
+-    sortOrder = 300
++    sortOrder = 100
+     title = N_("SYSTEM")
+diff --git a/pyanaconda/ui/gui/spokes/keyboard.py b/pyanaconda/ui/gui/spokes/keyboard.py
+index fdfa28a..6dd8345 100644
+--- a/pyanaconda/ui/gui/spokes/keyboard.py
++++ b/pyanaconda/ui/gui/spokes/keyboard.py
+@@ -651,3 +651,7 @@ class KeyboardSpoke(NormalSpoke):
+             layouts_list.append(row[0])
+ 
+         self._xkl_wrapper.replace_layouts(layouts_list)
++
++    @classmethod
++    def should_run(cls, environment, data):
++        return False
+diff --git a/pyanaconda/ui/gui/spokes/language_support.py b/pyanaconda/ui/gui/spokes/language_support.py
+index e4042d5..0552878 100644
+--- a/pyanaconda/ui/gui/spokes/language_support.py
++++ b/pyanaconda/ui/gui/spokes/language_support.py
+@@ -198,3 +198,7 @@ class LangsupportSpoke(LangLocaleHandler, NormalSpoke):
+             self._selected_locales.add(row[1])
+         else:
+             self._selected_locales.remove(row[1])
++
++    @classmethod
++    def should_run(cls, environment, data):
++        return False
+diff --git a/pyanaconda/ui/gui/spokes/network.py b/pyanaconda/ui/gui/spokes/network.py
+index 45e725b..95a3658 100644
+--- a/pyanaconda/ui/gui/spokes/network.py
++++ b/pyanaconda/ui/gui/spokes/network.py
+@@ -1557,6 +1557,10 @@ class NetworkSpoke(FirstbootSpokeMixIn, NormalSpoke):
+         self.network_control_box.kill_nmce(msg="finished with network spoke")
+         self.network_control_box.disconnect_client_callbacks()
+ 
++    @classmethod
++    def should_run(cls, environment, data):
++        return False
++
+ class NetworkStandaloneSpoke(StandaloneSpoke):
+     """
+        .. inheritance-diagram:: NetworkStandaloneSpoke
+-- 
+2.7.4
+
