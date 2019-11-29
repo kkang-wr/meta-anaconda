@@ -133,7 +133,7 @@ EXTRA_OECONF += "--disable-selinux \
          --with-sysroot=${PKG_CONFIG_SYSROOT_DIR} \
 "
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES = "systemd x11"
 
 inherit autotools-brokensep gettext python3native pkgconfig gobject-introspection

@@ -7,7 +7,7 @@ IMAGE_FSTYPES += "ext4"
 ROOTFS_POSTPROCESS_COMMAND_append = " copy_grub_lib;"
 IMAGE_POSTPROCESS_COMMAND_append = " emit_image_env;"
 
-inherit distro_features_check
+inherit features_check
 REQUIRED_DISTRO_FEATURES = "systemd ldconfig pam"
 
 DEPENDS += "grub grub-efi"
