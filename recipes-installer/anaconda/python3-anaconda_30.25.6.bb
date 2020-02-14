@@ -30,7 +30,7 @@ RDEPENDS_${PN} = "e2fsprogs e2fsprogs-e2fsck e2fsprogs-mke2fs \
                    tzdata-atlantic tzdata-australia tzdata-europe tzdata-pacific \
                    keybinder module-init-tools dnf util-linux efibootmgr \
                    ca-certificates isomd5sum \
-                   btrfs-tools ntfs-3g iproute2 mdadm shadow chkconfig \
+                   btrfs-tools ntfs-3g iproute2 mdadm shadow \
                    util-linux-swaponoff util-linux-uuidgen python3-blivet \
                    xrandr glibc-charmaps glibc-localedatas \
                    python3-pytz python3-langtable libpwquality \
