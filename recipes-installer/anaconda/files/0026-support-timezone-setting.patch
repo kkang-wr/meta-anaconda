@@ -12,64 +12,67 @@ Subject: [PATCH 26/65] support timezone setting
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
----
- pyanaconda/timezone.py | 29 +++++++----------------------
- 1 file changed, 7 insertions(+), 22 deletions(-)
 
-diff --git a/pyanaconda/timezone.py b/pyanaconda/timezone.py
-index 6f074ae..40d0f89 100644
---- a/pyanaconda/timezone.py
-+++ b/pyanaconda/timezone.py
-@@ -23,6 +23,7 @@ configuration, valid timezones recognition etc.
- """
- 
+Update context for anaconda 32.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ pyanaconda/modules/timezone/installation.py | 28 +++++++---------------------
+ 1 file changed, 7 insertions(+), 21 deletions(-)
+
+diff --git a/pyanaconda/modules/timezone/installation.py b/pyanaconda/modules/timezone/installation.py
+index 6383df1103..ba6ac1fcb8 100644
+--- a/pyanaconda/modules/timezone/installation.py
++++ b/pyanaconda/modules/timezone/installation.py
+@@ -17,6 +17,7 @@
+ #
  import os
+ import os.path
 +import shutil
- import pytz
- import langtable
- from collections import OrderedDict
-@@ -101,6 +102,9 @@ def write_timezone_config(timezone_proxy, root):
-     rooted_tz_file = os.path.normpath(root + tz_file)
-     relative_path = os.path.normpath("../" + tz_file)
-     link_path = os.path.normpath(root + "/etc/localtime")
-+    if not os.access(rooted_tz_file, os.R_OK) and os.access(tz_file, os.R_OK):
-+        util.mkdirChain(os.path.dirname(rooted_tz_file))
-+        shutil.copyfile(tz_file, rooted_tz_file)
  
-     if not os.access(rooted_tz_file, os.R_OK):
-         log.error("Timezone to be linked (%s) doesn't exist", rooted_tz_file)
-@@ -117,28 +121,9 @@ def write_timezone_config(timezone_proxy, root):
-             log.error("Error when symlinking timezone (from %s): %s",
-                       rooted_tz_file, oserr.strerror)
+ from pyanaconda import ntp
+ from pyanaconda.modules.common.constants.services import SERVICES
+@@ -74,6 +75,9 @@ class ConfigureTimezoneTask(Task):
+         rooted_tz_file = os.path.normpath(self._sysroot + tz_file)
+         relative_path = os.path.normpath("../" + tz_file)
+         link_path = os.path.normpath(self._sysroot + "/etc/localtime")
++        if not os.access(rooted_tz_file, os.R_OK) and os.access(tz_file, os.R_OK):
++            util.mkdirChain(os.path.dirname(rooted_tz_file))
++            shutil.copyfile(tz_file, rooted_tz_file)
  
--    if arch.is_s390():
--        # there is no HW clock on s390(x)
--        return
+         if not os.access(rooted_tz_file, os.R_OK):
+             log.error("Timezone to be linked (%s) doesn't exist", rooted_tz_file)
+@@ -96,27 +100,9 @@ class ConfigureTimezoneTask(Task):
+ 
+         :raise: TimezoneConfigurationError
+         """
+-        if arch.is_s390():
+-            # there is no HW clock on s390(x)
+-            return
 -
--    try:
--        fobj = open(os.path.normpath(root + "/etc/adjtime"), "r")
--        lines = fobj.readlines()
--        fobj.close()
--    except IOError:
--        lines = ["0.0 0 0.0\n", "0\n"]
+-        try:
+-            with open(os.path.normpath(self._sysroot + "/etc/adjtime"), "r") as fobj:
+-                lines = fobj.readlines()
+-        except IOError:
+-            lines = ["0.0 0 0.0\n", "0\n"]
 -
--    try:
--        with open(os.path.normpath(root + "/etc/adjtime"), "w") as fobj:
--            fobj.write(lines[0])
--            fobj.write(lines[1])
--            if timezone_proxy.IsUTC:
--                fobj.write("UTC\n")
--            else:
--                fobj.write("LOCAL\n")
--    except IOError as ioerr:
--        msg = "Error while writing /etc/adjtime file: %s" % ioerr.strerror
--        raise TimezoneConfigError(msg)
-+    log.info("timezone %s" % timezone_proxy.Timezone)
-+    with open(root + "/etc/timezone", "w") as fobj:
-+        fobj.write('%s\n' % timezone_proxy.Timezone)
+-        try:
+-            with open(os.path.normpath(self._sysroot + "/etc/adjtime"), "w") as fobj:
+-                fobj.write(lines[0])
+-                fobj.write(lines[1])
+-                if self._is_utc:
+-                    fobj.write("UTC\n")
+-                else:
+-                    fobj.write("LOCAL\n")
+-        except IOError as ioerr:
+-            msg = "Error while writing /etc/adjtime file: {}".format(ioerr.strerror)
+-            raise TimezoneConfigurationError(msg)
++        log.info("timezone %s" % timezone_proxy.Timezone)
++        with open(self._sysroot + "/etc/timezone", "w") as fobj:
++            fobj.write('%s\n' % timezone_proxy.Timezone)
  
- def save_hw_clock(timezone_proxy=None):
-     """
+ 
+ class ConfigureNTPTask(Task):
 -- 
 2.7.4
 

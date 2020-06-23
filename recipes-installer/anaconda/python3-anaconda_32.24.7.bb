@@ -47,12 +47,11 @@ RDEPENDS_${PN} += "networkmanager \
                    network-manager-applet \
 "
 
-SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-release \
+SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f32-release \
            file://81-edit-sudoers.ks \
            file://81-systemd-preset-all.ks \
            file://0001-do-not-build-po-and-doc.patch \
            file://0002-do-not-load-the-system-wide-Xresources.patch \
-           file://0003-tweak-iso-mount-dir-and-kernel-name.patch \
            file://0004-customize-default-option-for-OE.patch \
            file://0006-livepayload-fix-mount-install-tree-failed.patch \
            file://0007-dnfpayload.py-customize-for-OE.patch \
@@ -61,7 +60,6 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-relea
            file://0011-disable-audit.patch \
            file://0012-bootloader.py-Change-grub2-settings-to-match-oe-core.patch \
            file://0013-tweak-detect-kernel-version.patch \
-           file://0016-kickstart-not-support-Authselect-Firewall-Firstboot.patch \
            file://0017-invisible-help-button.patch \
            file://0018-disable-non-implemented-functions.patch \
            file://0019-support-UEFI-boot.patch \
@@ -70,9 +68,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-relea
            file://0024-fix-cannot-stat-usr-share-gettext-gettext.h.patch \
            file://0025-tweak-bootloader-fs-type.patch \
            file://0026-support-timezone-setting.patch \
-           file://0027-disable-ntp-support.patch \
            file://0028-do-not-support-manually-set-time.patch \
-           file://0029-support-user-account-creation.patch \
            file://0030-detect-existence-of-Xorg.patch \
            file://0031-fix-write-network-conf-failed-while-liveinst.patch \
            file://0033-text-repository-setting-do-not-support-local-ISO-fil.patch \
@@ -81,10 +77,8 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-relea
            file://0036-do-not-support-network-setting-for-now.patch \
            file://0037-tweak-boot-storage-sanity-check.patch \
            file://0038-support-to-get-kickstart-from-network.patch \
-           file://0039-support-authentication-for-kickstart.patch \
            file://0040-support-downloading-file-from-http-ftp-server-to-tar.patch \
            file://0041-live-install-supports-kickstart.patch \
-           file://0042-support-initramfs-boot.patch \
            file://0043-fix-hang-while-installed-system-reboot.patch \
            file://0044-fix-installed-system-boot-from-encrypt-fs-failed.patch \
            file://0045-installation-destination-disable-iSCSI-network-disks.patch \
@@ -92,7 +86,6 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-relea
            file://0047-remove-incorrect-prefix-of-addon-repo-url.patch \
            file://0048-fix-write-sysconfig-network-failed.patch \
            file://0049-pyanaconda-ui-gui-utils.py-tweak-mouse-arrow.patch \
-           file://0050-tweak-search-location-of-new-kernel-pkg.patch \
            file://0051-always-write-fstab-after-install.patch \
            file://0052-invoke-grub-install-to-generate-efi-filesystem.patch \
            file://0053-do-not-support-closest-mirror.patch \
@@ -116,7 +109,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f30-relea
            file://0070-remove-unsupported-icon-from-main-page-and-tweak-ico.patch \
           "
 
-SRCREV = "5c492721676257d239ebc38fbacafc96f944f856"
+SRCREV = "efe96d7a05431afd12fd4d92dcdfd5d6cc134cea"
 
 FILES_${PN}-dbg += "${libexecdir}/anaconda/.debug ${PYTHON_SITEPACKAGES_DIR}/pyanaconda/.debug"
 FILES_${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/pyanaconda/_isys.a"

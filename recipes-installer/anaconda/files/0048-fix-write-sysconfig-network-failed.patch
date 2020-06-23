@@ -9,24 +9,28 @@ write sysconfig network.
 Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Update context for anaconda 32.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/modules/network/installation.py | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/pyanaconda/modules/network/installation.py b/pyanaconda/modules/network/installation.py
-index c063c4e..bf9b931 100644
+index 90dde9a7d5..2d1cebaf60 100644
 --- a/pyanaconda/modules/network/installation.py
 +++ b/pyanaconda/modules/network/installation.py
-@@ -114,6 +114,9 @@ Name={}
+@@ -164,6 +164,9 @@ Name={}
          :param overwrite: overwrite existing configuration file
          :type overwrite: bool
          """
 +        if (not os.path.isdir(root + "/etc/sysconfig")):
 +            return False
 +
-         return self._write_config_file(root, self.SYSCONF_NETWORK_FILE_PATH,
-                                        "# Created by anaconda\n",
-                                        "Cannot write {} configuration file".format(
+         return _write_config_file(root, self.SYSCONF_NETWORK_FILE_PATH,
+                                   "# Created by anaconda\n",
+                                   "Cannot write {} configuration file".format(
 -- 
 2.7.4
 

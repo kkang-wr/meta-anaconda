@@ -12,6 +12,10 @@ have enough space to layout correctly
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Update context for anaconda 32.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/ui/categories/localization.py     | 2 +-
  pyanaconda/ui/categories/system.py           | 2 +-
@@ -21,32 +25,32 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  5 files changed, 14 insertions(+), 2 deletions(-)
 
 diff --git a/pyanaconda/ui/categories/localization.py b/pyanaconda/ui/categories/localization.py
-index 016f7d2..c6ff272 100644
+index 1e45fe92cb..9ad6c47d38 100644
 --- a/pyanaconda/ui/categories/localization.py
 +++ b/pyanaconda/ui/categories/localization.py
-@@ -25,5 +25,5 @@ __all__ = ["LocalizationCategory"]
+@@ -24,5 +24,5 @@ __all__ = ["LocalizationCategory"]
+ 
+ 
  class LocalizationCategory(SpokeCategory):
-     displayOnHubGUI = "SummaryHub"
-     displayOnHubTUI = "SummaryHub"
 -    sortOrder = 100
 +    sortOrder = 300
      title = N_("LOCALIZATION")
 diff --git a/pyanaconda/ui/categories/system.py b/pyanaconda/ui/categories/system.py
-index df3a0d9..75e8fff 100644
+index f8472e26df..45b9f4e127 100644
 --- a/pyanaconda/ui/categories/system.py
 +++ b/pyanaconda/ui/categories/system.py
-@@ -25,5 +25,5 @@ __all__ = ["SystemCategory"]
+@@ -24,5 +24,5 @@ __all__ = ["SystemCategory"]
+ 
+ 
  class SystemCategory(SpokeCategory):
-     displayOnHubGUI = "SummaryHub"
-     displayOnHubTUI = "SummaryHub"
 -    sortOrder = 300
 +    sortOrder = 100
      title = N_("SYSTEM")
 diff --git a/pyanaconda/ui/gui/spokes/keyboard.py b/pyanaconda/ui/gui/spokes/keyboard.py
-index fdfa28a..6dd8345 100644
+index cd16d1ea2c..e5bb22a2d4 100644
 --- a/pyanaconda/ui/gui/spokes/keyboard.py
 +++ b/pyanaconda/ui/gui/spokes/keyboard.py
-@@ -651,3 +651,7 @@ class KeyboardSpoke(NormalSpoke):
+@@ -652,3 +652,7 @@ class KeyboardSpoke(NormalSpoke):
              layouts_list.append(row[0])
  
          self._xkl_wrapper.replace_layouts(layouts_list)
@@ -55,7 +59,7 @@ index fdfa28a..6dd8345 100644
 +    def should_run(cls, environment, data):
 +        return False
 diff --git a/pyanaconda/ui/gui/spokes/language_support.py b/pyanaconda/ui/gui/spokes/language_support.py
-index e4042d5..0552878 100644
+index 17aad93848..469236c9d1 100644
 --- a/pyanaconda/ui/gui/spokes/language_support.py
 +++ b/pyanaconda/ui/gui/spokes/language_support.py
 @@ -198,3 +198,7 @@ class LangsupportSpoke(LangLocaleHandler, NormalSpoke):
@@ -67,10 +71,10 @@ index e4042d5..0552878 100644
 +    def should_run(cls, environment, data):
 +        return False
 diff --git a/pyanaconda/ui/gui/spokes/network.py b/pyanaconda/ui/gui/spokes/network.py
-index 45e725b..95a3658 100644
+index 780b1d83f1..3d11fd9469 100644
 --- a/pyanaconda/ui/gui/spokes/network.py
 +++ b/pyanaconda/ui/gui/spokes/network.py
-@@ -1557,6 +1557,10 @@ class NetworkSpoke(FirstbootSpokeMixIn, NormalSpoke):
+@@ -1561,6 +1561,10 @@ class NetworkSpoke(FirstbootSpokeMixIn, NormalSpoke):
          self.network_control_box.kill_nmce(msg="finished with network spoke")
          self.network_control_box.disconnect_client_callbacks()
  
@@ -78,9 +82,8 @@ index 45e725b..95a3658 100644
 +    def should_run(cls, environment, data):
 +        return False
 +
+ 
  class NetworkStandaloneSpoke(StandaloneSpoke):
      """
-        .. inheritance-diagram:: NetworkStandaloneSpoke
 -- 
 2.7.4
-

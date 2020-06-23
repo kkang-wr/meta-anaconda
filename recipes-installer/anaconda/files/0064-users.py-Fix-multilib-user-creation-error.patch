@@ -18,66 +18,71 @@ Do the same thing to `groupadd' and `useradd'
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Update for anaconda 32. The source code has been moved from users.py to
+core/users.py. Update accordingly.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/users.py | 12 ++++++------
+ pyanaconda/core/users.py | 12 ++++++------
  1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/pyanaconda/users.py b/pyanaconda/users.py
-index 7139d5f..4bbb9fd 100644
---- a/pyanaconda/users.py
-+++ b/pyanaconda/users.py
-@@ -206,13 +206,13 @@ class Users(object):
-         if self._getgrnam(group_name, root):
-             raise ValueError("Group %s already exists" % group_name)
+diff --git a/pyanaconda/core/users.py b/pyanaconda/core/users.py
+index db34444a31..45e371d8c6 100644
+--- a/pyanaconda/core/users.py
++++ b/pyanaconda/core/users.py
+@@ -266,13 +266,13 @@ def create_group(group_name, gid=None, root=None):
+     if _getgrnam(group_name, root):
+         raise ValueError("Group %s already exists" % group_name)
  
--        args = ["-R", root]
-+        args = []
-         if kwargs.get("gid") is not None:
-             args.extend(["-g", str(kwargs["gid"])])
+-    args = ["-R", root]
++    args = []
+     if gid is not None:
+         args.extend(["-g", str(gid)])
  
-         args.append(group_name)
-         with self._ensureLoginDefs(root):
--            status = util.execWithRedirect("groupadd", args)
-+            status = util.execWithRedirect("groupadd", args, root=root)
+     args.append(group_name)
+     with _ensure_login_defs(root):
+-        status = util.execWithRedirect("groupadd", args)
++        status = util.execWithRedirect("groupadd", args, root=root)
  
-         if status == 4:
-             raise ValueError("GID %s already exists" % kwargs.get("gid"))
-@@ -258,7 +258,7 @@ class Users(object):
-         if self.checkUserExists(user_name, root):
-             raise ValueError("User %s already exists" % user_name)
+     if status == 4:
+         raise ValueError("GID %s already exists" % gid)
+@@ -329,7 +329,7 @@ def create_user(username, password=False, is_crypted=False, lock=False,
+     if check_user_exists(username, root):
+         raise ValueError("User %s already exists" % username)
  
--        args = ["-R", root]
-+        args = []
+-    args = ["-R", root]
++    args = []
  
-         # Split the groups argument into a list of (username, gid or None) tuples
-         # the gid, if any, is a string since that makes things simpler
-@@ -333,7 +333,7 @@ class Users(object):
+     # Split the groups argument into a list of (username, gid or None) tuples
+     # the gid, if any, is a string since that makes things simpler
+@@ -397,7 +397,7 @@ def create_user(username, password=False, is_crypted=False, lock=False,
  
-         args.append(user_name)
-         with self._ensureLoginDefs(root):
--            status = util.execWithRedirect("useradd", args)
-+            status = util.execWithRedirect("useradd", args, root=root)
+     args.append(username)
+     with _ensure_login_defs(root):
+-        status = util.execWithRedirect("useradd", args)
++        status = util.execWithRedirect("useradd", args, root=root)
  
-         if status == 4:
-             raise ValueError("UID %s already exists" % kwargs.get("uid"))
-@@ -390,7 +390,7 @@ class Users(object):
-                 password = "!" + password
-                 log.info("user account %s locked", username)
+     if status == 4:
+         raise ValueError("UID %s already exists" % uid)
+@@ -468,7 +468,7 @@ def set_user_password(username, password, is_crypted, lock, root="/"):
+             password = "!" + password
+             log.info("user account %s locked", username)
  
--            proc = util.startProgram(["chpasswd", "-R", root, "-e"], stdin=subprocess.PIPE)
-+            proc = util.startProgram(["chpasswd", "-e"], root=root, stdin=subprocess.PIPE)
-             proc.communicate(("%s:%s\n" % (username, password)).encode("utf-8"))
-             if proc.returncode != 0:
-                 raise OSError("Unable to set password for new user: status=%s" % proc.returncode)
-@@ -398,7 +398,7 @@ class Users(object):
-         # Reset sp_lstchg to an empty string. On systems with no rtc, this
-         # field can be set to 0, which has a special meaning that the password
-         # must be reset on the next login.
--        util.execWithRedirect("chage", ["-R", root, "-d", "", username])
-+        util.execWithRedirect("chage", [ "-d", "", username], root=root)
+-        proc = util.startProgram(["chpasswd", "-R", root, "-e"], stdin=subprocess.PIPE)
++        proc = util.startProgram(["chpasswd", "-e"], root=root, stdin=subprocess.PIPE)
+         proc.communicate(("%s:%s\n" % (username, password)).encode("utf-8"))
+         if proc.returncode != 0:
+             raise OSError("Unable to set password for new user: status=%s" % proc.returncode)
+@@ -476,7 +476,7 @@ def set_user_password(username, password, is_crypted, lock, root="/"):
+     # Reset sp_lstchg to an empty string. On systems with no rtc, this
+     # field can be set to 0, which has a special meaning that the password
+     # must be reset on the next login.
+-    util.execWithRedirect("chage", ["-R", root, "-d", "", username])
++    util.execWithRedirect("chage", ["-d", "", username], root=root)
  
-     def setRootPassword(self, password, isCrypted=False, isLocked=False, algo=None, root="/"):
-         return self.setUserPassword("root", password, isCrypted, isLocked, algo, root)
+ 
+ def set_root_password(password, is_crypted=False, lock=False, root="/"):
 -- 
 2.7.4
 

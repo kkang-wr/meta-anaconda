@@ -14,6 +14,10 @@ Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
 Upstream-Status: Inappropriate [oe specific]
 Rebase to f30-release
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Update context for anaconda 32.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/bootloader/base.py         |  4 ++++
  pyanaconda/bootloader/grub2.py        | 26 +++++++++++++++++---------
@@ -21,13 +25,13 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  3 files changed, 24 insertions(+), 9 deletions(-)
 
 diff --git a/pyanaconda/bootloader/base.py b/pyanaconda/bootloader/base.py
-index 447dd05..0550745 100644
+index f1aa6acca6..bac6d6137c 100644
 --- a/pyanaconda/bootloader/base.py
 +++ b/pyanaconda/bootloader/base.py
-@@ -869,6 +869,10 @@ class BootLoader(object):
+@@ -902,6 +902,10 @@ class BootLoader(object):
              raise BootLoaderError("no config file defined for this boot loader")
  
-         config_path = os.path.normpath(util.getSysroot() + self.config_file)
+         config_path = os.path.normpath(conf.target.system_root + self.config_file)
 +        config_dir = os.path.dirname(config_path)
 +        if not os.path.isdir(config_dir):
 +            os.mkdir(config_dir, 755)
@@ -36,10 +40,10 @@ index 447dd05..0550745 100644
              os.rename(config_path, config_path + ".anacbak")
  
 diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
-index 600d2c0..352ad72 100644
+index 4695c1cd45..1d1302681b 100644
 --- a/pyanaconda/bootloader/grub2.py
 +++ b/pyanaconda/bootloader/grub2.py
-@@ -98,9 +98,9 @@ class GRUB2(BootLoader):
+@@ -100,9 +100,9 @@ class GRUB2(BootLoader):
      name = "GRUB2"
      # grub2 is a virtual provides that's provided by grub2-pc, grub2-ppc64le,
      # and all of the primary grub components that aren't grub2-efi-${EFIARCH}
@@ -51,10 +55,10 @@ index 600d2c0..352ad72 100644
      _passwd_file = "user.cfg"
      defaults_file = "/etc/default/grub"
      terminal_type = "console"
-@@ -226,6 +226,10 @@ class GRUB2(BootLoader):
+@@ -227,6 +227,10 @@ class GRUB2(BootLoader):
      def write_device_map(self):
          """Write out a device map containing all supported devices."""
-         map_path = os.path.normpath(util.getSysroot() + self.device_map_file)
+         map_path = os.path.normpath(conf.target.system_root + self.device_map_file)
 +        map_dir = os.path.dirname(map_path)
 +        if not os.path.isdir(map_dir):
 +            os.mkdir(map_dir, 755)
@@ -62,8 +66,8 @@ index 600d2c0..352ad72 100644
          if os.access(map_path, os.R_OK):
              os.rename(map_path, map_path + ".anacbak")
  
-@@ -253,9 +257,9 @@ class GRUB2(BootLoader):
-         defaults_file = "%s%s" % (util.getSysroot(), self.defaults_file)
+@@ -254,9 +258,9 @@ class GRUB2(BootLoader):
+         defaults_file = "%s%s" % (conf.target.system_root, self.defaults_file)
          defaults = open(defaults_file, "w+")
          defaults.write("GRUB_TIMEOUT=%d\n" % self.timeout)
 -        defaults.write("GRUB_DISTRIBUTOR=\"$(sed 's, release .*$,,g' /etc/system-release)\"\n")
@@ -74,19 +78,19 @@ index 600d2c0..352ad72 100644
          if self.console and self.has_serial_console:
              defaults.write("GRUB_TERMINAL=\"serial console\"\n")
              defaults.write("GRUB_SERIAL_COMMAND=\"%s\"\n" % self.serial_command)
-@@ -290,7 +294,7 @@ class GRUB2(BootLoader):
+@@ -298,7 +302,7 @@ class GRUB2(BootLoader):
          passwords = "%s\n%s\n" % (self.password, self.password)
          os.write(pwrite, passwords.encode("utf-8"))
          os.close(pwrite)
 -        buf = util.execWithCapture("grub2-mkpasswd-pbkdf2", [],
 +        buf = util.execWithCapture("grub-mkpasswd-pbkdf2", [],
                                     stdin=pread,
-                                    root=util.getSysroot())
+                                    root=conf.target.system_root)
          os.close(pread)
-@@ -303,6 +307,10 @@ class GRUB2(BootLoader):
+@@ -311,6 +315,10 @@ class GRUB2(BootLoader):
              return
  
-         users_file = "%s%s/%s" % (util.getSysroot(), self.config_dir, self._passwd_file)
+         users_file = "%s%s/%s" % (conf.target.system_root, self.config_dir, self._passwd_file)
 +        users_dir = os.path.dirname(users_file)
 +        if not os.path.isdir(users_dir):
 +            os.mkdir(users_dir, 755)
@@ -94,7 +98,7 @@ index 600d2c0..352ad72 100644
          header = util.open_with_perm(users_file, "w", 0o700)
          # XXX FIXME: document somewhere that the username is "root"
          self._encrypt_password()
-@@ -336,21 +344,21 @@ class GRUB2(BootLoader):
+@@ -344,21 +352,21 @@ class GRUB2(BootLoader):
                  machine_id = fd.readline().strip()
  
              default_entry = "%s-%s" % (machine_id, self.default.version)
@@ -119,29 +123,28 @@ index 600d2c0..352ad72 100644
                                  ["-o", self.config_file])
          if rc:
              raise BootLoaderError("failed to write boot loader configuration")
-@@ -420,7 +428,7 @@ class GRUB2(BootLoader):
+@@ -425,7 +433,7 @@ class GRUB2(BootLoader):
                  else:
                      log.info("bootloader.py: mbr will be updated for grub2")
  
 -            rc = util.execWithRedirect("grub2-install", grub_args,
 +            rc = util.execWithRedirect("grub-install", grub_args,
-                                        root=util.getSysroot(),
+                                        root=conf.target.system_root,
                                         env_prune=['MALLOC_PERTURB_'])
              if rc:
 diff --git a/pyanaconda/bootloader/installation.py b/pyanaconda/bootloader/installation.py
-index 71b18b2..8f6d999 100644
+index 5ed5c46423..c7c158007a 100644
 --- a/pyanaconda/bootloader/installation.py
 +++ b/pyanaconda/bootloader/installation.py
-@@ -154,6 +154,9 @@ def _write_sysconfig_kernel(sysroot, storage):
+@@ -130,6 +130,9 @@ def _write_sysconfig_kernel(sysroot, storage):
  
-     kernel = h.name.decode()
+     kernel = decode_bytes(h.name)
  
 +    if not os.path.isdir(util.getSysroot() + "/etc/sysconfig"):
 +        os.mkdir(util.getSysroot() + "/etc/sysconfig", 755)
 +
      f = open(sysroot + "/etc/sysconfig/kernel", "w+")
-     f.write("# UPDATEDEFAULT specifies if new-kernel-pkg should make\n"
+     f.write("# UPDATEDEFAULT specifies if kernel-install should make\n"
              "# new kernels the default\n")
 -- 
 2.7.4
-

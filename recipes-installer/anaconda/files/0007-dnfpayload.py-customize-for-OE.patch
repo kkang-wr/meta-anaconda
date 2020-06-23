@@ -6,12 +6,16 @@ Subject: [PATCH] dnfpayload.py: customize for OE
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Update context for anaconda 32.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/payload/dnfpayload.py | 397 +++++++++++++++++++++++++++++++++------
  1 file changed, 340 insertions(+), 57 deletions(-)
 
 diff --git a/pyanaconda/payload/dnfpayload.py b/pyanaconda/payload/dnfpayload.py
-index 1f2925d..53d40eb 100644
+index abb1826ed0..44e8293955 100644
 --- a/pyanaconda/payload/dnfpayload.py
 +++ b/pyanaconda/payload/dnfpayload.py
 @@ -17,6 +17,7 @@
@@ -22,15 +26,15 @@ index 1f2925d..53d40eb 100644
  import configparser
  import collections
  import multiprocessing
-@@ -55,6 +56,7 @@ import dnf.transaction
+@@ -58,6 +59,7 @@ import dnf.transaction
  import libdnf.conf
  import rpm
  from dnf.const import GROUP_PACKAGE_TYPES
 +import dnf.const
  
  from blivet.size import Size
- from pykickstart.constants import GROUP_ALL, GROUP_DEFAULT, KS_MISSING_IGNORE
-@@ -62,6 +64,11 @@ from pykickstart.constants import GROUP_ALL, GROUP_DEFAULT, KS_MISSING_IGNORE
+ from pykickstart.constants import GROUP_ALL, GROUP_DEFAULT, KS_MISSING_IGNORE, KS_BROKEN_IGNORE
+@@ -65,6 +67,11 @@ from pykickstart.constants import GROUP_ALL, GROUP_DEFAULT, KS_MISSING_IGNORE, K
  from pyanaconda.anaconda_loggers import get_packaging_logger, get_dnf_logger
  log = get_packaging_logger()
  
@@ -42,7 +46,7 @@ index 1f2925d..53d40eb 100644
  
  DNF_CACHE_DIR = '/tmp/dnf.cache'
  DNF_PLUGINCONF_DIR = '/tmp/dnf.pluginconf'
-@@ -232,7 +239,17 @@ class PayloadRPMDisplay(dnf.callback.TransactionProgress):
+@@ -230,7 +237,17 @@ class PayloadRPMDisplay(dnf.callback.TransactionProgress):
          """Report an error that occurred during the transaction. Message is a
          string which describes the error.
          """
@@ -61,7 +65,7 @@ index 1f2925d..53d40eb 100644
  
  
  class DownloadProgress(dnf.callback.DownloadProgress):
-@@ -302,6 +319,12 @@ class DNFPayload(payload.PackagePayload):
+@@ -300,6 +317,12 @@ class DNFPayload(payload.PackagePayload):
          self._updates_enabled = True
          self._configure()
  
@@ -74,7 +78,7 @@ index 1f2925d..53d40eb 100644
          # Protect access to _base.repos to ensure that the dictionary is not
          # modified while another thread is attempting to iterate over it. The
          # lock only needs to be held during operations that change the number
-@@ -315,12 +338,28 @@ class DNFPayload(payload.PackagePayload):
+@@ -313,12 +336,28 @@ class DNFPayload(payload.PackagePayload):
          self._req_packages = set()
          self.requirements.set_apply_callback(self._apply_requirements)
  
@@ -103,7 +107,7 @@ index 1f2925d..53d40eb 100644
      def _replace_vars(self, url):
          """Replace url variables with their values.
  
-@@ -482,24 +521,16 @@ class DNFPayload(payload.PackagePayload):
+@@ -494,24 +533,16 @@ class DNFPayload(payload.PackagePayload):
              log.debug("excluding group %s", group.name)
              exclude_list.append("@{}".format(group.name))
  
@@ -134,7 +138,7 @@ index 1f2925d..53d40eb 100644
  
          # groups from kickstart data
          for group in self.data.packages.groupList:
-@@ -579,6 +610,62 @@ class DNFPayload(payload.PackagePayload):
+@@ -593,6 +624,62 @@ class DNFPayload(payload.PackagePayload):
          except Exception as e:  # pylint: disable=broad-except
              self._payload_setup_error(e)
  
@@ -197,7 +201,7 @@ index 1f2925d..53d40eb 100644
      def _apply_requirements(self, requirements):
          self._req_groups = set()
          self._req_packages = set()
-@@ -594,7 +681,7 @@ class DNFPayload(payload.PackagePayload):
+@@ -608,7 +695,7 @@ class DNFPayload(payload.PackagePayload):
              log.debug("selected package: %s, requirement for %s %s",
                        req.id, req.reasons, ", ".join(ignore_msgs))
  
@@ -206,7 +210,7 @@ index 1f2925d..53d40eb 100644
              # NOTE: req.strong not handled yet
              log.debug("selected group: %s, requirement for %s",
                        req.id, req.reasons)
-@@ -645,16 +732,47 @@ class DNFPayload(payload.PackagePayload):
+@@ -659,16 +746,47 @@ class DNFPayload(payload.PackagePayload):
          if os.path.exists("/etc/os-release"):
              config = SimpleConfigFile()
              config.read("/etc/os-release")
@@ -256,8 +260,8 @@ index 1f2925d..53d40eb 100644
      def _configure(self):
          self._base = dnf.Base()
          config = self._base.conf
-@@ -674,6 +792,8 @@ class DNFPayload(payload.PackagePayload):
-         config.installroot = util.getSysroot()
+@@ -688,6 +806,8 @@ class DNFPayload(payload.PackagePayload):
+         config.installroot = conf.target.system_root
          config.prepend_installroot('persistdir')
  
 +        self._oe_configure(config)
@@ -265,7 +269,7 @@ index 1f2925d..53d40eb 100644
          self._base.conf.substitutions.update_from_etc(config.installroot)
  
          if self.data.packages.multiLib:
-@@ -801,20 +921,23 @@ class DNFPayload(payload.PackagePayload):
+@@ -822,20 +942,23 @@ class DNFPayload(payload.PackagePayload):
      def base_repo(self):
          # is any locking needed here?
          repo_names = [constants.BASE_REPO_NAME] + constants.DEFAULT_REPOS
@@ -292,7 +296,7 @@ index 1f2925d..53d40eb 100644
  
      @property
      def repos(self):
-@@ -936,42 +1059,39 @@ class DNFPayload(payload.PackagePayload):
+@@ -955,42 +1078,39 @@ class DNFPayload(payload.PackagePayload):
          super().enable_repo(repo_id)
  
      def environment_description(self, environment_id):
@@ -358,8 +362,8 @@ index 1f2925d..53d40eb 100644
  
      def group_id(self, group_name):
          """Translate group name to group ID.
-@@ -994,6 +1114,31 @@ class DNFPayload(payload.PackagePayload):
-         self._base.read_comps()
+@@ -1013,6 +1133,31 @@ class DNFPayload(payload.PackagePayload):
+         self._base.read_comps(arch_filter=True)
          self._refresh_environment_addons()
  
 +    # Refer upstream oe-core meta/lib/oe/package_manager.py
@@ -390,7 +394,7 @@ index 1f2925d..53d40eb 100644
      def install(self):
          progress_message(N_('Starting package installation process'))
  
-@@ -1028,6 +1173,7 @@ class DNFPayload(payload.PackagePayload):
+@@ -1047,6 +1192,7 @@ class DNFPayload(payload.PackagePayload):
                  _failure_limbo()
  
          log.info('Downloading packages finished.')
@@ -398,7 +402,7 @@ index 1f2925d..53d40eb 100644
  
          pre_msg = (N_("Preparing transaction from installation source"))
          progress_message(pre_msg)
-@@ -1060,6 +1206,9 @@ class DNFPayload(payload.PackagePayload):
+@@ -1079,6 +1225,9 @@ class DNFPayload(payload.PackagePayload):
              elif token == 'quit':
                  msg = ("Payload error - DNF installation has ended up abruptly: %s" % msg)
                  raise PayloadError(msg)
@@ -408,7 +412,7 @@ index 1f2925d..53d40eb 100644
              elif token == 'error':
                  exc = PayloadInstallError("DNF error: %s" % msg)
                  if errors.errorHandler.cb(exc) == errors.ERROR_RAISE:
-@@ -1068,6 +1217,10 @@ class DNFPayload(payload.PackagePayload):
+@@ -1087,6 +1236,10 @@ class DNFPayload(payload.PackagePayload):
              (token, msg) = queue_instance.get()
  
          process.join()
@@ -419,7 +423,7 @@ index 1f2925d..53d40eb 100644
          # Don't close the mother base here, because we still need it.
          if os.path.exists(self._download_location):
              log.info("Cleaning up downloaded packages: %s", self._download_location)
-@@ -1079,6 +1232,39 @@ class DNFPayload(payload.PackagePayload):
+@@ -1098,6 +1251,39 @@ class DNFPayload(payload.PackagePayload):
              # we don't have to care about clearing the download location ourselves.
              log.warning("Can't delete nonexistent download location: %s", self._download_location)
  
@@ -459,7 +463,7 @@ index 1f2925d..53d40eb 100644
      def get_repo(self, repo_id):
          """Return the yum repo object."""
          return self._base.repos[repo_id]
-@@ -1101,16 +1287,7 @@ class DNFPayload(payload.PackagePayload):
+@@ -1120,16 +1306,7 @@ class DNFPayload(payload.PackagePayload):
          return True
  
      def language_groups(self):
@@ -477,16 +481,16 @@ index 1f2925d..53d40eb 100644
  
      def reset(self):
          super().reset()
-@@ -1134,6 +1311,8 @@ class DNFPayload(payload.PackagePayload):
+@@ -1152,6 +1329,8 @@ class DNFPayload(payload.PackagePayload):
          sslverify = True
          if method.method == "url":
-             sslverify = not (method.noverifyssl or flags.noverifyssl)
+             sslverify = not method.noverifyssl and conf.payload.verify_ssl
 +        log.info('configuring base repo: url %s, mirrorlist %s, sslverify %s, method %s'
 +                    % (base_repo_url, mirrorlist, sslverify, method.method))
  
          # Read in all the repos from the installation environment, make a note of which
          # are enabled, and then disable them all.  If the user gave us a method, we want
-@@ -1179,6 +1358,7 @@ class DNFPayload(payload.PackagePayload):
+@@ -1193,6 +1372,7 @@ class DNFPayload(payload.PackagePayload):
                      sslcacert=getattr(method, 'sslcacert', None),
                      sslclientcert=getattr(method, 'sslclientcert', None),
                      sslclientkey=getattr(method, 'sslclientkey', None))
@@ -494,7 +498,7 @@ index 1f2925d..53d40eb 100644
                  self._add_repo(base_ksrepo)
                  self._fetch_md(base_ksrepo.name)
              except (MetadataError, PayloadError) as e:
-@@ -1397,6 +1577,66 @@ class DNFPayload(payload.PackagePayload):
+@@ -1416,6 +1596,66 @@ class DNFPayload(payload.PackagePayload):
          self._base.close()
          super().post_install()
  
@@ -561,7 +565,7 @@ index 1f2925d..53d40eb 100644
  
  class RepoMDMetaHash(object):
      """Class that holds hash of a repomd.xml file content from a repository.
-@@ -1469,3 +1709,46 @@ class RepoMDMetaHash(object):
+@@ -1489,3 +1729,46 @@ class RepoMDMetaHash(object):
                            url, proxies, e)
  
          return repomd
@@ -610,4 +614,3 @@ index 1f2925d..53d40eb 100644
 +    _payload.post_install()
 -- 
 2.7.4
-

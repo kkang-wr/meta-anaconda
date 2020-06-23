@@ -6,6 +6,10 @@ Subject: [PATCH] dynamic detect workable locale
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Update context for anaconda 32.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/localization.py                          | 18 +++++++++++++++++-
  pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py |  2 ++
@@ -13,7 +17,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  3 files changed, 22 insertions(+), 3 deletions(-)
 
 diff --git a/pyanaconda/localization.py b/pyanaconda/localization.py
-index 20908ef..18d4be9 100644
+index 326bc145cb..d195885af0 100644
 --- a/pyanaconda/localization.py
 +++ b/pyanaconda/localization.py
 @@ -27,7 +27,7 @@ import glob
@@ -22,10 +26,10 @@ index 20908ef..18d4be9 100644
  from pyanaconda.core import constants, util
 -from pyanaconda.core.util import upcase_first_letter, setenv, execWithRedirect
 +from pyanaconda.core.util import upcase_first_letter, setenv, execWithRedirect, execReadlines
+ from pyanaconda.modules.common.constants.services import BOSS
  
  from pyanaconda.anaconda_loggers import get_module_logger
- log = get_module_logger(__name__)
-@@ -776,3 +776,19 @@ def strip_codeset_and_modifier(locale):
+@@ -712,3 +712,19 @@ def strip_codeset_and_modifier(locale):
      if '.' in locale:
          locale = locale[:locale.find('.')]
      return locale
@@ -46,10 +50,10 @@ index 20908ef..18d4be9 100644
 +
 +    return _all_locales
 diff --git a/pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py b/pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py
-index 6380c14..c4e361b 100644
+index cd265ff3bb..4de373b228 100644
 --- a/pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py
 +++ b/pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py
-@@ -166,6 +166,8 @@ class LangLocaleHandler(object):
+@@ -167,6 +167,8 @@ class LangLocaleHandler(object):
          locales = localization.get_language_locales(lang)
          locales = self._filter_locales(lang, locales)
          for locale in locales:
@@ -59,10 +63,10 @@ index 6380c14..c4e361b 100644
                               localization.get_native_name(locale),
                               locale)
 diff --git a/pyanaconda/ui/tui/spokes/language_support.py b/pyanaconda/ui/tui/spokes/language_support.py
-index f4e8f48..9a48a78 100644
+index c5cdbf1542..1722880c1d 100644
 --- a/pyanaconda/ui/tui/spokes/language_support.py
 +++ b/pyanaconda/ui/tui/spokes/language_support.py
-@@ -97,8 +97,9 @@ class LangSpoke(FirstbootSpokeMixIn, NormalTUISpoke):
+@@ -96,8 +96,9 @@ class LangSpoke(FirstbootSpokeMixIn, NormalTUISpoke):
          if args:
              self.window.add(TextWidget(_("Available locales")))
              for locale in args:
@@ -76,4 +80,3 @@ index f4e8f48..9a48a78 100644
              for lang in self._langs:
 -- 
 2.7.4
-

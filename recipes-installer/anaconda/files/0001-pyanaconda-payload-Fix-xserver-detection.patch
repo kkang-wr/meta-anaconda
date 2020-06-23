@@ -12,23 +12,29 @@ To fix this, use the right rpm query to detect the presence of xserver.
 Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
----
- pyanaconda/payload/__init__.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
-index cbe2154..6b3e5ff 100644
---- a/pyanaconda/payload/__init__.py
-+++ b/pyanaconda/payload/__init__.py
-@@ -631,7 +631,7 @@ class Payload(metaclass=ABCMeta):
-             ts = rpm.TransactionSet(util.getSysroot())
+Update context for anaconda 32.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ pyanaconda/modules/services/installation.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pyanaconda/modules/services/installation.py b/pyanaconda/modules/services/installation.py
+index ead5b02fa2..9dc85b7982 100644
+--- a/pyanaconda/modules/services/installation.py
++++ b/pyanaconda/modules/services/installation.py
+@@ -218,8 +218,8 @@ class ConfigureSystemdDefaultTargetTask(Task):
+         else:
+             ts = rpm.TransactionSet(conf.target.system_root)
  
-             # XXX one day this might need to account for anaconda's display mode
--            if ts.dbMatch("provides", 'service(graphical-login)').count() and \
-+            if ts.dbMatch('provides', 'xserver-xorg').count() and \
-                not flags.usevnc:
-                 # We only manipulate the ksdata.  The symlink is made later
-                 # during the config write out.
+-            if ts.dbMatch("provides", 'service(graphical-login)').count():
+-                log.debug("A package with provides == service(graphical-login) is installed, "
++            if ts.dbMatch("provides", 'xserver-xorg').count():
++                log.debug("A package with provides == xserver-xorg is installed, "
+                           "using graphical.target.")
+                 self._default_target = GRAPHICAL_TARGET
+ 
 -- 
 2.7.4
 

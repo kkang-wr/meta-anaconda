@@ -13,23 +13,26 @@ Try mounting with noload
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Update context for anaconda 32.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/payload/livepayload.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/pyanaconda/payload/livepayload.py b/pyanaconda/payload/livepayload.py
-index 6a8d345..c8df0cd 100644
+index cca38c0510..dbcb04fee0 100644
 --- a/pyanaconda/payload/livepayload.py
 +++ b/pyanaconda/payload/livepayload.py
-@@ -80,7 +80,7 @@ class LiveImagePayload(Payload):
+@@ -82,7 +82,7 @@ class LiveImagePayload(Payload):
                                      (self.data.method.partition,))
              if errorHandler.cb(exn) == ERROR_RAISE:
                  raise exn
--        rc = payload_utils.mount(osimg.path, INSTALL_TREE, fstype="auto", options="ro")
-+        rc = payload_utils.mount(osimg.path, INSTALL_TREE, fstype="auto", options="ro,noload")
+-        rc = payload_utils.mount(osimg_path, INSTALL_TREE, fstype="auto", options="ro")
++        rc = payload_utils.mount(osimg_path, INSTALL_TREE, fstype="auto", options="ro,noload")
          if rc != 0:
              raise PayloadInstallError("Failed to mount the install tree")
  
 -- 
 2.7.4
-
