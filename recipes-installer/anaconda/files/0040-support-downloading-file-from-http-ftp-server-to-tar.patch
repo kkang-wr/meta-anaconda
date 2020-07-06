@@ -31,7 +31,7 @@ diff --git a/pyanaconda/installation.py b/pyanaconda/installation.py
 index d8d96d8811..904460ea8c 100644
 --- a/pyanaconda/installation.py
 +++ b/pyanaconda/installation.py
-@@ -137,6 +137,12 @@ def _prepare_configuration(payload, ksdata):
+@@ -129,6 +129,12 @@ def _prepare_configuration(payload, ksdata):
          (None, ksdata, None, payload)
      ))
  
@@ -50,14 +50,14 @@ index 7dbf83971a..848d0dc969 100644
 +++ b/pyanaconda/kickstart.py
 @@ -47,6 +47,8 @@ from pykickstart.base import BaseHandler, KickstartCommand
  from pykickstart.constants import KS_SCRIPT_POST, KS_SCRIPT_PRE, KS_SCRIPT_TRACEBACK, KS_SCRIPT_PREINSTALL
- from pykickstart.errors import KickstartError, KickstartParseWarning
+ from pykickstart.errors import KickstartError, KickstartParseWarning, KickstartAuthError
  from pykickstart.parser import KickstartParser
 +from pykickstart.base import KickstartCommand, BaseData
 +from pykickstart.options import KSOptionParser
  from pykickstart.parser import Script as KSScript
  from pykickstart.sections import NullSection, PackageSection, PostScriptSection, PreScriptSection, PreInstallScriptSection, \
                                   OnErrorScriptSection, TracebackScriptSection, Section
-@@ -341,6 +343,101 @@ class AnacondaSection(Section):
+@@ -343,6 +343,101 @@ class AnacondaSection(Section):
          Section.finalize(self)
  
  
@@ -159,7 +159,7 @@ index 7dbf83971a..848d0dc969 100644
  ###
  ### HANDLERS
  ###
-@@ -387,10 +484,12 @@ commandMap = {
+@@ -384,10 +479,12 @@ commandMap = {
      "xconfig": UselessCommand,
      "zerombr": UselessCommand,
      "zfcp": UselessCommand,

@@ -39,9 +39,9 @@ diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
 index 0da743e..4fb40cb 100644
 --- a/pyanaconda/payload/__init__.py
 +++ b/pyanaconda/payload/__init__.py
-@@ -574,6 +574,11 @@ class Payload(metaclass=ABCMeta):
+@@ -534,6 +534,11 @@ class Payload(metaclass=ABCMeta):
          for subdir in ["log", "tmp"]:
-             util.mkdirChain(util.getSysroot() + "/var/volatile/%s" % subdir)
+             util.mkdirChain(conf.target.system_root + "/var/volatile/%s" % subdir)
  
 +        with open(conf.target.system_root + "/etc/dracut.conf.d/cryptsetup.conf", "w") as f:
 +            f.write('add_drivers+=" aesni_intel"\n')

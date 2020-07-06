@@ -17,7 +17,7 @@ diff --git a/pyanaconda/storage/checker.py b/pyanaconda/storage/checker.py
 index 0f0be6e..c3e5780 100644
 --- a/pyanaconda/storage/checker.py
 +++ b/pyanaconda/storage/checker.py
-@@ -567,7 +567,7 @@ class StorageChecker(object):
+@@ -620,7 +620,7 @@ class StorageChecker(object):
              '/tmp': Size("50 MiB"),
              '/var': Size("384 MiB"),
              '/home': Size("100 MiB"),
@@ -25,7 +25,7 @@ index 0f0be6e..c3e5780 100644
 +            '/boot': Size("300 MiB")
          })
  
-         self.add_new_constraint(STORAGE_MUST_BE_ON_LINUXFS, {
+         self.add_constraint(STORAGE_MUST_BE_ON_LINUXFS, {
 -- 
 2.7.4
 

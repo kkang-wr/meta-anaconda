@@ -16,7 +16,7 @@ diff --git a/pyanaconda/geoloc.py b/pyanaconda/geoloc.py
 index 12059ce..dc332f7 100644
 --- a/pyanaconda/geoloc.py
 +++ b/pyanaconda/geoloc.py
-@@ -482,6 +482,9 @@ class FedoraGeoIPProvider(GeolocationBackend):
+@@ -473,6 +473,9 @@ class FedoraGeoIPProvider(GeolocationBackend):
          return "Fedora GeoIP"
  
      def _refresh(self):
@@ -24,8 +24,8 @@ index 12059ce..dc332f7 100644
 +
 +    def __refresh(self):
          try:
-             reply = self._session.get(self.API_URL, timeout=constants.NETWORK_CONNECTION_TIMEOUT, verify=True)
-             if reply.status_code == requests.codes.ok:
+             reply = self._session.get(self.API_URL,
+                                       timeout=constants.NETWORK_CONNECTION_TIMEOUT,
 -- 
 2.7.4
 

@@ -24,8 +24,8 @@ index 4c7f3bd..9e21d35 100644
 -    window.set_cursor(Gdk.Cursor(Gdk.CursorType.ARROW))
 +    window.set_cursor(Gdk.Cursor(Gdk.CursorType.LEFT_PTR))
  
+
  def ignoreEscape(dlg):
-     """Prevent a dialog from accepting the escape keybinding, which emits a
 -- 
 2.7.4
 

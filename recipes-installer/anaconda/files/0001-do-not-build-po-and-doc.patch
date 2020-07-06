@@ -16,7 +16,7 @@ diff --git a/Makefile.am b/Makefile.am
 index 6f580f4..5c505b4 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -17,7 +17,7 @@
+@@ -19,7 +19,7 @@ include ./branch-config.mk
  
  ACLOCAL_AMFLAGS = -I m4
  
@@ -29,15 +29,15 @@ diff --git a/configure.ac b/configure.ac
 index c1af6e2..2321b62 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -122,7 +122,6 @@ AC_CONFIG_FILES([Makefile
-                  zanata.xml
+@@ -117,7 +117,6 @@ AC_CONFIG_FILES([Makefile
+                  anaconda.spec
                   data/Makefile
                   data/command-stubs/Makefile
 -                 docs/Makefile
                   dracut/Makefile
                   data/conf.d/Makefile
                   data/product.d/Makefile
-@@ -134,7 +133,6 @@ AC_CONFIG_FILES([Makefile
+@@ -129,7 +128,6 @@ AC_CONFIG_FILES([Makefile
                   data/dbus/Makefile
                   data/window-manager/Makefile
                   data/window-manager/config/Makefile

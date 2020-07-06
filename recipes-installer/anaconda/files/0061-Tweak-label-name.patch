@@ -18,8 +18,8 @@ diff --git a/pyanaconda/product.py b/pyanaconda/product.py
 index 9d97dab..5548f99 100644
 --- a/pyanaconda/product.py
 +++ b/pyanaconda/product.py
-@@ -52,6 +52,10 @@ if productVersion == "development":
-     productVersion = "rawhide"
+@@ -53,5 +53,9 @@ if productVersion == "development":
+
  
  def distributionText():
 +    if '(' in productName and ')' in productName:
@@ -28,7 +28,6 @@ index 9d97dab..5548f99 100644
 +
      return _("%(productName)s %(productVersion)s INSTALLATION") % \
               {"productName": productName, "productVersion": productVersion}
- 
 diff --git a/pyanaconda/ui/gui/spokes/welcome.py b/pyanaconda/ui/gui/spokes/welcome.py
 index c1ac605..dc8d9e6 100644
 --- a/pyanaconda/ui/gui/spokes/welcome.py
@@ -42,7 +41,7 @@ index c1ac605..dc8d9e6 100644
  from pyanaconda.modules.common.constants.services import TIMEZONE, LOCALIZATION
  
  from pyanaconda.anaconda_loggers import get_module_logger
-@@ -238,7 +238,7 @@ class WelcomeLanguageSpoke(LangLocaleHandler, StandaloneSpoke):
+@@ -237,7 +237,7 @@ class WelcomeLanguageSpoke(LangLocaleHandler, StandaloneSpoke):
          welcomeLabel = self.builder.get_object("welcomeLabel")
  
          welcomeLabel.set_text(_("WELCOME TO %(name)s %(version)s.") %

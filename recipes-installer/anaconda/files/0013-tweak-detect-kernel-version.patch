@@ -18,7 +18,7 @@ diff --git a/pyanaconda/bootloader/installation.py b/pyanaconda/bootloader/insta
 index 8f6d999..b620ab3 100644
 --- a/pyanaconda/bootloader/installation.py
 +++ b/pyanaconda/bootloader/installation.py
-@@ -129,14 +129,19 @@ def _write_sysconfig_kernel(sysroot, storage):
+@@ -105,14 +105,19 @@ def _write_sysconfig_kernel(sysroot, storage):
      log.debug("Writing to /etc/sysconfig/kernel.")
  
      # get the name of the default kernel package based on the version
@@ -50,8 +50,8 @@ diff --git a/pyanaconda/payload/livepayload.py b/pyanaconda/payload/livepayload.
 index aaafa20..235a3b5 100644
 --- a/pyanaconda/payload/livepayload.py
 +++ b/pyanaconda/payload/livepayload.py
-@@ -211,9 +211,15 @@ class LiveImagePayload(Payload):
-         return Size(util.getDirSize("/") * 1024)
+@@ -230,9 +230,15 @@ class LiveImagePayload(Payload):
+         return Size(get_dir_size("/") * 1024)
  
      def _update_kernel_version_list(self):
 -        files = glob.glob(INSTALL_TREE + "/boot/vmlinuz-*")

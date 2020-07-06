@@ -20,9 +20,9 @@ diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
 index 80b026a..447b4bf 100644
 --- a/pyanaconda/bootloader/grub2.py
 +++ b/pyanaconda/bootloader/grub2.py
-@@ -337,8 +337,10 @@ class GRUB2(BootLoader):
+@@ -345,8 +345,10 @@ class GRUB2(BootLoader):
          if self.default is not None:
-             machine_id_path = util.getSysroot() + "/etc/machine-id"
+             machine_id_path = conf.target.system_root + "/etc/machine-id"
              if not os.access(machine_id_path, os.R_OK):
 -                log.error("failed to read machine-id, default entry not set")
 -                return

@@ -20,7 +20,7 @@ diff --git a/pyanaconda/ui/helpers.py b/pyanaconda/ui/helpers.py
 index d980983..e9cdcab 100644
 --- a/pyanaconda/ui/helpers.py
 +++ b/pyanaconda/ui/helpers.py
-@@ -109,6 +109,7 @@ class SourceSwitchHandler(object, metaclass=ABCMeta):
+@@ -90,6 +90,7 @@ class SourceSwitchHandler(object, metaclass=ABCMeta):
      It will correctly switch to the new method
      and cleanup any previous method set.
      """
@@ -28,8 +28,8 @@ index d980983..e9cdcab 100644
  
      @abstractproperty
      def data(self):
-@@ -177,7 +178,7 @@ class SourceSwitchHandler(object, metaclass=ABCMeta):
-         # as we already made the device protected when
+@@ -150,7 +151,7 @@ class SourceSwitchHandler(object, metaclass=ABCMeta):
+         # as we already made the device_name protected when
          # switching to it, we don't need to protect it here
  
 -    def set_source_url(self, url=None):
@@ -37,7 +37,7 @@ index d980983..e9cdcab 100644
          """ Switch to install source specified by URL """
          # clean any old HDD ISO sources
          self._clean_hdd_iso()
-@@ -185,6 +186,11 @@ class SourceSwitchHandler(object, metaclass=ABCMeta):
+@@ -158,6 +159,11 @@ class SourceSwitchHandler(object, metaclass=ABCMeta):
          self.data.method.method = "url"
          if url is not None:
              self.data.method.url = url
@@ -53,7 +53,7 @@ diff --git a/pyanaconda/ui/tui/spokes/installation_source.py b/pyanaconda/ui/tui
 index ab44ecc..da65437 100644
 --- a/pyanaconda/ui/tui/spokes/installation_source.py
 +++ b/pyanaconda/ui/tui/spokes/installation_source.py
-@@ -263,6 +263,7 @@ class SpecifyRepoSpoke(NormalTUISpoke, SourceSwitchHandler):
+@@ -268,6 +268,7 @@ class SpecifyRepoSpoke(NormalTUISpoke, SourceSwitchHandler):
          self._container = None
  
          self._url = self.data.url.url
@@ -61,7 +61,7 @@ index ab44ecc..da65437 100644
  
      def refresh(self, args=None):
          """ Refresh window. """
-@@ -273,11 +274,17 @@ class SpecifyRepoSpoke(NormalTUISpoke, SourceSwitchHandler):
+@@ -278,11 +279,17 @@ class SpecifyRepoSpoke(NormalTUISpoke, SourceSwitchHandler):
          dialog = Dialog(_("Repo URL"))
          self._container.add(EntryWidget(dialog.title, self._url), self._set_repo_url, dialog)
  
@@ -79,7 +79,7 @@ index ab44ecc..da65437 100644
      def input(self, args, key):
          if self._container.process_user_input(key):
              self.apply()
-@@ -302,7 +309,15 @@ class SpecifyRepoSpoke(NormalTUISpoke, SourceSwitchHandler):
+@@ -306,7 +313,15 @@ class SpecifyRepoSpoke(NormalTUISpoke, SourceSwitchHandler):
              # protocol either unknown or entry already starts with a protocol
              # specification
              url = self._url
