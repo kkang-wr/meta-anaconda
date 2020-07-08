@@ -140,8 +140,8 @@ index 5ed5c46423..c7c158007a 100644
  
      kernel = decode_bytes(h.name)
  
-+    if not os.path.isdir(util.getSysroot() + "/etc/sysconfig"):
-+        os.mkdir(util.getSysroot() + "/etc/sysconfig", 755)
++    if not os.path.isdir(conf.target.system_root + "/etc/sysconfig"):
++        os.mkdir(conf.target.system_root + "/etc/sysconfig", 755)
 +
      f = open(sysroot + "/etc/sysconfig/kernel", "w+")
      f.write("# UPDATEDEFAULT specifies if kernel-install should make\n"

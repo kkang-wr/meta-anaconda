@@ -232,7 +232,7 @@ index abb1826ed0..44e8293955 100644
 +
 +        # Refers oe-core's meta/lib/oe/package_manager.py
 +        # def _prepare_pkg_transaction(self) in class RpmPM(PackageManager)
-+        target_rootfs = util.getSysroot()
++        target_rootfs = conf.target.system_root
 +        os.environ['D'] = target_rootfs
 +        os.environ['OFFLINE_ROOT'] = target_rootfs
 +        os.environ['IPKG_OFFLINE_ROOT'] = target_rootfs
@@ -252,7 +252,7 @@ index abb1826ed0..44e8293955 100644
 +        # def _configure_rpm(self) and def _configure_dnf(self)
 +        # in class RpmPM(PackageManager)
 +        # directly copy its result from installer system
-+        target_sysconf = "%s/etc" % util.getSysroot()
++        target_sysconf = "%s/etc" % conf.target.system_root
 +        util.execWithRedirect("cp", ["-fr", "/etc/rpmrc", target_sysconf])
 +        util.execWithRedirect("cp", ["-rf", "/etc/dnf", target_sysconf])
 +        util.execWithRedirect("cp", ["-rf", "/etc/rpm", target_sysconf])
@@ -378,7 +378,7 @@ index abb1826ed0..44e8293955 100644
 +
 +        log.info("Saving postinstall script of %s" % (pkg))
 +
-+        target_rootfs = util.getSysroot()
++        target_rootfs = conf.target.system_root
 +        args = ["-q", "--root=%s" % target_rootfs, "--queryformat", "%{postin}", pkg]
 +
 +        output = util.execWithCapture('rpm', args, log_output=False)
@@ -433,7 +433,7 @@ index abb1826ed0..44e8293955 100644
 +                      [
 +                        'repoquery',
 +                        '--installed',
-+                        '--installroot='+util.getSysroot(),
++                        '--installroot='+conf.target.system_root,
 +                        '--queryformat=Package:%{name}'
 +                      ],
 +                      log_output=False
@@ -511,7 +511,7 @@ index abb1826ed0..44e8293955 100644
 +
 +        util.execWithRedirect("depmod",
 +                              ["-a"],
-+                              root=util.getSysroot())
++                              root=conf.target.system_root)
 +
 +    def _read_buildstamp(self):
 +        image = {}

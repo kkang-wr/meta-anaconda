@@ -139,7 +139,7 @@ index 7dbf83971a..848d0dc969 100644
 +                stderrLog.critical(msg)
 +                sys.exit(1)
 +
-+            dest = util.getSysroot() + dd.dest
++            dest = conf.target.system_root + dd.dest
 +            log.info("downloading %s to %s" % (dd.src, dest))
 +            dest_dir = os.path.dirname(dest)
 +            if not os.path.exists(dest_dir):

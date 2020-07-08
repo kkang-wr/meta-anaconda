@@ -11,6 +11,10 @@ Add a wraper to generate efi filesystem with fs_uuid located.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Replace util.getSysroot() with conf.target.system_root.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/bootloader/efi.py | 16 ++++++++++++++++
  1 file changed, 16 insertions(+)
@@ -23,13 +27,13 @@ index 73d348b..6199b51 100644
              self.remove_efi_boot_target()
          self.add_efi_boot_target()
  
-+        with open(util.getSysroot() + "/tmp/grub-mkimage-wrapper.sh", "w") as f:
++        with open(conf.target.system_root + "/tmp/grub-mkimage-wrapper.sh", "w") as f:
 +            f.write('#!/bin/sh\n')
 +            f.write('uuid=`grub-probe  --target=fs_uuid  /boot/efi/`\n')
 +            f.write('echo "search.fs_uuid ${uuid} root" > /tmp/load.cfg\n')
 +            f.write('echo "grub-mkimage -c /tmp/load.cfg $@ search_fs_uuid"\n')
 +            f.write('grub-mkimage -c /tmp/load.cfg $@ search_fs_uuid\n')
-+        os.chmod(util.getSysroot() + "/tmp/grub-mkimage-wrapper.sh", 0o755)
++        os.chmod(conf.target.system_root + "/tmp/grub-mkimage-wrapper.sh", 0o755)
 +
 +        rc = util.execInSysroot("grub-install", ["--removable",
 +                                                  "--efi-directory=/boot/efi/",

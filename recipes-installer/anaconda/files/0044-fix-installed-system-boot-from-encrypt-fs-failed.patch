@@ -27,6 +27,10 @@ loop dependency with lvm2, so ommit systemd module in dracut.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Replace util.getSysroot() with conf.target.system_root.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/payload/__init__.py | 5 +++++
  1 file changed, 5 insertions(+)
@@ -39,7 +43,7 @@ index 0da743e..4fb40cb 100644
          for subdir in ["log", "tmp"]:
              util.mkdirChain(util.getSysroot() + "/var/volatile/%s" % subdir)
  
-+        with open(util.getSysroot() + "/etc/dracut.conf.d/cryptsetup.conf", "w") as f:
++        with open(conf.target.system_root + "/etc/dracut.conf.d/cryptsetup.conf", "w") as f:
 +            f.write('add_drivers+=" aesni_intel"\n')
 +            f.write('add_drivers+=" aes_x86_64"\n')
 +            f.write('omit_dracutmodules+=" systemd"\n')

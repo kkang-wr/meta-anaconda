@@ -19,6 +19,10 @@ Imporve the fix which is compatible with OE
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Replace util.getSysroot() with conf.target.system_root.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/bootloader/efi.py | 15 +++++++++++++++
  1 file changed, 15 insertions(+)
@@ -29,16 +33,16 @@ index 6199b51..b2413a0 100644
 +++ b/pyanaconda/bootloader/efi.py
 @@ -137,10 +137,25 @@ class EFIBase(object):
              f.write('grub-mkimage -c /tmp/load.cfg $@ search_fs_uuid\n')
-         os.chmod(util.getSysroot() + "/tmp/grub-mkimage-wrapper.sh", 0o755)
+         os.chmod(conf.target.system_root + "/tmp/grub-mkimage-wrapper.sh", 0o755)
  
 +        if self._is_32bit_firmware:
-+            if os.path.exists(util.getSysroot()+"/usr/lib/grub/i386-efi"):
++            if os.path.exists(conf.target.system_root+"/usr/lib/grub/i386-efi"):
 +                mod_path = "/usr/lib/grub/i386-efi"
 +            else:
 +                raise BootLoaderError("GRUB2 32-bit libdir not eixst")
 +
 +        else:
-+            if os.path.exists(util.getSysroot()+"/usr/lib64/grub/x86_64-efi"):
++            if os.path.exists(conf.target.system_root+"/usr/lib64/grub/x86_64-efi"):
 +                mod_path = "/usr/lib64/grub/x86_64-efi"
 +            elif os.path.exists(util.getSysroot()+"/usr/lib/grub/x86_64-efi"):
 +                mod_path = "/usr/lib/grub/x86_64-efi"
