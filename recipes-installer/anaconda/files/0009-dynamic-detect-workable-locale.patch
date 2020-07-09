@@ -9,6 +9,8 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
 Update context for anaconda 32.
 
+Replace parse_langcode() with get_language_id().
+
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/localization.py                          | 18 +++++++++++++++++-
@@ -17,7 +19,7 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  3 files changed, 22 insertions(+), 3 deletions(-)
 
 diff --git a/pyanaconda/localization.py b/pyanaconda/localization.py
-index 326bc145cb..d195885af0 100644
+index 326bc145c..e9b84570a 100644
 --- a/pyanaconda/localization.py
 +++ b/pyanaconda/localization.py
 @@ -27,7 +27,7 @@ import glob
@@ -40,17 +42,17 @@ index 326bc145cb..d195885af0 100644
 +
 +    if _all_locales == []:
 +        for lang in execReadlines("locale", ["-a"]):
-+            parts= parse_langcode(lang)
-+            locales = langtable.list_locales(languageId=parts["language"],
-+                                             territoryId=parts.get("territory", ""),
-+                                             scriptId=parts.get("script", ""))
++            parts = langtable.parse_locale(lang)
++            locales = langtable.list_locales(languageId=parts.language,
++                                             territoryId=parts.territory,
++                                             scriptId=parts.script)
 +            _all_locales += locales
 +
 +        log.info("all locales: %s" % _all_locales)
 +
 +    return _all_locales
 diff --git a/pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py b/pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py
-index cd265ff3bb..4de373b228 100644
+index cd265ff3b..4de373b22 100644
 --- a/pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py
 +++ b/pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py
 @@ -167,6 +167,8 @@ class LangLocaleHandler(object):
@@ -63,7 +65,7 @@ index cd265ff3bb..4de373b228 100644
                               localization.get_native_name(locale),
                               locale)
 diff --git a/pyanaconda/ui/tui/spokes/language_support.py b/pyanaconda/ui/tui/spokes/language_support.py
-index c5cdbf1542..1722880c1d 100644
+index c5cdbf154..1722880c1 100644
 --- a/pyanaconda/ui/tui/spokes/language_support.py
 +++ b/pyanaconda/ui/tui/spokes/language_support.py
 @@ -96,8 +96,9 @@ class LangSpoke(FirstbootSpokeMixIn, NormalTUISpoke):
