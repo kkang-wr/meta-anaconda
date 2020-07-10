@@ -9,6 +9,9 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
 Update context for anaconda 32.
 
+the storage and data are not propagated to the payload again, so remove
+from setup().
+
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/payload/dnfpayload.py | 397 +++++++++++++++++++++++++++++++++------
@@ -86,13 +89,13 @@ index abb1826ed0..44e8293955 100644
 +        self.image = {}
 +        self.tasks = {}
 +
-+    def setup(self, storage):
++    def setup(self):
 +        log.info("%s %s" % (self.__class__.__name__, inspect.stack()[0][3]))
 +
 +        # OE specific
 +        self.image, self.tasks = self._read_buildstamp()
 +
-+        super().setup(storage)
++        super().setup()
 +
      def unsetup(self):
          super().unsetup()
@@ -520,7 +523,7 @@ index abb1826ed0..44e8293955 100644
 +        config = configparser.ConfigParser()
 +        config.read(["/tmp/product/.buildstamp", "/.buildstamp", os.environ.get("PRODBUILDPATH", "")])
 +
-+        image_list = (config.get("Rootfs", "LIST") or "").split()
++        image_list = config.get("Rootfs", "LIST", fallback='').split()
 +        for image_name in image_list:
 +            _id_ = image_name.split('-')[0]
 +            image_summary = config.get(image_name, "SUMMARY")
@@ -589,7 +592,7 @@ index abb1826ed0..44e8293955 100644
 +
 +    _payload = DNFPayload(ksdata)
 +
-+    _payload.setup(storage)
++    _payload.setup()
 +
 +    # Keep setting up package-based repositories
 +    # Download package metadata
