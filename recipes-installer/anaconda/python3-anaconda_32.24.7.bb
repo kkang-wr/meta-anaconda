@@ -80,6 +80,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f32-relea
            file://0036-do-not-support-network-setting-for-now.patch \
            file://0037-tweak-boot-storage-sanity-check.patch \
            file://0038-support-to-get-kickstart-from-network.patch \
+           file://0039-support-authentication-for-kickstart.patch \
            file://0040-support-downloading-file-from-http-ftp-server-to-tar.patch \
            file://0041-live-install-supports-kickstart.patch \
            file://0043-fix-hang-while-installed-system-reboot.patch \

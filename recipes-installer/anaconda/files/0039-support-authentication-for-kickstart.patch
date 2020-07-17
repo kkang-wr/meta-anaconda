@@ -9,44 +9,60 @@ authentication while downloading kickstart from web server.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Update patch for anaconda 32:
+* replace self.cmdline with kernel_arguments
+* update patch context
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/flags.py                                |  5 +++
+ pyanaconda/flags.py                                |  7 +++-
  pyanaconda/kickstart.py                            | 37 +++++++++++++++++++---
- .../modules/boss/kickstart_manager/parser.py       | 10 +++---
- 3 files changed, 42 insertions(+), 10 deletions(-)
+ .../modules/boss/kickstart_manager/parser.py       |  6 ++--
+ 3 files changed, 41 insertions(+), 9 deletions(-)
 
 diff --git a/pyanaconda/flags.py b/pyanaconda/flags.py
-index 0a98d2c..05442d0 100644
+index a17a063eed..a2e3ac6518 100644
 --- a/pyanaconda/flags.py
 +++ b/pyanaconda/flags.py
-@@ -59,6 +59,11 @@ class Flags(object):
+@@ -17,6 +17,7 @@
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+ from pyanaconda.core.constants import ANACONDA_ENVIRON
++from pyanaconda.core.kernel import kernel_arguments
+ 
+ from pyanaconda.anaconda_loggers import get_module_logger
+ log = get_module_logger(__name__)
+@@ -52,8 +53,12 @@ class Flags(object):
+         self.singlelang = False
+         # current runtime environments
          self.environs = [ANACONDA_ENVIRON]
-         # parse the boot commandline
-         self.cmdline = KernelArguments.from_defaults()
 +
 +        # Authentication for downloading kickstart file through http
-+        self.ksuser = self.cmdline.get('ksuser', None)
-+        self.kspasswd = self.cmdline.get('kspasswd', None)
++        self.ksuser = kernel_arguments.get('ksuser')
++        self.kspasswd = kernel_arguments.get('kspasswd')
 +
          # Lock it down: no more creating new flags!
          self.__dict__['_in_init'] = False
  
+-
+ flags = Flags()
 diff --git a/pyanaconda/kickstart.py b/pyanaconda/kickstart.py
-index 5b69ebb..5108a5a 100644
+index b7c0807dfd..e3c4a6d2e4 100644
 --- a/pyanaconda/kickstart.py
 +++ b/pyanaconda/kickstart.py
-@@ -60,7 +60,7 @@ from pyanaconda.timezone import NTP_PACKAGE, NTP_SERVICE
+@@ -45,7 +45,7 @@ from pyanaconda.pwpolicy import F22_PwPolicy, F22_PwPolicyData
+ 
  from pykickstart.base import BaseHandler, KickstartCommand
- from pykickstart.constants import KS_SCRIPT_POST, KS_SCRIPT_PRE, KS_SCRIPT_TRACEBACK, \
-     KS_SCRIPT_PREINSTALL, SELINUX_DISABLED, SELINUX_ENFORCING, SELINUX_PERMISSIVE
--from pykickstart.errors import KickstartError, KickstartParseError
-+from pykickstart.errors import KickstartError, KickstartParseError, KickstartAuthError
+ from pykickstart.constants import KS_SCRIPT_POST, KS_SCRIPT_PRE, KS_SCRIPT_TRACEBACK, KS_SCRIPT_PREINSTALL
+-from pykickstart.errors import KickstartError, KickstartParseWarning
++from pykickstart.errors import KickstartError, KickstartParseWarning, KickstartAuthError
  from pykickstart.parser import KickstartParser
  from pykickstart.parser import Script as KSScript
  from pykickstart.sections import NullSection, PackageSection, PostScriptSection, PreScriptSection, PreInstallScriptSection, \
-@@ -1016,8 +1016,35 @@ class AnacondaKSHandler(superclass):
-     def __str__(self):
-         return super().__str__() + "\n" + str(self.addons) + str(self.anaconda)
+@@ -437,8 +437,35 @@ class AnacondaKSHandler(superclass):
+         return super().__str__() + "\n" + modules + "\n\n" + str(self.addons) + str(self.anaconda)
+ 
  
 -class AnacondaPreParser(KickstartParser):
 -    # A subclass of KickstartParser that only looks for %pre scripts and
@@ -82,7 +98,7 @@ index 5b69ebb..5108a5a 100644
      # sets them up to be run.  All other scripts and commands are ignored.
      def __init__(self, handler, followIncludes=True, errorsAreFatal=True,
                   missingIncludeIsFatal=True):
-@@ -1037,7 +1064,7 @@ class AnacondaPreParser(KickstartParser):
+@@ -458,7 +485,7 @@ class AnacondaPreParser(KickstartParser):
          self.registerSection(NullSection(self.handler.anaconda, sectionOpen="%anaconda"))
  
  
@@ -91,7 +107,7 @@ index 5b69ebb..5108a5a 100644
      def __init__(self, handler, followIncludes=True, errorsAreFatal=True,
                   missingIncludeIsFatal=True, scriptClass=AnacondaKSScript):
          self.scriptClass = scriptClass
-@@ -1047,7 +1074,7 @@ class AnacondaKSParser(KickstartParser):
+@@ -468,7 +495,7 @@ class AnacondaKSParser(KickstartParser):
          if not self.handler:
              return
  
@@ -101,7 +117,7 @@ index 5b69ebb..5108a5a 100644
      def setupSections(self):
          self.registerSection(PreScriptSection(self.handler, dataObj=self.scriptClass))
 diff --git a/pyanaconda/modules/boss/kickstart_manager/parser.py b/pyanaconda/modules/boss/kickstart_manager/parser.py
-index af9b305..ff840b5 100644
+index a65afdc9b2..3183ba41ee 100644
 --- a/pyanaconda/modules/boss/kickstart_manager/parser.py
 +++ b/pyanaconda/modules/boss/kickstart_manager/parser.py
 @@ -18,7 +18,7 @@
@@ -113,7 +129,7 @@ index af9b305..ff840b5 100644
  from pykickstart.sections import Section
  
  from pyanaconda.modules.boss.kickstart_manager.element import KickstartElement,\
-@@ -79,7 +79,7 @@ class StoreSection(Section):
+@@ -80,7 +80,7 @@ class StoreSection(Section):
          self.lines = []
  
  
@@ -122,7 +138,7 @@ index af9b305..ff840b5 100644
      """Kickstart parser for storing kickstart elements.
  
      Stores kickstart elements (commands, sections, addons) with their line
-@@ -130,9 +130,9 @@ class SplitKickstartParser(KickstartParser):
+@@ -131,9 +131,9 @@ class SplitKickstartParser(KickstartParser):
                   kickstart files
          :rtype: KickstartElements
          """
