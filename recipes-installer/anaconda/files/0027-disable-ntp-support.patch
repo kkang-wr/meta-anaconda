@@ -17,86 +17,56 @@ Do not support NTP, here are the reasons:
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
----
- pyanaconda/kickstart.py                       | 54 +---------------
- pyanaconda/ui/gui/spokes/datetime_spoke.glade | 74 ----------------------
- pyanaconda/ui/gui/spokes/datetime_spoke.py    | 89 ---------------------------
- 3 files changed, 1 insertion(+), 216 deletions(-)
 
-diff --git a/pyanaconda/kickstart.py b/pyanaconda/kickstart.py
-index 88d552d..5b69ebb 100644
---- a/pyanaconda/kickstart.py
-+++ b/pyanaconda/kickstart.py
-@@ -760,35 +760,7 @@ class Timezone(RemovedCommand):
-         return timezone_proxy.GenerateKickstart()
+Update patch context for anaconda 32. It uses dbus modules to handle
+ntp, so update patch accordingly.
+
+And remove 'chrony' from package requirements too.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ pyanaconda/installation.py                    | 10 +--
+ pyanaconda/ui/gui/spokes/datetime_spoke.glade | 74 -----------------------
+ pyanaconda/ui/gui/spokes/datetime_spoke.py    | 87 ---------------------------
+ 3 files changed, 1 insertion(+), 170 deletions(-)
+
+diff --git a/pyanaconda/installation.py b/pyanaconda/installation.py
+index 4f8f1295f..65fc0c089 100644
+--- a/pyanaconda/installation.py
++++ b/pyanaconda/installation.py
+@@ -89,9 +89,6 @@ def _prepare_configuration(payload, ksdata):
+     os_config.append_dbus_tasks(SERVICES, services_dbus_tasks)
  
-     def setup(self, ksdata):
--        timezone_proxy = TIMEZONE.get_proxy()
--        services_proxy = SERVICES.get_proxy()
--
--        enabled_services = services_proxy.EnabledServices
--        disabled_services = services_proxy.DisabledServices
--
--        # do not install and use NTP package
--        if not timezone_proxy.NTPEnabled or NTP_PACKAGE in ksdata.packages.excludedList:
--            if util.service_running(NTP_SERVICE) and conf.system.can_set_time_synchronization:
--                ret = util.stop_service(NTP_SERVICE)
--                if ret != 0:
--                    timezone_log.error("Failed to stop NTP service")
--
--            if NTP_SERVICE not in disabled_services:
--                disabled_services.append(NTP_SERVICE)
--                services_proxy.SetDisabledServices(disabled_services)
--        # install and use NTP package
--        else:
--            if not util.service_running(NTP_SERVICE) and conf.system.can_set_time_synchronization:
--                ret = util.start_service(NTP_SERVICE)
--                if ret != 0:
--                    timezone_log.error("Failed to start NTP service")
--
--            self.packages.append(NTP_PACKAGE)
--
--            if not NTP_SERVICE in enabled_services and \
--                    not NTP_SERVICE in disabled_services:
--                enabled_services.append(NTP_SERVICE)
--                services_proxy.SetEnabledServices(enabled_services)
-+        pass
+     # add installation tasks for the Timezone DBus module
+-    timezone_proxy = TIMEZONE.get_proxy()
+-    timezone_dbus_tasks = timezone_proxy.InstallWithTasks()
+-    os_config.append_dbus_tasks(TIMEZONE, timezone_dbus_tasks)
  
-     def execute(self):
-         # get the DBus proxies
-@@ -805,30 +777,6 @@ class Timezone(RemovedCommand):
+     # add installation tasks for the Localization DBus module
+     localization_proxy = LOCALIZATION.get_proxy()
+@@ -260,11 +257,6 @@ def _prepare_installation(payload, ksdata):
+     pre_install = TaskQueue("Pre install tasks", N_("Running pre-installation tasks"))
+     # Setup timezone and add chrony as package if timezone was set in KS
+     # and "-chrony" wasn't in packages section and/or --nontp wasn't set.
+-    timezone_proxy = TIMEZONE.get_proxy()
+-    ntp_excluded = timezone.NTP_PACKAGE in ksdata.packages.excludedList
+-    pre_install.append_dbus_tasks(
+-        TIMEZONE, [timezone_proxy.ConfigureNTPServiceEnablementWithTask(ntp_excluded)]
+-    )
  
-         timezone.write_timezone_config(timezone_proxy, util.getSysroot())
- 
--        # write out NTP configuration (if set) and --nontp is not used
--        kickstart_ntp_servers = timezone_proxy.NTPServers
--
--        if timezone_proxy.NTPEnabled and kickstart_ntp_servers:
--            chronyd_conf_path = os.path.normpath(util.getSysroot() + ntp.NTP_CONFIG_FILE)
--            pools, servers = ntp.internal_to_pools_and_servers(kickstart_ntp_servers)
--            if os.path.exists(chronyd_conf_path):
--                timezone_log.debug("Modifying installed chrony configuration")
--                try:
--                    ntp.save_servers_to_config(pools, servers, conf_file_path=chronyd_conf_path)
--                except ntp.NTPconfigError as ntperr:
--                    timezone_log.warning("Failed to save NTP configuration: %s", ntperr)
--            # use chrony conf file from installation environment when
--            # chrony is not installed (chrony conf file is missing)
--            else:
--                timezone_log.debug("Creating chrony configuration based on the "
--                                   "configuration from installation environment")
--                try:
--                    ntp.save_servers_to_config(pools, servers,
--                                               conf_file_path=ntp.NTP_CONFIG_FILE,
--                                               out_file_path=chronyd_conf_path)
--                except ntp.NTPconfigError as ntperr:
--                    timezone_log.warning("Failed to save NTP configuration without chrony package: %s", ntperr)
--
- class User(COMMANDS.User):
-     def execute(self, storage, ksdata, users):
- 
+     # make name resolution work for rpm scripts in chroot
+     if conf.system.provides_resolver_config:
+@@ -290,7 +282,7 @@ def _prepare_installation(payload, ksdata):
+         # add package requirements from modules
+         # - iterate over all modules we know have valid package requirements
+         # - add any requirements found to the payload requirement tracking
+-        modules_with_package_requirements = [SECURITY, NETWORK, TIMEZONE, STORAGE]
++        modules_with_package_requirements = [SECURITY, NETWORK, STORAGE]
+         for module in modules_with_package_requirements:
+             module_proxy = module.get_proxy()
+             module_requirements = Requirement.from_structure_list(module_proxy.CollectRequirements())
 diff --git a/pyanaconda/ui/gui/spokes/datetime_spoke.glade b/pyanaconda/ui/gui/spokes/datetime_spoke.glade
-index 37c7c6e..875cfea 100644
+index 37c7c6edc..875cfea21 100644
 --- a/pyanaconda/ui/gui/spokes/datetime_spoke.glade
 +++ b/pyanaconda/ui/gui/spokes/datetime_spoke.glade
 @@ -460,80 +460,6 @@
@@ -181,10 +151,10 @@ index 37c7c6e..875cfea 100644
                          </child>
                        </object>
 diff --git a/pyanaconda/ui/gui/spokes/datetime_spoke.py b/pyanaconda/ui/gui/spokes/datetime_spoke.py
-index 9ce853d..a83c2c9 100644
+index aa7bc2ed7..cab0559e4 100644
 --- a/pyanaconda/ui/gui/spokes/datetime_spoke.py
 +++ b/pyanaconda/ui/gui/spokes/datetime_spoke.py
-@@ -500,8 +500,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+@@ -502,8 +502,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
          self._year_format, suffix = formats[widgets.index(year_box)]
          year_label.set_text(suffix)
  
@@ -193,7 +163,7 @@ index 9ce853d..a83c2c9 100644
          self._regions_zones = get_all_regions_and_timezones()
  
          # Set the initial sensitivity of the AM/PM toggle based on the time-type selected
-@@ -510,9 +508,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+@@ -512,9 +510,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
          if not conf.system.can_set_system_clock:
              self._hide_date_time_setting()
  
@@ -203,20 +173,20 @@ index 9ce853d..a83c2c9 100644
          threadMgr.add(AnacondaThread(name=constants.THREAD_DATE_TIME,
                                       target=self._initialize))
  
-@@ -600,8 +595,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+@@ -602,8 +597,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
              # TODO: seen should be set from the module
              self._kickstarted = False
  
--        self._timezone_module.proxy.SetNTPEnabled(self._ntpSwitch.get_active())
+-        self._timezone_module.SetNTPEnabled(self._ntpSwitch.get_active())
 -
      def execute(self):
          if self._update_datetime_timer is not None:
              self._update_datetime_timer.cancel()
-@@ -639,20 +632,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
+@@ -641,20 +634,6 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
  
          self._update_datetime()
  
--        has_active_network = self._network_module.proxy.Connected
+-        has_active_network = self._network_module.Connected
 -        if not has_active_network:
 -            self._show_no_network_warning()
 -        else:
@@ -226,18 +196,17 @@ index 9ce853d..a83c2c9 100644
 -        if conf.system.can_set_time_synchronization:
 -            ntp_working = has_active_network and util.service_running(NTP_SERVICE)
 -        else:
--            ntp_working = self._timezone_module.proxy.NTPEnabled
+-            ntp_working = self._timezone_module.NTPEnabled
 -
 -        self._ntpSwitch.set_active(ntp_working)
 -
      @async_action_wait
      def _set_timezone(self, timezone):
          """
-@@ -1111,71 +1090,3 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
-         #contains all date/time setting widgets
+@@ -1114,70 +1093,4 @@ class DatetimeSpoke(FirstbootSpokeMixIn, NormalSpoke):
          footer_alignment = self.builder.get_object("footerAlignment")
          footer_alignment.set_sensitive(sensitive)
--
+ 
 -    def _show_no_network_warning(self):
 -        self.set_warning(_("You need to set up networking first if you "\
 -                           "want to use NTP"))
@@ -252,7 +221,7 @@ index 9ce853d..a83c2c9 100644
 -                #cannot touch runtime system, not much to do here
 -                return
 -
--            if not self._network_module.proxy.Connected:
+-            if not self._network_module.Connected:
 -                self._show_no_network_warning()
 -                switch.set_active(False)
 -                return
@@ -293,13 +262,13 @@ index 9ce853d..a83c2c9 100644
 -
 -    def on_ntp_config_clicked(self, *args):
 -        self._config_dialog.refresh()
--
+ 
 -        with self.main_window.enlightbox(self._config_dialog.window):
 -            response = self._config_dialog.run()
 -
 -        if response == 1:
 -            pools, servers = self._config_dialog.pools_servers
--            self._timezone_module.proxy.SetNTPServers(ntp.pools_servers_to_internal(pools, servers))
+-            self._timezone_module.SetNTPServers(ntp.pools_servers_to_internal(pools, servers))
 -
 -            if self._config_dialog.working_server is None:
 -                self._show_no_ntp_server_warning()
