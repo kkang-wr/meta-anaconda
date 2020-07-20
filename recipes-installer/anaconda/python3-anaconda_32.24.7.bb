@@ -113,6 +113,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f32-relea
            file://0001-pyanaconda-payload-Fix-xserver-detection.patch \
            file://0001-limit-product-name-less-then-30-chars.patch \
            file://0070-remove-unsupported-icon-from-main-page-and-tweak-ico.patch \
+           file://0071-disable-payloads-flatpak-ostree.patch \
           "
 
 SRCREV = "efe96d7a05431afd12fd4d92dcdfd5d6cc134cea"
