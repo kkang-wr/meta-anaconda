@@ -50,6 +50,7 @@ RDEPENDS_${PN} += "networkmanager \
 SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f32-release \
            file://81-edit-sudoers.ks \
            file://81-systemd-preset-all.ks \
+           file://81-add-env-file-for-sshd.ks \
            file://0001-do-not-build-po-and-doc.patch \
            file://0002-do-not-load-the-system-wide-Xresources.patch \
            file://0003-tweak-iso-mount-dir-and-kernel-name.patch \
@@ -114,6 +115,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f32-relea
            file://0001-limit-product-name-less-then-30-chars.patch \
            file://0070-remove-unsupported-icon-from-main-page-and-tweak-ico.patch \
            file://0071-disable-payloads-flatpak-ostree.patch \
+           file://0072-fix-sshd-config.patch \
           "
 
 SRCREV = "efe96d7a05431afd12fd4d92dcdfd5d6cc134cea"
@@ -145,6 +147,7 @@ do_configure_prepend() {
 do_install_append() {
     install -m 644 ${WORKDIR}/81-edit-sudoers.ks ${D}${datadir}/anaconda/post-scripts
     install -m 644 ${WORKDIR}/81-systemd-preset-all.ks ${D}${datadir}/anaconda/post-scripts
+    install -m 644 ${WORKDIR}/81-add-env-file-for-sshd.ks ${D}${datadir}/anaconda/post-scripts
     install -m 644 ${S}/widgets/src/resources/*.svg ${D}${datadir}/anaconda/pixmaps
     install -m 644 ${S}/widgets/src/resources/*.png ${D}${datadir}/anaconda/pixmaps
 }
