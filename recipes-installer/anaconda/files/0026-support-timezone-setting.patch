@@ -67,9 +67,9 @@ index 6383df1103..ba6ac1fcb8 100644
 -        except IOError as ioerr:
 -            msg = "Error while writing /etc/adjtime file: {}".format(ioerr.strerror)
 -            raise TimezoneConfigurationError(msg)
-+        log.info("timezone %s" % timezone_proxy.Timezone)
++        log.info("timezone %s" % self._timezone)
 +        with open(self._sysroot + "/etc/timezone", "w") as fobj:
-+            fobj.write('%s\n' % timezone_proxy.Timezone)
++            fobj.write('%s\n' % self._timezone)
  
  
  class ConfigureNTPTask(Task):
