@@ -116,6 +116,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f32-relea
            file://0070-remove-unsupported-icon-from-main-page-and-tweak-ico.patch \
            file://0071-disable-payloads-flatpak-ostree.patch \
            file://0072-fix-sshd-config.patch \
+           file://0073-Fix-kickstart-file-error-with-user-groups.patch \
           "
 
 SRCREV = "efe96d7a05431afd12fd4d92dcdfd5d6cc134cea"
