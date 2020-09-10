@@ -19,7 +19,7 @@ IMAGE_INSTALL = "\
     anaconda-init \
     kernel-modules \
     ${CUSTOMIZE_LOGOS} \
-    dhcp-client \
+    dhcpcd \
     ldd \
     rng-tools \
     "
