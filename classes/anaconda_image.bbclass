@@ -337,7 +337,7 @@ python __anonymous() {
                 count += 1
                 d.appendVar('PSEUDO_IGNORE_PATHS', ',' + target_build)
             else:
-                d.appendVar('PSEUDO_IGNORE_PATHS', ',' + os.path.dirname(target_build))
+                d.appendVar('PSEUDO_IGNORE_PATHS', ',' + os.path.abspath(os.path.dirname(target_build)))
 
         # While do package management install
         if count > 0:
