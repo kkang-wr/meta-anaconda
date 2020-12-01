@@ -59,7 +59,7 @@ wrl_installer_copy_local_repos() {
     deploy_dir_rpm=$1
 
     if [ -d "$deploy_dir_rpm" ]; then
-        echo "Copy rpms from target build to installer image."
+        echo "Copy rpms from target build $deploy_dir_rpm to installer image."
         mkdir -p ${IMAGE_ROOTFS}/Packages.$prj_name
 
         cat > ${IMAGE_ROOTFS}/Packages.$prj_name/.treeinfo <<ENDOF
@@ -135,7 +135,7 @@ wrl_installer_copy_pkgs() {
             | sed -e 's/=/=\"/' -e 's/$/\"/' > ${BB_LOGFILE}.distro_vals"
 
         eval "cat $target_build/installersupport_$target_image | \
-            grep -e '^WORKDIR=.*' >> ${BB_LOGFILE}.distro_vals"
+            grep -e '^WORKDIR=.*' -e '^DEPLOY_DIR_RPM=.*' >> ${BB_LOGFILE}.distro_vals"
 
         eval `cat ${BB_LOGFILE}.distro_vals`
         if [ $? -ne 0 ]; then
@@ -192,14 +192,30 @@ IMAGE_LINGUAS=${IMAGE_LINGUAS}
 _EOF
     fi
 
-    if [ -d "$WORKDIR/oe-rootfs-repo/rpm" ]; then
-        # Copy local repos while the image is not initramfs
-        bpn=${BPN}
-        if [ "${bpn##*initramfs}" = "${bpn%%initramfs*}" ]; then
-            wrl_installer_copy_local_repos $WORKDIR/oe-rootfs-repo/rpm
+    if [ -f "$installer_conf" ]; then
+        if [ -z "$DEPLOY_DIR_RPM" ]; then
+            bbfatal "Can't determine \$DEPLOY_DIR_RPM to construct rpm repo."
         fi
-        echo "$DISTRO::$prj_name::$DISTRO_NAME::$DISTRO_VERSION" >> ${IMAGE_ROOTFS}/.target_build_list
+
+        if [ -d "$DEPLOY_DIR_RPM" ]; then
+            target_repo="$DEPLOY_DIR_RPM"
+        else
+            bbfatal "$DEPLOY_DIR_RPM is not a valid rpm repo."
+        fi
+    else
+        if [ -d "$WORKDIR/oe-rootfs-repo/rpm" ]; then
+            target_repo="$WORKDIR/oe-rootfs-repo/rpm"
+        else
+            bbfatal "$WORKDIR/oe-rootfs-repo/rpm is not a valid rpm repo."
+        fi
     fi
+
+    # Copy local repos while the image is not initramfs
+    bpn=${BPN}
+    if [ "${bpn##*initramfs}" = "${bpn%%initramfs*}" ]; then
+        wrl_installer_copy_local_repos $target_repo
+    fi
+    echo "$DISTRO::$prj_name::$DISTRO_NAME::$DISTRO_VERSION" >> ${IMAGE_ROOTFS}/.target_build_list
 }
 
 wrl_installer_get_count() {
@@ -313,13 +329,15 @@ python __anonymous() {
 
         count = 0
         for target_build in target_builds.split():
+            target_build = os.path.abspath(target_build)
             if not os.path.exists(target_build):
                 raise bb.parse.SkipPackage("The %s of INSTALLER_TARGET_BUILD does not exist" % target_build)
 
             if os.path.isdir(target_build):
                 count += 1
+                d.appendVar('PSEUDO_IGNORE_PATHS', ',' + target_build)
             else:
-                d.appendVar('PSEUDO_IGNORE_PATHS', ',' + os.path.abspath(os.path.dirname(target_build)))
+                d.appendVar('PSEUDO_IGNORE_PATHS', ',' + os.path.dirname(target_build))
 
         # While do package management install
         if count > 0:
