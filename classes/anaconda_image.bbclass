@@ -335,7 +335,6 @@ python __anonymous() {
 
             if os.path.isdir(target_build):
                 count += 1
-                d.appendVar('PSEUDO_IGNORE_PATHS', ',' + target_build)
             else:
                 d.appendVar('PSEUDO_IGNORE_PATHS', ',' + os.path.abspath(os.path.dirname(target_build)))
 
