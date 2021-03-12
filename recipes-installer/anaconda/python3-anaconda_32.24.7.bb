@@ -118,6 +118,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f32-relea
            file://0072-fix-sshd-config.patch \
            file://0073-Fix-kickstart-file-error-with-user-groups.patch \
            file://0074-Fix-SECTION-headers-in-docstrings.patch \
+           file://anaconda-enable-root-ssh-login.patch \
           "
 
 SRCREV = "efe96d7a05431afd12fd4d92dcdfd5d6cc134cea"
