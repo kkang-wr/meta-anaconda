@@ -47,81 +47,37 @@ RDEPENDS_${PN} += "networkmanager \
                    network-manager-applet \
 "
 
-SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f32-release \
+SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-release \
            file://81-edit-sudoers.ks \
            file://81-systemd-preset-all.ks \
            file://81-add-env-file-for-sshd.ks \
            file://0001-do-not-build-po-and-doc.patch \
            file://0002-do-not-load-the-system-wide-Xresources.patch \
-           file://0003-tweak-iso-mount-dir-and-kernel-name.patch \
            file://0004-customize-default-option-for-OE.patch \
-           file://0006-livepayload-fix-mount-install-tree-failed.patch \
-           file://0007-dnfpayload.py-customize-for-OE.patch \
-           file://0009-dynamic-detect-workable-locale.patch \
            file://0010-reboot-unconditionally.patch \
            file://0011-disable-audit.patch \
-           file://0012-bootloader.py-Change-grub2-settings-to-match-oe-core.patch \
-           file://0013-tweak-detect-kernel-version.patch \
-           file://0016-kickstart-not-support-Authselect-Firewall-Firstboot.patch \
            file://0017-invisible-help-button.patch \
            file://0018-disable-non-implemented-functions.patch \
-           file://0019-support-UEFI-boot.patch \
-           file://0022-fix-quoted-empty-string-failed.patch \
            file://0023-do-not-support-ISO-hold-by-hard-drive-partitions.patch \
            file://0024-fix-cannot-stat-usr-share-gettext-gettext.h.patch \
-           file://0025-tweak-bootloader-fs-type.patch \
-           file://0026-support-timezone-setting.patch \
-           file://0027-disable-ntp-support.patch \
-           file://0028-do-not-support-manually-set-time.patch \
            file://0030-detect-existence-of-Xorg.patch \
            file://0031-fix-write-network-conf-failed-while-liveinst.patch \
-           file://0033-text-repository-setting-do-not-support-local-ISO-fil.patch \
-           file://0034-text-repository-setting-support-http-proxy.patch \
-           file://0035-set-keyboard-xlayouts-with-us-by-default.patch \
-           file://0036-do-not-support-network-setting-for-now.patch \
-           file://0037-tweak-boot-storage-sanity-check.patch \
            file://0038-support-to-get-kickstart-from-network.patch \
-           file://0039-support-authentication-for-kickstart.patch \
-           file://0040-support-downloading-file-from-http-ftp-server-to-tar.patch \
            file://0041-live-install-supports-kickstart.patch \
-           file://0042-support-initramfs-boot.patch \
-           file://0043-fix-hang-while-installed-system-reboot.patch \
-           file://0044-fix-installed-system-boot-from-encrypt-fs-failed.patch \
            file://0045-installation-destination-disable-iSCSI-network-disks.patch \
            file://0046-update-region-while-city-changes.patch \
            file://0047-remove-incorrect-prefix-of-addon-repo-url.patch \
            file://0048-fix-write-sysconfig-network-failed.patch \
            file://0049-pyanaconda-ui-gui-utils.py-tweak-mouse-arrow.patch \
-           file://0050-tweak-search-location-of-new-kernel-pkg.patch \
-           file://0051-always-write-fstab-after-install.patch \
-           file://0052-invoke-grub-install-to-generate-efi-filesystem.patch \
-           file://0053-do-not-support-closest-mirror.patch \
-           file://0054-tweak-MAX_TREEINFO_DOWNLOAD_RETRIES.patch \
-           file://0055-tweak-time-setting.patch \
-           file://0056-Add-dracut-args-for-home-to-bootloader.patch \
-           file://0057-do-not-customize-window-theme.patch \
            file://0058-tweak-product-short-name.patch \
-           file://0059-disable-dmraid.patch \
            file://0060-tweak-shebang-of-bash.patch \
-           file://0061-Tweak-label-name.patch \
-           file://0062-Mount-var-volatile-during-install.patch \
-           file://0063-update-fstab-by-appending.patch \
            file://0064-users.py-Fix-multilib-user-creation-error.patch \
-           file://0065-bootloader.py-fix-UEFI-multilib-installation.patch \
-           file://0066-fix-calling-grub-mkconfig-failed.patch \
            file://0068-disable-chronyd.patch \
            file://0069-disable-location-detection-based-on-IP-address.patch \
            file://0001-pyanaconda-payload-Fix-xserver-detection.patch \
-           file://0001-limit-product-name-less-then-30-chars.patch \
-           file://0070-remove-unsupported-icon-from-main-page-and-tweak-ico.patch \
-           file://0071-disable-payloads-flatpak-ostree.patch \
-           file://0072-fix-sshd-config.patch \
-           file://0073-Fix-kickstart-file-error-with-user-groups.patch \
-           file://0074-Fix-SECTION-headers-in-docstrings.patch \
-           file://anaconda-enable-root-ssh-login.patch \
           "
 
-SRCREV = "efe96d7a05431afd12fd4d92dcdfd5d6cc134cea"
+SRCREV = "43ce5dfb0566d14926bfb60e11564a656829e92d"
 
 FILES_${PN}-dbg += "${libexecdir}/anaconda/.debug ${PYTHON_SITEPACKAGES_DIR}/pyanaconda/.debug"
 FILES_${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/pyanaconda/_isys.a"
