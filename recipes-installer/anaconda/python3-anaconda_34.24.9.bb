@@ -53,6 +53,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://81-add-env-file-for-sshd.ks \
            file://0001-do-not-build-po-and-doc.patch \
            file://0002-do-not-load-the-system-wide-Xresources.patch \
+           file://0003-tweak-iso-mount-dir-and-kernel-name.patch \
            file://0004-customize-default-option-for-OE.patch \
            file://0010-reboot-unconditionally.patch \
            file://0011-disable-audit.patch \
