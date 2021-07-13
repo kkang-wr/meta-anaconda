@@ -60,6 +60,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0010-reboot-unconditionally.patch \
            file://0011-disable-audit.patch \
            file://0012-bootloader.py-Change-grub2-settings-to-match-oe-core.patch \
+           file://0013-tweak-detect-kernel-version.patch \
            file://0017-invisible-help-button.patch \
            file://0018-disable-non-implemented-functions.patch \
            file://0023-do-not-support-ISO-hold-by-hard-drive-partitions.patch \

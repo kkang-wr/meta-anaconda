@@ -9,16 +9,43 @@ rather than using redhat's.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase for anaconda 34.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/bootloader/installation.py | 21 +++++++++++++--------
- pyanaconda/payload/livepayload.py     | 12 +++++++++---
+ .../modules/payloads/payload/live_os/utils.py       | 12 +++++++++---
+ pyanaconda/modules/storage/bootloader/utils.py      | 21 +++++++++++++--------
  2 files changed, 22 insertions(+), 11 deletions(-)
 
-diff --git a/pyanaconda/bootloader/installation.py b/pyanaconda/bootloader/installation.py
-index 8f6d999..b620ab3 100644
---- a/pyanaconda/bootloader/installation.py
-+++ b/pyanaconda/bootloader/installation.py
-@@ -105,14 +105,19 @@ def _write_sysconfig_kernel(sysroot, storage):
+diff --git a/pyanaconda/modules/payloads/payload/live_os/utils.py b/pyanaconda/modules/payloads/payload/live_os/utils.py
+index 9d1223801..33518723e 100644
+--- a/pyanaconda/modules/payloads/payload/live_os/utils.py
++++ b/pyanaconda/modules/payloads/payload/live_os/utils.py
+@@ -31,9 +31,15 @@ def get_kernel_version_list(root_path):
+     :param root_path: a path to the system root
+     :return: a list of kernel versions
+     """
+-    efi_dir = conf.bootloader.efi_dir
+-    files = glob.glob(root_path + "/boot/vmlinuz-*")
+-    files.extend(glob.glob(root_path + "/boot/efi/EFI/{}/vmlinuz-*".format(efi_dir)))
++    for kernel in ["vmlinux", "bzImage"]:
++        files = glob.glob(root_path + "/boot/%s-*" % kernel)
++        files.extend(glob.glob(root_path + "/boot/efi/EFI/%s/%s-*" %
++                                (conf.bootloader.efi_dir, kernel)))
++
++        versions = sorted((f.split("/")[-1][8:] for f in files if os.path.isfile(f)))
++        if versions:
++            log.info("kernel versions: %s", versions)
++            break
+ 
+     kernel_version_list = [
+         f.split("/")[-1][8:] for f in files
+diff --git a/pyanaconda/modules/storage/bootloader/utils.py b/pyanaconda/modules/storage/bootloader/utils.py
+index ec4239ecc..2fdf8b921 100644
+--- a/pyanaconda/modules/storage/bootloader/utils.py
++++ b/pyanaconda/modules/storage/bootloader/utils.py
+@@ -155,14 +155,19 @@ def _write_sysconfig_kernel(sysroot, storage):
      log.debug("Writing to /etc/sysconfig/kernel.")
  
      # get the name of the default kernel package based on the version
@@ -46,29 +73,6 @@ index 8f6d999..b620ab3 100644
  
      try:
          import rpm
-diff --git a/pyanaconda/payload/livepayload.py b/pyanaconda/payload/livepayload.py
-index aaafa20..235a3b5 100644
---- a/pyanaconda/payload/livepayload.py
-+++ b/pyanaconda/payload/livepayload.py
-@@ -230,9 +230,15 @@ class LiveImagePayload(Payload):
-         return Size(get_dir_size("/") * 1024)
- 
-     def _update_kernel_version_list(self):
--        files = glob.glob(INSTALL_TREE + "/boot/vmlinuz-*")
--        files.extend(glob.glob(INSTALL_TREE + "/boot/efi/EFI/%s/vmlinuz-*" %
--                               conf.bootloader.efi_dir))
-+        for kernel in ["vmlinux", "bzImage"]:
-+            files = glob.glob(INSTALL_TREE + "/boot/%s-*" % kernel)
-+            files.extend(glob.glob(INSTALL_TREE + "/boot/efi/EFI/%s/%s-*" %
-+                                   (conf.bootloader.efi_dir, kernel)))
-+
-+            versions = sorted((f.split("/")[-1][8:] for f in files if os.path.isfile(f)))
-+            if versions:
-+                log.info("kernel versions: %s", versions)
-+                break
- 
-         self._kernel_version_list = sorted((f.split("/")[-1][8:] for f in files
-                                            if os.path.isfile(f) and "-rescue-" not in f),
 -- 
 2.7.4
 
