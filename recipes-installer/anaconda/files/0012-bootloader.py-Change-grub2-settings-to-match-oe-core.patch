@@ -15,20 +15,20 @@ Upstream-Status: Inappropriate [oe specific]
 Rebase to f30-release
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
-Update context for anaconda 32.
+Rebase for anaconda 34.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/bootloader/base.py         |  4 ++++
- pyanaconda/bootloader/grub2.py        | 26 +++++++++++++++++---------
- pyanaconda/bootloader/installation.py |  3 +++
- 3 files changed, 24 insertions(+), 9 deletions(-)
+ pyanaconda/modules/storage/bootloader/base.py  |  4 ++++
+ pyanaconda/modules/storage/bootloader/grub2.py | 26 +++++++++++++++++---------
+ pyanaconda/modules/storage/bootloader/utils.py |  7 +++++--
+ 3 files changed, 26 insertions(+), 11 deletions(-)
 
-diff --git a/pyanaconda/bootloader/base.py b/pyanaconda/bootloader/base.py
-index f1aa6acca6..bac6d6137c 100644
---- a/pyanaconda/bootloader/base.py
-+++ b/pyanaconda/bootloader/base.py
-@@ -902,6 +902,10 @@ class BootLoader(object):
+diff --git a/pyanaconda/modules/storage/bootloader/base.py b/pyanaconda/modules/storage/bootloader/base.py
+index 71ca9c5c4..37a4111de 100644
+--- a/pyanaconda/modules/storage/bootloader/base.py
++++ b/pyanaconda/modules/storage/bootloader/base.py
+@@ -942,6 +942,10 @@ class BootLoader(object):
              raise BootLoaderError("no config file defined for this boot loader")
  
          config_path = os.path.normpath(conf.target.system_root + self.config_file)
@@ -39,10 +39,10 @@ index f1aa6acca6..bac6d6137c 100644
          if os.access(config_path, os.R_OK):
              os.rename(config_path, config_path + ".anacbak")
  
-diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
-index 4695c1cd45..1d1302681b 100644
---- a/pyanaconda/bootloader/grub2.py
-+++ b/pyanaconda/bootloader/grub2.py
+diff --git a/pyanaconda/modules/storage/bootloader/grub2.py b/pyanaconda/modules/storage/bootloader/grub2.py
+index add7dc970..47a3a6d55 100644
+--- a/pyanaconda/modules/storage/bootloader/grub2.py
++++ b/pyanaconda/modules/storage/bootloader/grub2.py
 @@ -100,9 +100,9 @@ class GRUB2(BootLoader):
      name = "GRUB2"
      # grub2 is a virtual provides that's provided by grub2-pc, grub2-ppc64le,
@@ -55,7 +55,7 @@ index 4695c1cd45..1d1302681b 100644
      _passwd_file = "user.cfg"
      defaults_file = "/etc/default/grub"
      terminal_type = "console"
-@@ -227,6 +227,10 @@ class GRUB2(BootLoader):
+@@ -226,6 +226,10 @@ class GRUB2(BootLoader):
      def write_device_map(self):
          """Write out a device map containing all supported devices."""
          map_path = os.path.normpath(conf.target.system_root + self.device_map_file)
@@ -66,7 +66,7 @@ index 4695c1cd45..1d1302681b 100644
          if os.access(map_path, os.R_OK):
              os.rename(map_path, map_path + ".anacbak")
  
-@@ -254,9 +258,9 @@ class GRUB2(BootLoader):
+@@ -253,9 +257,9 @@ class GRUB2(BootLoader):
          defaults_file = "%s%s" % (conf.target.system_root, self.defaults_file)
          defaults = open(defaults_file, "w+")
          defaults.write("GRUB_TIMEOUT=%d\n" % self.timeout)
@@ -78,7 +78,7 @@ index 4695c1cd45..1d1302681b 100644
          if self.console and self.has_serial_console:
              defaults.write("GRUB_TERMINAL=\"serial console\"\n")
              defaults.write("GRUB_SERIAL_COMMAND=\"%s\"\n" % self.serial_command)
-@@ -298,7 +302,7 @@ class GRUB2(BootLoader):
+@@ -297,7 +301,7 @@ class GRUB2(BootLoader):
          passwords = "%s\n%s\n" % (self.password, self.password)
          os.write(pwrite, passwords.encode("utf-8"))
          os.close(pwrite)
@@ -87,7 +87,7 @@ index 4695c1cd45..1d1302681b 100644
                                     stdin=pread,
                                     root=conf.target.system_root)
          os.close(pread)
-@@ -311,6 +315,10 @@ class GRUB2(BootLoader):
+@@ -310,6 +314,10 @@ class GRUB2(BootLoader):
              return
  
          users_file = "%s%s/%s" % (conf.target.system_root, self.config_dir, self._passwd_file)
@@ -98,7 +98,7 @@ index 4695c1cd45..1d1302681b 100644
          header = util.open_with_perm(users_file, "w", 0o700)
          # XXX FIXME: document somewhere that the username is "root"
          self._encrypt_password()
-@@ -344,21 +352,21 @@ class GRUB2(BootLoader):
+@@ -343,21 +351,21 @@ class GRUB2(BootLoader):
                  machine_id = fd.readline().strip()
  
              default_entry = "%s-%s" % (machine_id, self.default.version)
@@ -123,7 +123,7 @@ index 4695c1cd45..1d1302681b 100644
                                  ["-o", self.config_file])
          if rc:
              raise BootLoaderError("failed to write boot loader configuration")
-@@ -425,7 +433,7 @@ class GRUB2(BootLoader):
+@@ -424,7 +432,7 @@ class GRUB2(BootLoader):
                  else:
                      log.info("bootloader.py: mbr will be updated for grub2")
  
@@ -132,11 +132,11 @@ index 4695c1cd45..1d1302681b 100644
                                         root=conf.target.system_root,
                                         env_prune=['MALLOC_PERTURB_'])
              if rc:
-diff --git a/pyanaconda/bootloader/installation.py b/pyanaconda/bootloader/installation.py
-index 5ed5c46423..c7c158007a 100644
---- a/pyanaconda/bootloader/installation.py
-+++ b/pyanaconda/bootloader/installation.py
-@@ -130,6 +130,9 @@ def _write_sysconfig_kernel(sysroot, storage):
+diff --git a/pyanaconda/modules/storage/bootloader/utils.py b/pyanaconda/modules/storage/bootloader/utils.py
+index bd6641c74..d8973ce58 100644
+--- a/pyanaconda/modules/storage/bootloader/utils.py
++++ b/pyanaconda/modules/storage/bootloader/utils.py
+@@ -180,6 +180,9 @@ def _write_sysconfig_kernel(sysroot, storage):
  
      kernel = decode_bytes(h.name)
  
@@ -146,5 +146,16 @@ index 5ed5c46423..c7c158007a 100644
      f = open(sysroot + "/etc/sysconfig/kernel", "w+")
      f.write("# UPDATEDEFAULT specifies if kernel-install should make\n"
              "# new kernels the default\n")
+@@ -246,8 +249,8 @@ def create_bls_entries(sysroot, storage, kernel_versions):
+     # entries will have the correct kernel cmdline and not the value
+     # taken from /proc/cmdline, that is used to boot the live image.
+     rc = execWithRedirect(
+-        "grub2-mkconfig",
+-        ["-o", "/etc/grub2.cfg"],
++        "grub-mkconfig",
++        ["-o", "/etc/grub.cfg"],
+         root=sysroot
+     )
+ 
 -- 
 2.7.4
