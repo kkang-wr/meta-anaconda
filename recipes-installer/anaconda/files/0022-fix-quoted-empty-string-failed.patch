@@ -16,15 +16,19 @@ line 823, in parse_components
 Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase for anaconda 34.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/core/util.py | 10 +++++++---
+ pyanaconda/core/payload.py | 10 +++++++---
  1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/pyanaconda/core/util.py b/pyanaconda/core/util.py
-index 90340d9..df94f17 100644
---- a/pyanaconda/core/util.py
-+++ b/pyanaconda/core/util.py
-@@ -832,9 +832,13 @@ class ProxyString(object):
+diff --git a/pyanaconda/core/payload.py b/pyanaconda/core/payload.py
+index 3573c6cd9..645222e82 100644
+--- a/pyanaconda/core/payload.py
++++ b/pyanaconda/core/payload.py
+@@ -172,9 +172,13 @@ class ProxyString(object):
      def parse_components(self):
          """ Parse the components of a proxy url into url and noauth_url
          """
