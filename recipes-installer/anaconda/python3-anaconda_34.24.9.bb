@@ -75,6 +75,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0030-detect-existence-of-Xorg.patch \
            file://0031-fix-write-network-conf-failed-while-liveinst.patch \
            file://0033-text-repository-setting-do-not-support-local-ISO-fil.patch \
+           file://0034-text-repository-setting-support-http-proxy.patch \
            file://0038-support-to-get-kickstart-from-network.patch \
            file://0041-live-install-supports-kickstart.patch \
            file://0045-installation-destination-disable-iSCSI-network-disks.patch \
