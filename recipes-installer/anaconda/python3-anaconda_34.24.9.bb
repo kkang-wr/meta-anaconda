@@ -64,6 +64,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0016-kickstart-not-support-Authselect-Firewall-Firstboot.patch \
            file://0017-invisible-help-button.patch \
            file://0018-disable-non-implemented-functions.patch \
+           file://0019-support-UEFI-boot.patch \
            file://0023-do-not-support-ISO-hold-by-hard-drive-partitions.patch \
            file://0024-fix-cannot-stat-usr-share-gettext-gettext.h.patch \
            file://0030-detect-existence-of-Xorg.patch \
