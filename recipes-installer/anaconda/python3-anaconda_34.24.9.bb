@@ -71,6 +71,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0025-tweak-bootloader-fs-type.patch \
            file://0026-support-timezone-setting.patch \
            file://0027-disable-ntp-support.patch \
+           file://0028-do-not-support-manually-set-time.patch \
            file://0030-detect-existence-of-Xorg.patch \
            file://0031-fix-write-network-conf-failed-while-liveinst.patch \
            file://0038-support-to-get-kickstart-from-network.patch \
