@@ -9,14 +9,18 @@ failure while e2fsprogs upgraded to 1.43
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase for anaconda 34.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/bootloader/grub2.py | 2 +-
+ pyanaconda/modules/storage/bootloader/grub2.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
-index 352ad72..80b026a 100644
---- a/pyanaconda/bootloader/grub2.py
-+++ b/pyanaconda/bootloader/grub2.py
+diff --git a/pyanaconda/modules/storage/bootloader/grub2.py b/pyanaconda/modules/storage/bootloader/grub2.py
+index 47a3a6d55..46c03af68 100644
+--- a/pyanaconda/modules/storage/bootloader/grub2.py
++++ b/pyanaconda/modules/storage/bootloader/grub2.py
 @@ -186,7 +186,7 @@ class GRUB2(BootLoader):
          if productName.startswith("Red Hat "): # pylint: disable=no-member
              return ["xfs", "ext4", "ext3", "ext2"]
