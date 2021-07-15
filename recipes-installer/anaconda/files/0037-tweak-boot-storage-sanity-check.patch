@@ -9,23 +9,27 @@ tweak /boot storage sanity check from 200MB to 300MB.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase for anaconda 34.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/storage/checker.py | 2 +-
+ .../nosetests/pyanaconda_tests/modules/storage/storage_checker_test.py  | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/pyanaconda/storage/checker.py b/pyanaconda/storage/checker.py
-index 0f0be6e..c3e5780 100644
---- a/pyanaconda/storage/checker.py
-+++ b/pyanaconda/storage/checker.py
-@@ -620,7 +620,7 @@ class StorageChecker(object):
-             '/tmp': Size("50 MiB"),
-             '/var': Size("384 MiB"),
-             '/home': Size("100 MiB"),
--            '/boot': Size("200 MiB")
-+            '/boot': Size("300 MiB")
-         })
- 
-         self.add_constraint(STORAGE_MUST_BE_ON_LINUXFS, {
+diff --git a/tests/nosetests/pyanaconda_tests/modules/storage/storage_checker_test.py b/tests/nosetests/pyanaconda_tests/modules/storage/storage_checker_test.py
+index 2782c278e..003f70514 100644
+--- a/tests/nosetests/pyanaconda_tests/modules/storage/storage_checker_test.py
++++ b/tests/nosetests/pyanaconda_tests/modules/storage/storage_checker_test.py
+@@ -235,7 +235,7 @@ class StorageCheckerTests(unittest.TestCase):
+                 '/tmp': Size("50 MiB"),
+                 '/var': Size("384 MiB"),
+                 '/home': Size("100 MiB"),
+-                '/boot': Size("200 MiB")
++                '/boot': Size("300 MiB")
+             },
+             checks.STORAGE_REQ_PARTITION_SIZES: dict(),
+             checks.STORAGE_MUST_BE_ON_LINUXFS: {
 -- 
 2.7.4
 
