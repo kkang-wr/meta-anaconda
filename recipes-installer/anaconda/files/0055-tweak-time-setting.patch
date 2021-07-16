@@ -10,32 +10,36 @@ Subject: [PATCH] tweak time setting
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase for anaconda 34.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/core/constants.py               | 2 ++
  pyanaconda/ui/gui/spokes/datetime_spoke.py | 2 +-
- pyanaconda/ui/tui/spokes/time_spoke.py     | 3 +--
- 3 files changed, 4 insertions(+), 3 deletions(-)
+ pyanaconda/ui/tui/spokes/time_spoke.py     | 7 +------
+ 3 files changed, 4 insertions(+), 7 deletions(-)
 
 diff --git a/pyanaconda/core/constants.py b/pyanaconda/core/constants.py
-index cdf5ef6..5e3cd7b 100644
+index 031e547d0..9c36d6014 100644
 --- a/pyanaconda/core/constants.py
 +++ b/pyanaconda/core/constants.py
-@@ -82,6 +82,8 @@ DEFAULT_KEYBOARD = "us"
+@@ -77,6 +77,8 @@ DEFAULT_KEYBOARD = "us"
  
  DRACUT_SHUTDOWN_EJECT = "/run/initramfs/usr/lib/dracut/hooks/shutdown/99anaconda-eject.sh"
  
 +DEFAULT_TZ = "America/New_York"
 +
  # Help.
- HELP_DIR = "/usr/share/anaconda/help"
  HELP_MAIN_PAGE_GUI = "Installation_Guide.xml"
+ HELP_MAIN_PAGE_TUI = "Installation_Guide.txt"
 diff --git a/pyanaconda/ui/gui/spokes/datetime_spoke.py b/pyanaconda/ui/gui/spokes/datetime_spoke.py
-index 98652cf..b312e05 100644
+index ff4b69577..92c406434 100644
 --- a/pyanaconda/ui/gui/spokes/datetime_spoke.py
 +++ b/pyanaconda/ui/gui/spokes/datetime_spoke.py
-@@ -65,7 +65,7 @@ SERVER_POOL = 1
- SERVER_WORKING = 2
- SERVER_USE = 3
+@@ -69,7 +69,7 @@ SERVER_WORKING = 3
+ SERVER_USE = 4
+ SERVER_OBJECT = 5
  
 -DEFAULT_TZ = "America/New_York"
 +DEFAULT_TZ = constants.DEFAULT_TZ
@@ -43,10 +47,10 @@ index 98652cf..b312e05 100644
  SPLIT_NUMBER_SUFFIX_RE = re.compile(r'([^0-9]*)([-+])([0-9]+)')
  
 diff --git a/pyanaconda/ui/tui/spokes/time_spoke.py b/pyanaconda/ui/tui/spokes/time_spoke.py
-index e232344..411186b 100644
+index 1cce819dc..601ee58d5 100644
 --- a/pyanaconda/ui/tui/spokes/time_spoke.py
 +++ b/pyanaconda/ui/tui/spokes/time_spoke.py
-@@ -201,7 +201,7 @@ class TimeSpoke(FirstbootSpokeMixIn, NormalTUISpoke):
+@@ -121,7 +121,7 @@ class TimeSpoke(FirstbootSpokeMixIn, NormalTUISpoke):
          if kickstart_timezone:
              return _("%s timezone") % kickstart_timezone
          else:
@@ -55,14 +59,18 @@ index e232344..411186b 100644
  
      def _summary_text(self):
          """Return summary of current timezone & NTP configuration.
-@@ -245,7 +245,6 @@ class TimeSpoke(FirstbootSpokeMixIn, NormalTUISpoke):
-         self._container = ListColumnContainer(1, columns_width=78, spacing=1)
+@@ -168,11 +168,6 @@ class TimeSpoke(FirstbootSpokeMixIn, NormalTUISpoke):
+             callback=self._timezone_callback
+         )
  
-         self._container.add(TextWidget(timezone_option), callback=self._timezone_callback)
--        self._container.add(TextWidget(_("Configure NTP servers")), callback=self._configure_ntp_server_callback)
- 
+-        self._container.add(
+-            TextWidget(_("Configure NTP servers")),
+-            callback=self._configure_ntp_server_callback
+-        )
+-
          self.window.add_with_separator(self._container)
  
+     def _timezone_callback(self, data):
 -- 
 2.7.4
 
