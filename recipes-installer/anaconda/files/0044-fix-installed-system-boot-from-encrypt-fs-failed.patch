@@ -31,26 +31,30 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Replace util.getSysroot() with conf.target.system_root.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 34.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/payload/__init__.py | 5 +++++
+ pyanaconda/modules/storage/bootloader/utils.py | 5 +++++
  1 file changed, 5 insertions(+)
 
-diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
-index 0da743e..4fb40cb 100644
---- a/pyanaconda/payload/__init__.py
-+++ b/pyanaconda/payload/__init__.py
-@@ -534,6 +534,11 @@ class Payload(metaclass=ABCMeta):
-         for subdir in ["log", "tmp"]:
-             util.mkdirChain(conf.target.system_root + "/var/volatile/%s" % subdir)
+diff --git a/pyanaconda/modules/storage/bootloader/utils.py b/pyanaconda/modules/storage/bootloader/utils.py
+index d25c51ee3..d53538d3a 100644
+--- a/pyanaconda/modules/storage/bootloader/utils.py
++++ b/pyanaconda/modules/storage/bootloader/utils.py
+@@ -294,6 +294,11 @@ def recreate_initrds(sysroot, kernel_versions):
+     for subdir in ["log", "tmp"]:
+         mkdirChain(conf.target.system_root + "/var/volatile/%s" % subdir)
  
-+        with open(conf.target.system_root + "/etc/dracut.conf.d/cryptsetup.conf", "w") as f:
-+            f.write('add_drivers+=" aesni_intel"\n')
-+            f.write('add_drivers+=" aes_x86_64"\n')
-+            f.write('omit_dracutmodules+=" systemd"\n')
++    with open(conf.target.system_root + "/etc/dracut.conf.d/cryptsetup.conf", "w") as f:
++        f.write('add_drivers+=" aesni_intel"\n')
++        f.write('add_drivers+=" aes_x86_64"\n')
++        f.write('omit_dracutmodules+=" systemd"\n')
 +
-         for kernel in self.kernel_version_list:
-             log.info("recreating initrd for %s", kernel)
-             if not conf.target.is_image:
+     for kernel in kernel_versions:
+         log.info("Recreating initrd for %s", kernel)
+ 
 -- 
 2.7.4
 
