@@ -94,6 +94,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0053-do-not-support-closest-mirror.patch \
            file://0054-tweak-MAX_TREEINFO_DOWNLOAD_RETRIES.patch \
            file://0055-tweak-time-setting.patch \
+           file://0056-Add-dracut-args-for-home-to-bootloader.patch \
            file://0058-tweak-product-short-name.patch \
            file://0060-tweak-shebang-of-bash.patch \
            file://0064-users.py-Fix-multilib-user-creation-error.patch \
