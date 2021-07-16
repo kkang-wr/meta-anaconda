@@ -23,15 +23,19 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Replace util.getSysroot() with conf.target.system_root.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
----
- pyanaconda/bootloader/efi.py | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
 
-diff --git a/pyanaconda/bootloader/efi.py b/pyanaconda/bootloader/efi.py
-index 6199b51..b2413a0 100644
---- a/pyanaconda/bootloader/efi.py
-+++ b/pyanaconda/bootloader/efi.py
-@@ -137,10 +137,25 @@ class EFIBase(object):
+Rebase for anaconda 34.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ pyanaconda/modules/storage/bootloader/efi.py | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/pyanaconda/modules/storage/bootloader/efi.py b/pyanaconda/modules/storage/bootloader/efi.py
+index 87ae27f2c..d25243173 100644
+--- a/pyanaconda/modules/storage/bootloader/efi.py
++++ b/pyanaconda/modules/storage/bootloader/efi.py
+@@ -134,10 +134,24 @@ class EFIBase(object):
              f.write('grub-mkimage -c /tmp/load.cfg $@ search_fs_uuid\n')
          os.chmod(conf.target.system_root + "/tmp/grub-mkimage-wrapper.sh", 0o755)
  
@@ -40,7 +44,6 @@ index 6199b51..b2413a0 100644
 +                mod_path = "/usr/lib/grub/i386-efi"
 +            else:
 +                raise BootLoaderError("GRUB2 32-bit libdir not eixst")
-+
 +        else:
 +            if os.path.exists(conf.target.system_root+"/usr/lib64/grub/x86_64-efi"):
 +                mod_path = "/usr/lib64/grub/x86_64-efi"
