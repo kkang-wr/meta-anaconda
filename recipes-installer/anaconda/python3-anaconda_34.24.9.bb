@@ -89,6 +89,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0047-remove-incorrect-prefix-of-addon-repo-url.patch \
            file://0048-fix-write-sysconfig-network-failed.patch \
            file://0049-pyanaconda-ui-gui-utils.py-tweak-mouse-arrow.patch \
+           file://0050-tweak-search-location-of-new-kernel-pkg.patch \
            file://0058-tweak-product-short-name.patch \
            file://0060-tweak-shebang-of-bash.patch \
            file://0064-users.py-Fix-multilib-user-creation-error.patch \
