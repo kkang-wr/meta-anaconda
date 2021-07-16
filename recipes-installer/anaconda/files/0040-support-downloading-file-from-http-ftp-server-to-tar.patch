@@ -19,21 +19,21 @@ Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
-Update context for anaconda 32.
+Rebase for anaconda 34.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/installation.py |  6 +++
- pyanaconda/kickstart.py    | 99 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 105 insertions(+)
+ pyanaconda/installation.py |   6 +++
+ pyanaconda/kickstart.py    | 100 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 106 insertions(+)
 
 diff --git a/pyanaconda/installation.py b/pyanaconda/installation.py
-index d8d96d8811..904460ea8c 100644
+index 0548b539b..2cb222ab6 100644
 --- a/pyanaconda/installation.py
 +++ b/pyanaconda/installation.py
-@@ -129,6 +129,12 @@ def _prepare_configuration(payload, ksdata):
-         (None, ksdata, None, payload)
-     ))
+@@ -144,6 +144,12 @@ def _prepare_configuration(payload, ksdata):
+     # Anaconda addon configuration
+     addon_config = TaskQueue("Anaconda addon configuration", N_("Configuring addons"))
  
 +    addon_config.append(Task(
 +        "Configure download",
@@ -42,22 +42,30 @@ index d8d96d8811..904460ea8c 100644
 +    ))
 +
      boss_proxy = BOSS.get_proxy()
-     addon_config.append_dbus_tasks(BOSS, [boss_proxy.InstallSystemWithTask()])
- 
+     for service_name, object_path in boss_proxy.CollectInstallSystemTasks():
+         task_proxy = DBus.get_proxy(service_name, object_path)
 diff --git a/pyanaconda/kickstart.py b/pyanaconda/kickstart.py
-index 7dbf83971a..848d0dc969 100644
+index 5ba8ef7eb..07cc3a886 100644
 --- a/pyanaconda/kickstart.py
 +++ b/pyanaconda/kickstart.py
-@@ -47,6 +47,8 @@ from pykickstart.base import BaseHandler, KickstartCommand
- from pykickstart.constants import KS_SCRIPT_POST, KS_SCRIPT_PRE, KS_SCRIPT_TRACEBACK, KS_SCRIPT_PREINSTALL
- from pykickstart.errors import KickstartError, KickstartParseWarning, KickstartAuthError
+@@ -26,6 +26,7 @@ import sys
+ import tempfile
+ import time
+ import warnings
++import requests
+ 
+ from contextlib import contextmanager
+ 
+@@ -47,6 +48,8 @@ from pykickstart.constants import KS_SCRIPT_POST, KS_SCRIPT_PRE, KS_SCRIPT_TRACE
+ from pykickstart.errors import KickstartError, KickstartParseWarning, KickstartDeprecationWarning, KickstartAuthError
+ from pykickstart.ko import KickstartObject
  from pykickstart.parser import KickstartParser
 +from pykickstart.base import KickstartCommand, BaseData
 +from pykickstart.options import KSOptionParser
  from pykickstart.parser import Script as KSScript
- from pykickstart.sections import NullSection, PackageSection, PostScriptSection, PreScriptSection, PreInstallScriptSection, \
-                                  OnErrorScriptSection, TracebackScriptSection, Section
-@@ -343,6 +343,101 @@ class AnacondaSection(Section):
+ from pykickstart.sections import NullSection, PostScriptSection, PreScriptSection, \
+     PreInstallScriptSection, OnErrorScriptSection, TracebackScriptSection, Section
+@@ -308,6 +311,101 @@ class AnacondaSection(Section):
          Section.finalize(self)
  
  
@@ -159,18 +167,21 @@ index 7dbf83971a..848d0dc969 100644
  ###
  ### HANDLERS
  ###
-@@ -384,10 +479,12 @@ commandMap = {
-     "xconfig": UselessCommand,
-     "zerombr": UselessCommand,
-     "zfcp": UselessCommand,
-+    "download": Download,
- }
+@@ -338,6 +436,7 @@ class AnacondaKickstartSpecification(KickstartSpecification):
+         "text": COMMANDS.DisplayMode,
+         "updates": COMMANDS.Updates,
+         "vnc": COMMANDS.Vnc,
++        "download": Download,
+     }
  
- dataMap = {
-     "RepoData": RepoData,
-+    "DownloadData": DownloadData,
- }
+     commands_data = {
+@@ -345,6 +444,7 @@ class AnacondaKickstartSpecification(KickstartSpecification):
+         "ModuleData": COMMANDS.ModuleData,
+         "RepoData": RepoData,
+         "SshPwData": COMMANDS.SshPwData,
++        "DownloadData": DownloadData,
+     }
  
- superclass = returnClassForVersion(VERSION)
+     @classmethod
 -- 
 2.7.4
