@@ -10,32 +10,19 @@ Tweak log debug to log info.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
----
- pyanaconda/payload/__init__.py              | 4 ++--
- pyanaconda/payload/install_tree_metadata.py | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
-index 8b48625..cbe2154 100644
---- a/pyanaconda/payload/__init__.py
-+++ b/pyanaconda/payload/__init__.py
-@@ -428,9 +428,9 @@ class Payload(metaclass=ABCMeta):
- 
-         if self._install_tree_metadata:
-             version = self._install_tree_metadata.get_release_version()
--            log.debug("using treeinfo release version of %s", version)
-+            log.info("using treeinfo release version of %s", version)
-         else:
--            log.debug("using default release version of %s", version)
-+            log.info("using default release version of %s", version)
- 
-         return version
- 
+Rebase for anaconda 34.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ pyanaconda/payload/install_tree_metadata.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/pyanaconda/payload/install_tree_metadata.py b/pyanaconda/payload/install_tree_metadata.py
-index 30abfd6..04799ce 100644
+index 297ea9ee7..d1fca163e 100644
 --- a/pyanaconda/payload/install_tree_metadata.py
 +++ b/pyanaconda/payload/install_tree_metadata.py
-@@ -27,7 +27,7 @@ from pyanaconda.core import util, constants
+@@ -28,7 +28,7 @@ from pyanaconda.core.payload import split_protocol
  from pyanaconda.anaconda_loggers import get_packaging_logger
  log = get_packaging_logger()
  
