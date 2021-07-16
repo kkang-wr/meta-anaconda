@@ -17,16 +17,28 @@ Update for anaconda 32:
 * replace obsolete function util.getSysroot()
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
----
- pyanaconda/bootloader/installation.py | 14 ++++++++++++--
- pyanaconda/payload/__init__.py        |  4 ++++
- 2 files changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/pyanaconda/bootloader/installation.py b/pyanaconda/bootloader/installation.py
-index 57d139b3e1..d220dc828d 100644
---- a/pyanaconda/bootloader/installation.py
-+++ b/pyanaconda/bootloader/installation.py
-@@ -47,7 +47,7 @@ def configure_boot_loader(sysroot, storage, kernel_versions):
+Rebase for anaconda 34.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ pyanaconda/modules/storage/bootloader/utils.py | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
+
+diff --git a/pyanaconda/modules/storage/bootloader/utils.py b/pyanaconda/modules/storage/bootloader/utils.py
+index 2fdf8b921..e02684f4d 100644
+--- a/pyanaconda/modules/storage/bootloader/utils.py
++++ b/pyanaconda/modules/storage/bootloader/utils.py
+@@ -21,7 +21,7 @@ from glob import glob
+ from pyanaconda.modules.common.errors.installation import BootloaderInstallationError
+ from pyanaconda.modules.storage.bootloader.image import LinuxBootLoaderImage
+ from pyanaconda.core.configuration.anaconda import conf
+-from pyanaconda.core.util import decode_bytes, execWithRedirect
++from pyanaconda.core.util import decode_bytes, execWithRedirect, mkdirChain
+ from pyanaconda.product import productName
+ 
+ from pyanaconda.anaconda_loggers import get_module_logger
+@@ -96,7 +96,7 @@ def configure_boot_loader(sysroot, storage, kernel_versions):
          return
  
      # Collect the boot loader images.
@@ -35,7 +47,7 @@ index 57d139b3e1..d220dc828d 100644
  
      # Write out /etc/sysconfig/kernel.
      _write_sysconfig_kernel(sysroot, storage)
-@@ -64,7 +64,7 @@ def _get_rescue_kernel_versions(sysroot):
+@@ -113,7 +113,7 @@ def _get_rescue_kernel_versions(sysroot):
      return [f.split("/")[-1][8:] for f in rescue_versions]
  
  
@@ -44,7 +56,7 @@ index 57d139b3e1..d220dc828d 100644
      """Collect the OS images for the boot loader.
  
      :param storage: an instance of the storage
-@@ -86,6 +86,12 @@ def _collect_os_images(storage, kernel_versions):
+@@ -135,6 +135,12 @@ def _collect_os_images(storage, kernel_versions):
      storage.bootloader.add_image(default_image)
      storage.bootloader.default = default_image
  
@@ -57,8 +69,8 @@ index 57d139b3e1..d220dc828d 100644
      # now add an image for each of the other kernels
      for version in kernel_versions:
          label = "%s-%s" % (base_label, version)
-@@ -95,6 +101,10 @@ def _collect_os_images(storage, kernel_versions):
-                                      label=label, short=short)
+@@ -145,6 +151,10 @@ def _collect_os_images(storage, kernel_versions):
+         )
          storage.bootloader.add_image(image)
  
 +        initrd = sysroot + "/boot/initramfs-%s.img" % version
@@ -68,21 +80,17 @@ index 57d139b3e1..d220dc828d 100644
  
  def _write_sysconfig_kernel(sysroot, storage):
      """Write to /etc/sysconfig/kernel.
-diff --git a/pyanaconda/payload/__init__.py b/pyanaconda/payload/__init__.py
-index 949652d6a8..eb4dff1537 100644
---- a/pyanaconda/payload/__init__.py
-+++ b/pyanaconda/payload/__init__.py
-@@ -530,6 +530,10 @@ class Payload(metaclass=ABCMeta):
-             log.debug("new-kernel-pkg does not exist, using dracut instead.")
-             use_dracut = True
+@@ -280,6 +291,10 @@ def recreate_initrds(sysroot, kernel_versions):
+         log.debug("new-kernel-pkg does not exist, using dracut instead")
+         use_dracut = True
  
-+        # Make sure temp dir existed, dracut requires it while live install
-+        for subdir in ["log", "tmp"]:
-+            util.mkdirChain(conf.target.system_root + "/var/volatile/%s" % subdir)
++    # Make sure temp dir existed, dracut requires it while live install
++    for subdir in ["log", "tmp"]:
++        mkdirChain(conf.target.system_root + "/var/volatile/%s" % subdir)
 +
-         for kernel in self.kernel_version_list:
-             log.info("recreating initrd for %s", kernel)
-             if not conf.target.is_image:
+     for kernel in kernel_versions:
+         log.info("Recreating initrd for %s", kernel)
+ 
 -- 
 2.7.4
 

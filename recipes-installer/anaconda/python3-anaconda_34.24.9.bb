@@ -82,6 +82,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0039-support-authentication-for-kickstart.patch \
            file://0040-support-downloading-file-from-http-ftp-server-to-tar.patch \
            file://0041-live-install-supports-kickstart.patch \
+           file://0042-support-initramfs-boot.patch \
            file://0045-installation-destination-disable-iSCSI-network-disks.patch \
            file://0046-update-region-while-city-changes.patch \
            file://0047-remove-incorrect-prefix-of-addon-repo-url.patch \
