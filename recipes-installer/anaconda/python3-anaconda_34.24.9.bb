@@ -107,6 +107,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0066-fix-calling-grub-mkconfig-failed.patch \
            file://0068-disable-chronyd.patch \
            file://0069-disable-location-detection-based-on-IP-address.patch \
+           file://0070-remove-unsupported-icon-from-main-page-and-tweak-ico.patch \
            file://0001-pyanaconda-payload-Fix-xserver-detection.patch \
           "
 
