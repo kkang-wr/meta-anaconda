@@ -12,15 +12,19 @@ Make sure the existence of /etc/machine-id for Yocto
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase for anaconda 34.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/bootloader/grub2.py | 6 ++++--
+ pyanaconda/modules/storage/bootloader/grub2.py | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/pyanaconda/bootloader/grub2.py b/pyanaconda/bootloader/grub2.py
-index 80b026a..447b4bf 100644
---- a/pyanaconda/bootloader/grub2.py
-+++ b/pyanaconda/bootloader/grub2.py
-@@ -345,8 +345,10 @@ class GRUB2(BootLoader):
+diff --git a/pyanaconda/modules/storage/bootloader/grub2.py b/pyanaconda/modules/storage/bootloader/grub2.py
+index 52116bcee..441f89e73 100644
+--- a/pyanaconda/modules/storage/bootloader/grub2.py
++++ b/pyanaconda/modules/storage/bootloader/grub2.py
+@@ -344,8 +344,10 @@ class GRUB2(BootLoader):
          if self.default is not None:
              machine_id_path = conf.target.system_root + "/etc/machine-id"
              if not os.access(machine_id_path, os.R_OK):
