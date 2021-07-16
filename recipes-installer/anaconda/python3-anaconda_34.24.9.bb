@@ -97,6 +97,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0056-Add-dracut-args-for-home-to-bootloader.patch \
            file://0057-do-not-customize-window-theme.patch \
            file://0058-tweak-product-short-name.patch \
+           file://0059-disable-dmraid.patch \
            file://0060-tweak-shebang-of-bash.patch \
            file://0064-users.py-Fix-multilib-user-creation-error.patch \
            file://0068-disable-chronyd.patch \
