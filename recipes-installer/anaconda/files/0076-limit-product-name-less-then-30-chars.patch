@@ -8,20 +8,24 @@ Previously 40 is still too long, which broke gui window layout
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase for anaconda 34.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/storage/root.py | 2 +-
+ pyanaconda/modules/storage/devicetree/root.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/pyanaconda/storage/root.py b/pyanaconda/storage/root.py
-index a321899..4e3b7aa 100644
---- a/pyanaconda/storage/root.py
-+++ b/pyanaconda/storage/root.py
-@@ -160,7 +160,7 @@ def get_release_string():
-         if os.access(filename, os.R_OK):
-             (rel_name, rel_ver) = _release_from_os_release(filename)
+diff --git a/pyanaconda/modules/storage/devicetree/root.py b/pyanaconda/modules/storage/devicetree/root.py
+index 1af402e2d..b375e9164 100644
+--- a/pyanaconda/modules/storage/devicetree/root.py
++++ b/pyanaconda/modules/storage/devicetree/root.py
+@@ -174,7 +174,7 @@ def get_release_string(chroot):
+     except ValueError:
+         pass
  
 -    return rel_arch, rel_name, rel_ver
-+    return rel_arch, rel_name[0:30], rel_ver
++    return rel_arch, rel_name[:30], rel_ver
  
  
  def _release_from_redhat_release(fn):
