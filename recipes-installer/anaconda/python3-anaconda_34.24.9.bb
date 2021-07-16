@@ -101,6 +101,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0060-tweak-shebang-of-bash.patch \
            file://0061-Tweak-label-name.patch \
            file://0062-Mount-var-volatile-during-install.patch \
+           file://0063-update-fstab-by-appending.patch \
            file://0064-users.py-Fix-multilib-user-creation-error.patch \
            file://0068-disable-chronyd.patch \
            file://0069-disable-location-detection-based-on-IP-address.patch \

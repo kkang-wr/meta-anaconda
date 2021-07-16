@@ -10,15 +10,19 @@ to keep original tmpfs partitions.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase for anaconda 34.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/storage/fsset.py | 2 +-
+ pyanaconda/modules/storage/devicetree/fsset.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/pyanaconda/storage/fsset.py b/pyanaconda/storage/fsset.py
-index 2addc56..7716e7d 100644
---- a/pyanaconda/storage/fsset.py
-+++ b/pyanaconda/storage/fsset.py
-@@ -652,7 +652,7 @@ class FSSet(object):
+diff --git a/pyanaconda/modules/storage/devicetree/fsset.py b/pyanaconda/modules/storage/devicetree/fsset.py
+index dc4dab34f..0569bcb95 100644
+--- a/pyanaconda/modules/storage/devicetree/fsset.py
++++ b/pyanaconda/modules/storage/devicetree/fsset.py
+@@ -649,7 +649,7 @@ class FSSet(object):
          # /etc/fstab
          fstab_path = os.path.normpath("%s/etc/fstab" % sysroot)
          fstab = self.fstab()
