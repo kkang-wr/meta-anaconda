@@ -15,15 +15,19 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Replace util.getSysroot() with conf.target.system_root.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
----
- pyanaconda/bootloader/efi.py | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
 
-diff --git a/pyanaconda/bootloader/efi.py b/pyanaconda/bootloader/efi.py
-index 73d348b..6199b51 100644
---- a/pyanaconda/bootloader/efi.py
-+++ b/pyanaconda/bootloader/efi.py
-@@ -129,6 +129,22 @@ class EFIBase(object):
+Rebase for anaconda 34.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ pyanaconda/modules/storage/bootloader/efi.py | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/pyanaconda/modules/storage/bootloader/efi.py b/pyanaconda/modules/storage/bootloader/efi.py
+index 158287b1e..87ae27f2c 100644
+--- a/pyanaconda/modules/storage/bootloader/efi.py
++++ b/pyanaconda/modules/storage/bootloader/efi.py
+@@ -126,6 +126,23 @@ class EFIBase(object):
              self.remove_efi_boot_target()
          self.add_efi_boot_target()
  
@@ -43,6 +47,7 @@ index 73d348b..6199b51 100644
 +                                                 ])
 +        if rc:
 +            raise BootLoaderError("boot loader install failed")
++
  
  class EFIGRUB(EFIBase, GRUB2):
      """EFI GRUBv2"""
