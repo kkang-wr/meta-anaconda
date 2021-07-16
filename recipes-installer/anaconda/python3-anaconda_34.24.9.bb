@@ -99,6 +99,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0058-tweak-product-short-name.patch \
            file://0059-disable-dmraid.patch \
            file://0060-tweak-shebang-of-bash.patch \
+           file://0061-Tweak-label-name.patch \
            file://0064-users.py-Fix-multilib-user-creation-error.patch \
            file://0068-disable-chronyd.patch \
            file://0069-disable-location-detection-based-on-IP-address.patch \
