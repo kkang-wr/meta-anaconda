@@ -9,51 +9,32 @@ caused systemd's journalctl failed to record boot log.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
----
- pyanaconda/storage/fsset.py | 9 +++++++++
- 1 file changed, 9 insertions(+)
 
-diff --git a/pyanaconda/storage/fsset.py b/pyanaconda/storage/fsset.py
-index 6aa71a1..2addc56 100644
---- a/pyanaconda/storage/fsset.py
-+++ b/pyanaconda/storage/fsset.py
-@@ -221,6 +221,7 @@ class FSSet(object):
-         self._sysfs = None
-         self._proc = None
-         self._devshm = None
-+        self._volatile = None
-         self._usb = None
-         self._selinux = None
-         self._run = None
-@@ -262,6 +263,12 @@ class FSSet(object):
-         return self._devshm
- 
-     @property
-+    def volatile(self):
-+        if not self._volatile:
-+            self._volatile = NoDevice(fmt=get_format("tmpfs", device="tmpfs", mountpoint="/var/volatile"))
-+        return self._volatile
-+
-+    @property
-     def usb(self):
-         if not self._usb:
-             self._usb = NoDevice(fmt=get_format("usbfs", device="usbfs", mountpoint="/proc/bus/usb"))
-@@ -510,6 +517,7 @@ class FSSet(object):
-         """
-         devices = list(self.mountpoints.values()) + self.swap_devices
-         devices.extend([self.dev, self.devshm, self.devpts, self.sysfs,
-+                        self.volatile,
-                         self.proc, self.selinux, self.usb, self.run])
-         if isinstance(_platform, EFI):
-             devices.append(self.efivars)
-@@ -572,6 +580,7 @@ class FSSet(object):
-         """
-         devices = list(self.mountpoints.values()) + self.swap_devices
-         devices.extend([self.dev, self.devshm, self.devpts, self.sysfs,
-+                        self.volatile,
-                         self.proc, self.usb, self.selinux, self.run])
-         if isinstance(_platform, EFI):
-             devices.append(self.efivars)
+Rebase for anaconda 34.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ pyanaconda/modules/storage/devicetree/fsset.py | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/pyanaconda/modules/storage/devicetree/fsset.py b/pyanaconda/modules/storage/devicetree/fsset.py
+index dc4dab34f..ba66f529e 100644
+--- a/pyanaconda/modules/storage/devicetree/fsset.py
++++ b/pyanaconda/modules/storage/devicetree/fsset.py
+@@ -131,6 +131,13 @@ def get_system_filesystems(devicetree):
+                 mountpoint="/sys/fs/selinux"
+             )
+         ),
++        NoDevice(
++            fmt=get_format(
++                "tmpfs",
++                device="tmpfs",
++                mountpoint="/var/volatile"
++            )
++        ),
+         NoDevice(
+             fmt=get_format(
+                 "usbfs",
 -- 
 2.7.4
 
