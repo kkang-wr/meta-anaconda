@@ -1,4 +1,4 @@
-From d01bdbad4c984b818d77d457cae3e2313475977d Mon Sep 17 00:00:00 2001
+From e60cfacef2ec8734ae15ca69f8ccbc94d5f3ffcc Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Sat, 29 Jun 2019 12:40:30 +0800
 Subject: [PATCH] reboot unconditionally
@@ -8,12 +8,13 @@ Whatever image install or live install, reboot unconditionally
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
 ---
  pyanaconda/core/configuration/system.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/pyanaconda/core/configuration/system.py b/pyanaconda/core/configuration/system.py
-index e35da57..7459e2e 100644
+index 5d99dc8b5..333e46bf8 100644
 --- a/pyanaconda/core/configuration/system.py
 +++ b/pyanaconda/core/configuration/system.py
 @@ -66,7 +66,7 @@ class SystemSection(Section):
@@ -24,7 +25,4 @@ index e35da57..7459e2e 100644
 +        return True
  
      @property
-     def can_switch_tty(self):
--- 
-2.7.4
-
+     def can_start_user_systemd(self):

@@ -1,4 +1,4 @@
-From c2645c00b53107473efcb954afb06bd6906a7b00 Mon Sep 17 00:00:00 2001
+From c65b2674cbdbf3552d697babbdd5e6ab7c2e5415 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Sat, 29 Jun 2019 14:25:21 +0800
 Subject: [PATCH] support to get kickstart from network
@@ -12,15 +12,16 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Update for anaconda 32.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
 ---
  pyanaconda/startup_utils.py | 13 ++++++++++---
  1 file changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/pyanaconda/startup_utils.py b/pyanaconda/startup_utils.py
-index 25e4bd0346..30c9fb328f 100644
+index bff65308e..3a4ba77d9 100644
 --- a/pyanaconda/startup_utils.py
 +++ b/pyanaconda/startup_utils.py
-@@ -340,8 +340,11 @@ def find_kickstart(options):
+@@ -355,8 +355,11 @@ def find_kickstart(options):
      :param options: command line/boot options
      :returns: a path to a kickstart file or None
      """
@@ -34,9 +35,9 @@ index 25e4bd0346..30c9fb328f 100644
              stdout_log.error("Kickstart file %s is missing.", options.ksfile)
              util.ipmi_report(constants.IPMI_ABORTED)
              sys.exit(1)
-@@ -359,8 +362,12 @@ def find_kickstart(options):
-         ks_files = ["/tmp/updates/interactive-defaults.ks",
-                     "/usr/share/anaconda/interactive-defaults.ks"]
+@@ -373,8 +376,12 @@ def find_kickstart(options):
+     else:
+         ks_files = ["/usr/share/anaconda/interactive-defaults.ks"]
  
 +    log.info("ks_files: %s" % ks_files)
      for ks in ks_files:
@@ -48,6 +49,3 @@ index 25e4bd0346..30c9fb328f 100644
              continue
  
          return ks
--- 
-2.7.4
-
