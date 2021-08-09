@@ -76,7 +76,7 @@ Building the target installer
 
    A target image requires specific components to be compatible with
    the installer. To install these components set
-   DISTRO_FEATURES_append = " anaconda-support" in local.conf
+   DISTRO_FEATURES:append = " anaconda-support" in local.conf
 
    For installer image, you are not supposed to change the 'DISTRO'
    setting in target build directory. It may work, but it's not
@@ -132,12 +132,12 @@ Building the target installer
            The build requires 'anaconda-support' in DISTRO_FEATURES to
            help installation. It also requires pam, RPM packages and systemd
            init manager. Edit conf/local.conf to use:
-           $ echo 'DISTRO_FEATURES_append = " anaconda-support"' >> conf/local.conf
-           $ echo 'DISTRO_FEATURES_append = " pam"' >> conf/local.conf
+           $ echo 'DISTRO_FEATURES:append = " anaconda-support"' >> conf/local.conf
+           $ echo 'DISTRO_FEATURES:append = " pam"' >> conf/local.conf
            $ echo 'PACKAGE_CLASSES = "package_rpm"' >> conf/local.conf
            $ echo 'VIRTUAL-RUNTIME_init_manager = "systemd"' >> conf/local.conf
-           $ echo 'DISTRO_FEATURES_append = " systemd"' >> conf/local.conf
-           $ echo 'DISTRO_FEATURES_BACKFILL_CONSIDERED_append = " sysvinit"' >> conf/local.conf
+           $ echo 'DISTRO_FEATURES:append = " systemd"' >> conf/local.conf
+           $ echo 'DISTRO_FEATURES_BACKFILL_CONSIDERED:append = " sysvinit"' >> conf/local.conf
 
            Edit conf/bblayers.conf to include other layers
            BBLAYERS ?= " \
@@ -426,7 +426,7 @@ Building the target installer
 12. How to authenticate while downloading kickstart from web server
     12.1 We add boot options 'ksuser' and 'kspasswd'(listed in /proc/cmdline)
          to support authentication while downloading kickstart from web server.
-         You could integrate them to installer image by set APPEND_append =
+         You could integrate them to installer image by set APPEND:append =
          " ks=<url-ks> ksuser=<username> kspasswd=<password>" in local.conf
 
     12.2 Currently, we support basic/digest authentication, which decided by

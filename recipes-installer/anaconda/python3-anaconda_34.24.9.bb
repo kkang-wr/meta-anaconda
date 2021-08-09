@@ -16,7 +16,7 @@ DEPENDS += "libxklavier glade libxml2-native \
 
 S = "${WORKDIR}/git"
 
-RDEPENDS_${PN} = "e2fsprogs e2fsprogs-e2fsck e2fsprogs-mke2fs \
+RDEPENDS:${PN} = "e2fsprogs e2fsprogs-e2fsck e2fsprogs-mke2fs \
                    e2fsprogs-tune2fs e2fsprogs-resize2fs \
                    ntfsprogs xfsprogs btrfs-tools nfs-utils-client \
                    parted dosfstools gzip libarchive lvm2 \
@@ -43,7 +43,7 @@ RDEPENDS_${PN} = "e2fsprogs e2fsprogs-e2fsck e2fsprogs-mke2fs \
                    python3-productmd python3-dasbus libxkbcommon \
                 "
 
-RDEPENDS_${PN} += "networkmanager \
+RDEPENDS:${PN} += "networkmanager \
                    network-manager-applet \
 "
 
@@ -117,16 +117,16 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
 
 SRCREV = "43ce5dfb0566d14926bfb60e11564a656829e92d"
 
-FILES_${PN}-dbg += "${libexecdir}/anaconda/.debug ${PYTHON_SITEPACKAGES_DIR}/pyanaconda/.debug"
-FILES_${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/pyanaconda/_isys.a"
-FILES_${PN} = "/lib ${libdir} ${sysconfdir} ${bindir} ${sbindir} ${libexecdir} \
+FILES:${PN}-dbg += "${libexecdir}/anaconda/.debug ${PYTHON_SITEPACKAGES_DIR}/pyanaconda/.debug"
+FILES:${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/pyanaconda/_isys.a"
+FILES:${PN} = "/lib ${libdir} ${sysconfdir} ${bindir} ${sbindir} ${libexecdir} \
               ${datadir}/anaconda ${datadir}/applications ${datadir}/glade \
               ${PYTHON_SITEPACKAGES_DIR}/pyanaconda ${PYTHON_SITEPACKAGES_DIR}/log_picker \
               ${datadir}/themes \
 "
-FILES_${PN}-misc = "/usr/lib"
+FILES:${PN}-misc = "/usr/lib"
 PACKAGES += "${PN}-misc"
-RDEPENDS_${PN}-misc += "bash python3-core"
+RDEPENDS:${PN}-misc += "bash python3-core"
 
 EXTRA_OECONF += "--disable-selinux \
          --with-sysroot=${PKG_CONFIG_SYSROOT_DIR} \
@@ -137,11 +137,11 @@ REQUIRED_DISTRO_FEATURES = "systemd x11"
 
 inherit autotools-brokensep gettext python3native pkgconfig gobject-introspection
 
-do_configure_prepend() {
+do_configure:prepend() {
     ( cd ${S}; STAGING_DATADIR_NATIVE=${STAGING_DATADIR_NATIVE} ${S}/autogen.sh --noconfigure)
 }
 
-do_install_append() {
+do_install:append() {
     install -m 644 ${WORKDIR}/81-edit-sudoers.ks ${D}${datadir}/anaconda/post-scripts
     install -m 644 ${WORKDIR}/81-systemd-preset-all.ks ${D}${datadir}/anaconda/post-scripts
     install -m 644 ${WORKDIR}/81-add-env-file-for-sshd.ks ${D}${datadir}/anaconda/post-scripts
@@ -155,5 +155,5 @@ python __anonymous () {
 }
 
 COMPATIBLE_HOST = '(x86_64.*|i.86.*|arm.*|aarch64.*)-(linux.*|freebsd.*)'
-COMPATIBLE_HOST_armv7a = 'null'
-COMPATIBLE_HOST_armv7ve = 'null'
+COMPATIBLE_HOST:armv7a = 'null'
+COMPATIBLE_HOST:armv7ve = 'null'

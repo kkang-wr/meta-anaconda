@@ -1,11 +1,11 @@
 FEATURE_PACKAGES_anaconda-support = "packagegroup-anaconda-support"
-IMAGE_FEATURES_append = " anaconda-support package-management"
+IMAGE_FEATURES:append = " anaconda-support package-management"
 
 # Generate filesystem images for image copy install
 IMAGE_FSTYPES += "ext4"
 
-ROOTFS_POSTPROCESS_COMMAND_append = " copy_grub_lib;"
-IMAGE_POSTPROCESS_COMMAND_append = " emit_image_env;"
+ROOTFS_POSTPROCESS_COMMAND:append = " copy_grub_lib;"
+IMAGE_POSTPROCESS_COMMAND:append = " emit_image_env;"
 
 inherit features_check
 REQUIRED_DISTRO_FEATURES = "systemd ldconfig pam"

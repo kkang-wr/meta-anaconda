@@ -17,10 +17,10 @@ class TestAnacondaOE(OESelftestTestCase):
         features = 'MACHINE = "%s"\n' % self.machine
         features += 'PACKAGE_CLASSES = "package_rpm"\n'
         features += 'VIRTUAL-RUNTIME_init_manager = "systemd"\n'
-        features += 'DISTRO_FEATURES_append = " systemd"\n'
-        features += 'DISTRO_FEATURES_append = " pam"\n'
-        features += 'DISTRO_FEATURES_append = " ldconfig"\n'
-        features += 'DISTRO_FEATURES_BACKFILL_CONSIDERED_append = " sysvinit"\n'
+        features += 'DISTRO_FEATURES:append = " systemd"\n'
+        features += 'DISTRO_FEATURES:append = " pam"\n'
+        features += 'DISTRO_FEATURES:append = " ldconfig"\n'
+        features += 'DISTRO_FEATURES_BACKFILL_CONSIDERED:append = " sysvinit"\n'
         self.write_config(features)
         self.logger.info('local.conf:\n%s' % features)
 
@@ -94,7 +94,7 @@ class TestAnacondaOE(OESelftestTestCase):
 
     @OETestDepends(['anaconda_oe.TestAnacondaOE.test_testanaconda_create_target_disk'])
     def test_testanaconda_build_target_image(self):
-        features = 'DISTRO_FEATURES_append = " anaconda-support"\n'
+        features = 'DISTRO_FEATURES:append = " anaconda-support"\n'
         self.logger.info('extra local.conf:\n%s' % features)
         self.append_config(features)
 
@@ -149,7 +149,7 @@ class TestAnacondaOE(OESelftestTestCase):
         features += 'INSTALLER_TARGET_BUILD = "%s/%s-%s.ext4"\n' % (self.target_deploy_dir_image, self.target_recipe, self.machine)
         features += 'KICKSTART_FILE = "%s"\n' % ks_file
         features += 'SYSLINUX_TIMEOUT = "10"\n'
-        features += 'APPEND_append = " textinst"\n'
+        features += 'APPEND:append = " textinst"\n'
         features += 'INSTALLER_SERIAL = ""\n'
         self.logger.info('extra local.conf:\n%s' % features)
         self.append_config(features)

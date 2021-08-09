@@ -1,3 +1,3 @@
-FILESEXTRAPATHS_prepend_anaconda := "${THISDIR}/files:"
-SRC_URI_append_anaconda = " file://workaround-for-anaconda-installer-while-loading-libA.patch \
+FILESEXTRAPATHS:prepend:anaconda := "${THISDIR}/files:"
+SRC_URI:append:anaconda = " file://workaround-for-anaconda-installer-while-loading-libA.patch \
 "

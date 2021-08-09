@@ -1,5 +1,5 @@
-FILESEXTRAPATHS_append_anaconda := ":${THISDIR}/files"
+FILESEXTRAPATHS:append:anaconda := ":${THISDIR}/files"
 
-SRC_URI_append_anaconda = " \
+SRC_URI:append:anaconda = " \
     file://init-live.sh \
 "

@@ -1,5 +1,5 @@
-FILESEXTRAPATHS_prepend := "${LAYER_PATH_meta-anaconda}/recipes-kernel/linux/files/:"
-SRC_URI_append = " \
+FILESEXTRAPATHS:prepend := "${LAYER_PATH_meta-anaconda}/recipes-kernel/linux/files/:"
+SRC_URI:append = " \
     file://dmthin.scc \
     file://crypt.scc \
     file://liveinstall.scc \
@@ -8,7 +8,7 @@ SRC_URI_append = " \
     file://ide.scc \
 "
 
-KERNEL_FEATURES_append = " \
+KERNEL_FEATURES:append = " \
     features/overlayfs/overlayfs.scc \
     cfg/systemd.scc \
 "

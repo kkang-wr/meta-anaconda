@@ -12,7 +12,7 @@ S = "${WORKDIR}"
 
 inherit allarch
 
-FILES_${PN} = "${datadir}/anaconda"
+FILES:${PN} = "${datadir}/anaconda"
 
 do_install() {
     install -d ${D}/${datadir}/anaconda/boot

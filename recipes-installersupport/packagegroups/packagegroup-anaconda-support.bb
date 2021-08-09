@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 inherit packagegroup
 
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     sudo \
     kernel-image \
     kernel-modules \
@@ -30,5 +30,5 @@ RDEPENDS_${PN} = " \
 "
 
 COMPATIBLE_HOST = '(x86_64.*|i.86.*)-(linux.*|freebsd.*)'
-COMPATIBLE_HOST_armv7a = 'null'
-COMPATIBLE_HOST_armv7ve = 'null'
+COMPATIBLE_HOST:armv7a = 'null'
+COMPATIBLE_HOST:armv7ve = 'null'

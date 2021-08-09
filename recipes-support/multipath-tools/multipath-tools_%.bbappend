@@ -1,6 +1,6 @@
-SYSTEMD_AUTO_ENABLE_anaconda = "disable"
+SYSTEMD_AUTO_ENABLE:anaconda = "disable"
 
-do_install_append_anaconda () {
+do_install:append:anaconda () {
     install -d ${D}${sysconfdir}/multipath
     install -m 0644 ${WORKDIR}/multipath.conf.example \
     ${D}${sysconfdir}/multipath.conf

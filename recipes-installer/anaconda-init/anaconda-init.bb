@@ -17,16 +17,16 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 #RDEPENDS_${PN} = "networkmanager-tests"
 
 # For mount -oloop=/dev/loopX, busybox's mount doesn't support this.
-RDEPENDS_${PN} = "util-linux"
+RDEPENDS:${PN} = "util-linux"
 
 # While systemd, we need screen to control anaconda-init first boot
-RDEPENDS_${PN} += " \
+RDEPENDS:${PN} += " \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'screen', '', d)} \
 "
 
 inherit systemd
 
-SYSTEMD_SERVICE_${PN} = "anaconda-init.service \
+SYSTEMD_SERVICE:${PN} = "anaconda-init.service \
                          anaconda-init-screen@.service \
                          anaconda-init.target \
 "
@@ -69,7 +69,7 @@ INITSCRIPT_PARAMS = "start 30 2 3 4 5 . stop 20 0 1 6 ."
 # Use fixed Xusername of xuser for now, this will need to be
 # fixed if the Xusername changes from xuser
 USERADD_PACKAGES = "${PN}"
-USERADD_PARAM_${PN} = "--create-home \
+USERADD_PARAM:${PN} = "--create-home \
                        --groups video,tty,audio \
                        --user-group xuser"
 

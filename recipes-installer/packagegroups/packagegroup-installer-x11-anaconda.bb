@@ -7,7 +7,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 XSERVER ??= ""
 
-RDEPENDS_packagegroup-installer-x11-anaconda = "\
+RDEPENDS:packagegroup-installer-x11-anaconda = "\
     dbus \
     xinput-calibrator \
     xserver-nodm-init \

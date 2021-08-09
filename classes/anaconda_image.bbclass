@@ -1,8 +1,8 @@
-RPM_POSTPROCESS_COMMANDS_append = "wrl_installer;"
+RPM_POSTPROCESS_COMMANDS:append = "wrl_installer;"
 do_rootfs[vardeps] += "INSTALLER_TARGET_BUILD INSTALLER_TARGET_IMAGE"
 
 # Fix system-shutdown hang at ratelimiting
-APPEND_append = " printk.devkmsg=on"
+APPEND:append = " printk.devkmsg=on"
 
 INSTPRODUCT ?= "${@d.getVar('DISTRO_NAME')[:30]}"
 INSTVER     ?= "${DISTRO_VERSION}"
@@ -14,14 +14,14 @@ INSTALLER_CONFDIR = "${IMAGE_ROOTFS}/installer-config"
 KICKSTART_FILE ?= ""
 WRL_INSTALLER_CONF ?= ""
 
-build_iso_prepend() {
+build_iso:prepend() {
 	install -d ${ISODIR}
 	ln -snf /.discinfo ${ISODIR}/.discinfo
 	ln -snf /.buildstamp ${ISODIR}/.buildstamp
 	ln -snf /Packages ${ISODIR}/Packages
 }
 
-build_iso_append() {
+build_iso:append() {
 	implantisomd5 ${IMGDEPLOYDIR}/${IMAGE_NAME}.iso
 }
 
