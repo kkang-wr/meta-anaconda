@@ -114,6 +114,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0076-limit-product-name-less-then-30-chars.patch \
            file://0077-anaconda-enable-root-ssh-login.patch \
            file://0078-anaconda.py-use-Fedora-as-default-product.patch \
+           file://0079-find-live-os-image-for-oe.patch \
           "
 
 SRCREV = "43ce5dfb0566d14926bfb60e11564a656829e92d"
