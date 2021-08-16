@@ -40,7 +40,7 @@ RDEPENDS:${PN} = "e2fsprogs e2fsprogs-e2fsck e2fsprogs-mke2fs \
                    python3-requests-file python3-requests-ftp \
                    python3-blivetgui librsvg librsvg-gtk bash \
                    python3-systemd python3-pydbus python3-simpleline \
-                   python3-productmd python3-dasbus libxkbcommon \
+                   python3-productmd python3-dasbus libxkbcommon chrony \
                 "
 
 RDEPENDS:${PN} += "networkmanager \
@@ -70,7 +70,6 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0024-fix-cannot-stat-usr-share-gettext-gettext.h.patch \
            file://0025-tweak-bootloader-fs-type.patch \
            file://0026-support-timezone-setting.patch \
-           file://0027-disable-ntp-support.patch \
            file://0028-do-not-support-manually-set-time.patch \
            file://0030-detect-existence-of-Xorg.patch \
            file://0031-fix-write-network-conf-failed-while-liveinst.patch \
