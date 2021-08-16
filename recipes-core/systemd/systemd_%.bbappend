@@ -3,6 +3,8 @@ SRC_URI:append:anaconda = " \
     file://0001-set-tty2-as-default-instance.patch \
 "
 
+PACKAGECONFIG:remove:anaconda = "timesyncd"
+
 do_install:append:anaconda() {
     # Explicitly enable tty2
     mkdir -p ${D}${sysconfdir}/systemd/system/getty.target.wants
