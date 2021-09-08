@@ -24,8 +24,8 @@ Rebase for anaconda 34
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/core/constants.py                     |  4 ++--
- pyanaconda/modules/payloads/payload/dnf/utils.py | 13 +++++++++----
- 2 files changed, 11 insertions(+), 6 deletions(-)
+ pyanaconda/modules/payloads/payload/dnf/utils.py | 14 ++++++++++----
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
 diff --git a/pyanaconda/core/constants.py b/pyanaconda/core/constants.py
 index eafefe9f34..031e547d03 100644
@@ -58,7 +58,7 @@ index 7f6ec96da2..97ab4bfa27 100644
  
      # ARM systems use either the standard Multiplatform or LPAE platform.
      if is_lpae_available():
-@@ -168,19 +168,24 @@ def get_kernel_version_list():
+@@ -168,19 +168,25 @@ def get_kernel_version_list():
  
      # Find all installed RPMs that provide 'kernel'.
      ts = rpm.TransactionSet(conf.target.system_root)
@@ -76,8 +76,9 @@ index 7f6ec96da2..97ab4bfa27 100644
              f.split("/")[-1][8:] for f in unicode_fnames
 -            if fnmatch.fnmatch(f, "/boot/vmlinuz-*") or
 -            fnmatch.fnmatch(f, "/boot/efi/EFI/%s/vmlinuz-*" % efi_dir)
-+            if (fnmatch(f, "/boot/*") or fnmatch(f, "/boot/efi/EFI/%s/*" % conf.bootloader.efi_dir))
-+            and len(f.split("/")[-1]) > 7
++            if (fnmatch.fnmatch(f, "/boot/*") or
++            fnmatch.fnmatch(f, "/boot/efi/EFI/%s/*" % efi_dir)) and
++            len(f.split("/")[-1]) > 7
          ))
  
      # Sort the kernel versions.
