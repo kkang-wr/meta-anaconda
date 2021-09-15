@@ -16,11 +16,11 @@ not used.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/modules/storage/bootloader/efi.py | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ pyanaconda/modules/storage/bootloader/efi.py | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/pyanaconda/modules/storage/bootloader/efi.py b/pyanaconda/modules/storage/bootloader/efi.py
-index 82f60e4c4..158287b1e 100644
+index 82f60e4c4..60969bcda 100644
 --- a/pyanaconda/modules/storage/bootloader/efi.py
 +++ b/pyanaconda/modules/storage/bootloader/efi.py
 @@ -40,7 +40,7 @@ class EFIBase(object):
@@ -63,6 +63,15 @@ index 82f60e4c4..158287b1e 100644
  
      @property
      def packages(self):
+@@ -180,7 +180,7 @@ class EFIGRUB(EFIBase, GRUB2):
+             if fs_uuid is None:
+                 raise BootLoaderError("Could not get stage2 filesystem UUID")
+ 
+-            grub_dir = util.execWithCapture("grub2-mkrelpath", [grub_dir],
++            grub_dir = util.execWithCapture("grub-mkrelpath", [grub_dir],
+                                             root=conf.target.system_root)
+             if not grub_dir:
+                 raise BootLoaderError("Could not get GRUB directory path")
 -- 
 2.7.4
 
