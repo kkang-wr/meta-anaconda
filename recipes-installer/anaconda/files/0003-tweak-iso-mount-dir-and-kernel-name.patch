@@ -78,7 +78,7 @@ index 7f6ec96da2..97ab4bfa27 100644
 -            fnmatch.fnmatch(f, "/boot/efi/EFI/%s/vmlinuz-*" % efi_dir)
 +            if (fnmatch.fnmatch(f, "/boot/*") or
 +            fnmatch.fnmatch(f, "/boot/efi/EFI/%s/*" % efi_dir)) and
-+            len(f.split("/")[-1]) > 7
++            len(f.split("/")[-1]) > 7 and not f.endswith('.sig')
          ))
  
      # Sort the kernel versions.
