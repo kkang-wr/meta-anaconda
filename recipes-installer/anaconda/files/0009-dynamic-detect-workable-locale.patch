@@ -12,9 +12,9 @@ Refactor for anaconda 34.
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/localization.py                          | 19 ++++++++++++++++++-
- pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py |  6 +++++-
+ pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py |  2 ++
  pyanaconda/ui/tui/spokes/language_support.py        |  5 +++--
- 3 files changed, 26 insertions(+), 4 deletions(-)
+ 3 files changed, 22 insertions(+), 3 deletions(-)
 
 diff --git a/pyanaconda/localization.py b/pyanaconda/localization.py
 index 9a964c98d..dc25fe327 100644
@@ -51,22 +51,18 @@ index 9a964c98d..dc25fe327 100644
 +
 +    return _all_locales
 diff --git a/pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py b/pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py
-index 37b33cb2c..d908d9b28 100644
+index d908d9b28..24dc3699e 100644
 --- a/pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py
 +++ b/pyanaconda/ui/gui/spokes/lib/lang_locale_handler.py
-@@ -154,7 +154,11 @@ class LangLocaleHandler(object):
- 
-         # find matches and use the one with the highest rank
-         locales = localization.get_language_locales(locale)
--        locale_itr = set_treeview_selection(self._localeView, locales[0], col=1)
-+        support_locales = []
-+        for locale in locales:
-+            if locale in localization.list_all_locales():
-+                support_locales.append(locale)
-+        locale_itr = set_treeview_selection(self._localeView, support_locales[0], col=1)
- 
-         return (lang_itr, locale_itr)
- 
+@@ -171,6 +171,8 @@ class LangLocaleHandler(object):
+         for locale in locales:
+             if self._only_existing_locales and not localization.locale_has_translation(locale):
+                 continue
++            if locale not in localization.list_all_locales():
++                continue
+             self._add_locale(self._localeStore,
+                              localization.get_native_name(locale),
+                              locale)
 diff --git a/pyanaconda/ui/tui/spokes/language_support.py b/pyanaconda/ui/tui/spokes/language_support.py
 index f79fa3b9d..2833fc3c9 100644
 --- a/pyanaconda/ui/tui/spokes/language_support.py
