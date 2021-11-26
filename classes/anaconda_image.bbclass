@@ -372,6 +372,9 @@ python __anonymous() {
                 if not os.path.exists(kickstart_file):
                     raise bb.parse.SkipPackage("The kickstart file %s in KICKSTART_FILE doesn't exist!" % kickstart_file)
 
+        # enable EFI runtime for -rt kernel
+        if d.getVar("PREFERRED_PROVIDER_virtual/kernel") == "linux-yocto-rt":
+            d.appendVar('APPEND', ' efi=runtime')
 }
 
 systemd_preset_all () {
