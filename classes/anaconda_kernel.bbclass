@@ -3,7 +3,7 @@ SRC_URI:append = " \
     file://dmthin.scc \
     file://crypt.scc \
     file://liveinstall.scc \
-    file://efivars.scc \
+    file://efivarfs.scc \
     file://multipath.scc \
     file://ide.scc \
 "
