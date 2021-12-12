@@ -19,7 +19,6 @@ RDEPENDS:${PN} = " \
     lvm2-udevrules \
     util-linux-mount \
     util-linux-switch-root \
-    init-ifupdown \
     ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libuser', '', d)} \
     dracut \
     cryptsetup \
