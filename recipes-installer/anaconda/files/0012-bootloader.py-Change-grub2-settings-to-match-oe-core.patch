@@ -18,11 +18,15 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Rebase for anaconda 34.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Set GRUB_DISTRIBUTOR with target system rather than installer image.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/modules/storage/bootloader/base.py  |  4 ++++
- pyanaconda/modules/storage/bootloader/grub2.py | 26 +++++++++++++++++---------
- pyanaconda/modules/storage/bootloader/utils.py |  7 +++++--
- 3 files changed, 26 insertions(+), 11 deletions(-)
+ pyanaconda/modules/storage/bootloader/base.py  |  4 +++
+ pyanaconda/modules/storage/bootloader/grub2.py | 40 ++++++++++++++++++++------
+ pyanaconda/modules/storage/bootloader/utils.py |  7 +++--
+ 3 files changed, 40 insertions(+), 11 deletions(-)
 
 diff --git a/pyanaconda/modules/storage/bootloader/base.py b/pyanaconda/modules/storage/bootloader/base.py
 index 71ca9c5c4..37a4111de 100644
@@ -66,19 +70,33 @@ index add7dc970..47a3a6d55 100644
          if os.access(map_path, os.R_OK):
              os.rename(map_path, map_path + ".anacbak")
  
-@@ -253,9 +257,9 @@ class GRUB2(BootLoader):
+@@ -253,9 +257,23 @@ class GRUB2(BootLoader):
          defaults_file = "%s%s" % (conf.target.system_root, self.defaults_file)
          defaults = open(defaults_file, "w+")
          defaults.write("GRUB_TIMEOUT=%d\n" % self.timeout)
 -        defaults.write("GRUB_DISTRIBUTOR=\"$(sed 's, release .*$,,g' /etc/system-release)\"\n")
-+        defaults.write("GRUB_DISTRIBUTOR=\"%s\"\n" % productName)
++
++        targetProductName = ''
++        try:
++            with open(conf.target.system_root + '/etc/issue') as f:
++                for line in f:
++                    strippedline = line.strip().replace(r' \n \l', '')
++                    if strippedline:
++                        targetProductName = strippedline
++                        break
++        except FileNotFoundError:
++            pass
++
++        defaults.write("GRUB_DISTRIBUTOR=\"%s\"\n" % targetProductName
++                       if targetProductName else productName)
++
          defaults.write("GRUB_DEFAULT=saved\n")
 -        defaults.write("GRUB_DISABLE_SUBMENU=true\n")
 +        defaults.write("GRUB_DISABLE_SUBMENU=y\n")
          if self.console and self.has_serial_console:
              defaults.write("GRUB_TERMINAL=\"serial console\"\n")
              defaults.write("GRUB_SERIAL_COMMAND=\"%s\"\n" % self.serial_command)
-@@ -297,7 +301,7 @@ class GRUB2(BootLoader):
+@@ -297,7 +315,7 @@ class GRUB2(BootLoader):
          passwords = "%s\n%s\n" % (self.password, self.password)
          os.write(pwrite, passwords.encode("utf-8"))
          os.close(pwrite)
@@ -87,7 +105,7 @@ index add7dc970..47a3a6d55 100644
                                     stdin=pread,
                                     root=conf.target.system_root)
          os.close(pread)
-@@ -310,6 +314,10 @@ class GRUB2(BootLoader):
+@@ -310,6 +328,10 @@ class GRUB2(BootLoader):
              return
  
          users_file = "%s%s/%s" % (conf.target.system_root, self.config_dir, self._passwd_file)
@@ -98,7 +116,7 @@ index add7dc970..47a3a6d55 100644
          header = util.open_with_perm(users_file, "w", 0o700)
          # XXX FIXME: document somewhere that the username is "root"
          self._encrypt_password()
-@@ -343,21 +351,21 @@ class GRUB2(BootLoader):
+@@ -343,21 +365,21 @@ class GRUB2(BootLoader):
                  machine_id = fd.readline().strip()
  
              default_entry = "%s-%s" % (machine_id, self.default.version)
@@ -123,7 +141,7 @@ index add7dc970..47a3a6d55 100644
                                  ["-o", self.config_file])
          if rc:
              raise BootLoaderError("failed to write boot loader configuration")
-@@ -424,7 +432,7 @@ class GRUB2(BootLoader):
+@@ -424,7 +446,7 @@ class GRUB2(BootLoader):
                  else:
                      log.info("bootloader.py: mbr will be updated for grub2")
  
