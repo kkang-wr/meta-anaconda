@@ -22,12 +22,6 @@ for x in $CMDLINE; do
         cmdline)
             cmdline=1
             ;;
-        headless)
-            headless=1
-            ;;
-        kbdtype=*)
-            kbdtype="${x#kbdtype=}"
-            ;;
         keymap=*)
             keymap="${x#keymap=}"
             ;;
@@ -45,9 +39,6 @@ for x in $CMDLINE; do
             ;;
         liveinst)
             liveinst=1
-            ;;
-        loglevel=*)
-            loglevel="${x#loglevel=}"
             ;;
         mpath)
             mpath=1
@@ -175,13 +166,13 @@ FOE
            echo "$vncpassword" > /tmp/vncpassword.dat
        fi
 
-       for OPTIONS in vnc headless usefbx mpath nompath rescue cmdline; do
+       for OPTIONS in vnc usefbx mpath nompath rescue cmdline; do
            if [ -n "${!OPTIONS}" ]; then
                anaconda_opts="$anaconda_opts --$OPTIONS"
            fi
        done
 
-       for OPTIONS in resolution vncconnect xdriver syslog loglevel lang kbdtype keymap repo; do
+       for OPTIONS in resolution vncconnect xdriver syslog lang keymap repo; do
            if [ -n "${!OPTIONS}" ]; then
                anaconda_opts="$anaconda_opts --$OPTIONS=${!OPTIONS}"
            fi
