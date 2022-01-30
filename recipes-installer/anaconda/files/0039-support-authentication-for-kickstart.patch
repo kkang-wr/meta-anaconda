@@ -19,6 +19,11 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
 Rebase for anaconda 34:
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+It requires option prefix 'inst.' in anaconda 34. Update the error
+message.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/flags.py                                |  7 +++-
  pyanaconda/kickstart.py                            | 37 +++++++++++++++++++---
@@ -91,7 +96,7 @@ index 67297af70..5ba8ef7eb 100644
 +                flags.kspasswd = self.password
 +                break
 +            except KickstartAuthError as e:
-+                msg = 'Append "ksuser=<username> kspasswd=<password>" to boot command'
++                msg = 'Append "inst.ksuser=<username> inst.kspasswd=<password>" to boot command'
 +                raise KickstartError(msg)
 +            except:
 +                raise
