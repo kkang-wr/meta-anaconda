@@ -18,24 +18,24 @@ export PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
 
 [ -z "$CMDLINE" ] && read CMDLINE < /proc/cmdline
 for x in $CMDLINE; do
-        case $x in
+        case ${x#inst.} in
         cmdline)
             cmdline=1
             ;;
         keymap=*)
-            keymap="${x#keymap=}"
+            keymap="${x#*=}"
             ;;
         ks=*)
-            ks="${x#ks=}"
+            ks="${x#*=}"
             ;;
         lang=*)
-            lang="${x#lang=}"
+            lang="${x#*=}"
             ;;
         bootifonly=*)
-            bootifonly="${x#bootifonly=}"
+            bootifonly="${x#*=}"
             ;;
         stoponfail=*)
-            stoponfail="${x#stoponfail=}"
+            stoponfail="${x#*=}"
             ;;
         liveinst)
             liveinst=1
@@ -50,25 +50,25 @@ for x in $CMDLINE; do
             nompath=1
             ;;
         repo=*)
-            repo="${x#repo=}"
+            repo="${x#*=}"
             ;;
         rescue)
             rescue=1
             ;;
         resolution=*)
-            resolution="${x#resolution=}"
+            resolution="${x#*=}"
             ;;
         serial|console=*)
             textinst=1
             ;;
         syslog=*)
-            syslog="${x#syslog=}"
+            syslog="${x#*=}"
             ;;
         textinst)
             textinst=1
             ;;
         updates=*)
-            updates="${x#updates=}"
+            updates="${x#*=}"
             ;;
         usefbx)
             usefbx=1
@@ -77,13 +77,13 @@ for x in $CMDLINE; do
             vnc=1
             ;;
         vncconnect=*)
-            vncconnect="${x#vncconnect=}"
+            vncconnect="${x#*=}"
             ;;
         vncpassword=*)
-            vncpassword="${x#vncpassword=}"
+            vncpassword="${x#*=}"
             ;;
         xdriver=*)
-            xdriver="${x#xdriver=}"
+            xdriver="${x#*=}"
             ;;
         esac
 done
