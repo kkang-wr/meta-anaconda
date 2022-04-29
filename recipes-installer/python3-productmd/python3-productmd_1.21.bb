@@ -3,7 +3,7 @@ related to composes and installation media"
 DESCRIPTION = "Product, compose and installation media metadata library"
 HOMEPAGE = "http://productmd.readthedocs.io/en/latest/"
 SECTION = "devel"
-LICENSE = "LGPLv2.1"
+LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=768997ba510a952bef1775c50bc22b00"
 
 SRC_URI = "git://github.com/release-engineering/productmd;protocol=https;branch=master \
