@@ -6,46 +6,17 @@ SECTION = "devel"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-DEPENDS = "e2fsprogs gettext libarchive \
-           pango python3 rpm \
+DEPENDS = "e2fsprogs \
+           gdk-pixbuf-native \
+           gettext \
+           glade \
+           libarchive \
+           libxklavier \
+           libxml2-native \
+           pango \
+           python3 \
+           rpm \
            "
-
-DEPENDS += "libxklavier glade libxml2-native \
-            gdk-pixbuf-native \
-            "
-
-S = "${WORKDIR}/git"
-
-RDEPENDS:${PN} = "e2fsprogs e2fsprogs-e2fsck e2fsprogs-mke2fs \
-                   e2fsprogs-tune2fs e2fsprogs-resize2fs \
-                   ntfsprogs xfsprogs btrfs-tools nfs-utils-client \
-                   parted dosfstools gzip libarchive lvm2 \
-                   squashfs-tools openssh python3-core python3-misc \
-                   python3-modules  python3-dbus python3-pyparted \
-                   python3-pykickstart \
-                   dmidecode python3-meh python3-libreport localedef \
-                   python3-pygobject python3-rpm grub usermode tigervnc \
-                   tzdata tzdata-misc tzdata-posix tzdata-right tzdata-africa \
-                   tzdata-americas tzdata-antarctica tzdata-arctic tzdata-asia \
-                   tzdata-atlantic tzdata-australia tzdata-europe tzdata-pacific \
-                   keybinder module-init-tools dnf util-linux efibootmgr \
-                   ca-certificates isomd5sum \
-                   btrfs-tools ntfs-3g iproute2 mdadm shadow \
-                   util-linux-swaponoff util-linux-uuidgen python3-blivet \
-                   xrandr glibc-charmaps glibc-localedatas \
-                   python3-pytz python3-langtable libpwquality \
-                   python3-ntplib libgnomekbd libtimezonemap \
-                   procps rsync glibc-utils python3-pid \
-                   python3-ordered-set python3-wrapt python3-coverage \
-                   python3-requests-file python3-requests-ftp \
-                   python3-blivetgui librsvg librsvg-gtk bash \
-                   python3-systemd python3-pydbus python3-simpleline \
-                   python3-productmd python3-dasbus libxkbcommon chrony \
-                "
-
-RDEPENDS:${PN} += "networkmanager \
-                   network-manager-applet \
-"
 
 SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-release \
            file://81-edit-sudoers.ks \
@@ -116,29 +87,18 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0081-always-write-fstab-after-install.patch \
            file://0082-fix-grub-efi-boot-failure.patch \
            file://0083-reset-default-autopart-type.patch \
-          "
+           "
 
 SRCREV = "43ce5dfb0566d14926bfb60e11564a656829e92d"
 
-FILES:${PN}-dbg += "${libexecdir}/anaconda/.debug ${PYTHON_SITEPACKAGES_DIR}/pyanaconda/.debug"
-FILES:${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/pyanaconda/_isys.a"
-FILES:${PN} = "/lib ${libdir} ${sysconfdir} ${bindir} ${sbindir} ${libexecdir} \
-              ${datadir}/anaconda ${datadir}/applications ${datadir}/glade \
-              ${PYTHON_SITEPACKAGES_DIR}/pyanaconda ${PYTHON_SITEPACKAGES_DIR}/log_picker \
-              ${datadir}/themes \
-"
-FILES:${PN}-misc = "/usr/lib"
-PACKAGES += "${PN}-misc"
-RDEPENDS:${PN}-misc += "bash python3-core"
+S = "${WORKDIR}/git"
 
-EXTRA_OECONF += "--disable-selinux \
-         --with-sysroot=${PKG_CONFIG_SYSROOT_DIR} \
-"
-
-inherit features_check
+inherit autotools-brokensep features_check gettext gobject-introspection python3native pkgconfig
 REQUIRED_DISTRO_FEATURES = "systemd x11"
 
-inherit autotools-brokensep gettext python3native pkgconfig gobject-introspection
+EXTRA_OECONF += "--disable-selinux \
+                 --with-sysroot=${PKG_CONFIG_SYSROOT_DIR} \
+                 "
 
 do_configure:prepend() {
     ( cd ${S}; STAGING_DATADIR_NATIVE=${STAGING_DATADIR_NATIVE} ${S}/autogen.sh --noconfigure)
@@ -160,3 +120,116 @@ python __anonymous () {
 COMPATIBLE_HOST = '(x86_64.*|i.86.*|arm.*|aarch64.*)-(linux.*|freebsd.*)'
 COMPATIBLE_HOST:armv7a = 'null'
 COMPATIBLE_HOST:armv7ve = 'null'
+
+FILES:${PN}-dbg += "${libexecdir}/anaconda/.debug ${PYTHON_SITEPACKAGES_DIR}/pyanaconda/.debug"
+FILES:${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/pyanaconda/_isys.a"
+FILES:${PN} = "/lib \
+               ${PYTHON_SITEPACKAGES_DIR}/log_picker \
+               ${PYTHON_SITEPACKAGES_DIR}/pyanaconda \
+               ${bindir} \
+               ${datadir}/anaconda \
+               ${datadir}/applications \
+               ${datadir}/glade \
+               ${datadir}/themes \
+               ${libdir} \
+               ${libexecdir} \
+               ${sbindir} \
+               ${sysconfdir} \
+               "
+
+PACKAGES += "${PN}-misc"
+FILES:${PN}-misc = "/usr/lib"
+
+RDEPENDS:${PN}-misc += "bash python3-core"
+
+RDEPENDS:${PN} = "bash \
+                  btrfs-tools \
+                  btrfs-tools \
+                  ca-certificates \
+                  chrony \
+                  dmidecode \
+                  dnf \
+                  dosfstools \
+                  e2fsprogs \
+                  e2fsprogs-e2fsck \
+                  e2fsprogs-mke2fs \
+                  e2fsprogs-resize2fs \
+                  e2fsprogs-tune2fs \
+                  efibootmgr \
+                  glibc-charmaps \
+                  glibc-localedatas \
+                  glibc-utils \
+                  grub \
+                  gzip \
+                  iproute2 \
+                  isomd5sum \
+                  keybinder \
+                  libarchive \
+                  libgnomekbd \
+                  libpwquality \
+                  librsvg \
+                  librsvg-gtk \
+                  libtimezonemap \
+                  libxkbcommon \
+                  localedef \
+                  lvm2 \
+                  mdadm \
+                  module-init-tools \
+                  network-manager-applet \
+                  networkmanager \
+                  nfs-utils-client \
+                  ntfs-3g \
+                  ntfsprogs \
+                  openssh \
+                  parted \
+                  procps \
+                  python3-blivet \
+                  python3-blivetgui \
+                  python3-core \
+                  python3-coverage \
+                  python3-dasbus \
+                  python3-dbus \
+                  python3-langtable \
+                  python3-libreport \
+                  python3-meh \
+                  python3-misc \
+                  python3-modules \
+                  python3-ntplib \
+                  python3-ordered-set \
+                  python3-pid \
+                  python3-productmd \
+                  python3-pydbus \
+                  python3-pygobject \
+                  python3-pykickstart \
+                  python3-pyparted \
+                  python3-pytz \
+                  python3-requests-file \
+                  python3-requests-ftp \
+                  python3-rpm \
+                  python3-simpleline \
+                  python3-systemd \
+                  python3-wrapt \
+                  rsync \
+                  shadow \
+                  squashfs-tools \
+                  tigervnc \
+                  tzdata \
+                  tzdata-africa \
+                  tzdata-americas \
+                  tzdata-antarctica \
+                  tzdata-arctic \
+                  tzdata-asia \
+                  tzdata-atlantic \
+                  tzdata-australia \
+                  tzdata-europe \
+                  tzdata-misc \
+                  tzdata-pacific \
+                  tzdata-posix \
+                  tzdata-right \
+                  usermode \
+                  util-linux \
+                  util-linux-swaponoff \
+                  util-linux-uuidgen \
+                  xfsprogs \
+                  xrandr \
+                  "
