@@ -14,23 +14,27 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Rebase for anaconda 34.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 37.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/payload/install_tree_metadata.py | 2 +-
+ pyanaconda/modules/payloads/payload/dnf/tree_info.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/pyanaconda/payload/install_tree_metadata.py b/pyanaconda/payload/install_tree_metadata.py
-index 297ea9ee7..d1fca163e 100644
---- a/pyanaconda/payload/install_tree_metadata.py
-+++ b/pyanaconda/payload/install_tree_metadata.py
-@@ -28,7 +28,7 @@ from pyanaconda.core.payload import split_protocol
- from pyanaconda.anaconda_loggers import get_packaging_logger
- log = get_packaging_logger()
+diff --git a/pyanaconda/modules/payloads/payload/dnf/tree_info.py b/pyanaconda/modules/payloads/payload/dnf/tree_info.py
+index b0aa5f1d28..265419a6f9 100644
+--- a/pyanaconda/modules/payloads/payload/dnf/tree_info.py
++++ b/pyanaconda/modules/payloads/payload/dnf/tree_info.py
+@@ -89,7 +89,7 @@ class TreeInfoMetadata(object):
+     TREE_INFO_NAMES = [".treeinfo", "treeinfo"]
  
--MAX_TREEINFO_DOWNLOAD_RETRIES = 6
-+MAX_TREEINFO_DOWNLOAD_RETRIES = 1
+     # The number of download retries.
+-    MAX_TREEINFO_DOWNLOAD_RETRIES = 6
++    MAX_TREEINFO_DOWNLOAD_RETRIES = 1
  
- 
- class InstallTreeMetadata(object):
+     def __init__(self):
+         """Create a new instance."""
 -- 
 2.7.4
 
