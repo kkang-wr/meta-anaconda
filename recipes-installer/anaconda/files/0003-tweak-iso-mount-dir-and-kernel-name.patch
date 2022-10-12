@@ -22,16 +22,20 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
 Rebase for anaconda 34
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 37
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/core/constants.py                     |  4 ++--
- pyanaconda/modules/payloads/payload/dnf/utils.py | 14 ++++++++++----
- 2 files changed, 12 insertions(+), 6 deletions(-)
+ pyanaconda/modules/payloads/payload/dnf/utils.py | 15 +++++++++++----
+ 2 files changed, 13 insertions(+), 6 deletions(-)
 
 diff --git a/pyanaconda/core/constants.py b/pyanaconda/core/constants.py
-index eafefe9f34..031e547d03 100644
+index b130f71fd9..50c61779b0 100644
 --- a/pyanaconda/core/constants.py
 +++ b/pyanaconda/core/constants.py
-@@ -45,11 +45,11 @@ if productName.count(" "):                      # pylint: disable=no-member
+@@ -44,10 +44,10 @@ if productName.count(" "):                      # pylint: disable=no-member
  VIRTIO_PORT = "/dev/virtio-ports/org.fedoraproject.anaconda.log.0"
  
  ANACONDA_CLEANUP = "anaconda-cleanup"
@@ -39,17 +43,16 @@ index eafefe9f34..031e547d03 100644
 +MOUNT_DIR = "/media/realroot"
  DRACUT_ISODIR = "/run/install/source"
  ISO_DIR = MOUNT_DIR + "/isodir"
- IMAGE_DIR = MOUNT_DIR + "/image"
 -INSTALL_TREE = MOUNT_DIR + "/source"
 +INSTALL_TREE = "/media/source"
  SOURCES_DIR = MOUNT_DIR + "/sources"
  BASE_REPO_NAME = "anaconda"
  
 diff --git a/pyanaconda/modules/payloads/payload/dnf/utils.py b/pyanaconda/modules/payloads/payload/dnf/utils.py
-index 7f6ec96da2..97ab4bfa27 100644
+index 7cd765026f..f7895016e9 100644
 --- a/pyanaconda/modules/payloads/payload/dnf/utils.py
 +++ b/pyanaconda/modules/payloads/payload/dnf/utils.py
-@@ -55,7 +55,7 @@ def get_kernel_package(dnf_base, exclude_list):
+@@ -59,7 +59,7 @@ def get_kernel_package(dnf_manager, exclude_list):
          return None
  
      # Get the kernel packages.
@@ -58,7 +61,7 @@ index 7f6ec96da2..97ab4bfa27 100644
  
      # ARM systems use either the standard Multiplatform or LPAE platform.
      if is_lpae_available():
-@@ -168,19 +168,25 @@ def get_kernel_version_list():
+@@ -163,19 +163,26 @@ def get_kernel_version_list():
  
      # Find all installed RPMs that provide 'kernel'.
      ts = rpm.TransactionSet(conf.target.system_root)
@@ -69,16 +72,15 @@ index 7f6ec96da2..97ab4bfa27 100644
      for hdr in mi:
 +        log.info("hdr.filenames %s" % hdr.filenames)
 +
-         unicode_fnames = (decode_bytes(f) for f in hdr.filenames)
- 
          # Find all /boot/vmlinuz- files and strip off vmlinuz-.
          files.extend((
-             f.split("/")[-1][8:] for f in unicode_fnames
+             f.split("/")[-1][8:] for f in hdr.filenames
 -            if fnmatch.fnmatch(f, "/boot/vmlinuz-*") or
 -            fnmatch.fnmatch(f, "/boot/efi/EFI/%s/vmlinuz-*" % efi_dir)
-+            if (fnmatch.fnmatch(f, "/boot/*") or
-+            fnmatch.fnmatch(f, "/boot/efi/EFI/%s/*" % efi_dir)) and
-+            len(f.split("/")[-1]) > 7 and not f.endswith('.sig')
++            if ((fnmatch.fnmatch(f, "/boot/*") or
++                 fnmatch.fnmatch(f, "/boot/efi/EFI/%s/*" % efi_dir))
++                and len(f.split("/")[-1]) > 7
++                and not f.endswith('.sig'))
          ))
  
      # Sort the kernel versions.
@@ -87,5 +89,7 @@ index 7f6ec96da2..97ab4bfa27 100644
 +    log.info("kernelVersionList %s" % files)
 +
      return files
+ 
+ 
 -- 
 2.7.4
