@@ -9,22 +9,26 @@ Gdk.CursorType.LEFT_PTR to replace.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase for anaconda 37.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/ui/gui/utils.py | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/pyanaconda/ui/gui/utils.py b/pyanaconda/ui/gui/utils.py
-index 4c7f3bd..9e21d35 100644
+index 282f1bc53c..6fa2ffc3db 100644
 --- a/pyanaconda/ui/gui/utils.py
 +++ b/pyanaconda/ui/gui/utils.py
-@@ -275,7 +275,7 @@ def unbusyCursor():
+@@ -280,7 +280,7 @@ def unbusyCursor():
      if not window:
          return
  
--    window.set_cursor(Gdk.Cursor(Gdk.CursorType.ARROW))
-+    window.set_cursor(Gdk.Cursor(Gdk.CursorType.LEFT_PTR))
+-    window.set_cursor(Gdk.Cursor.new_for_display(Gdk.Display.get_default(), Gdk.CursorType.ARROW))
++    window.set_cursor(Gdk.Cursor.new_for_display(Gdk.Display.get_default(), Gdk.CursorType.LEFT_PTR))
  
-
+ 
  def ignoreEscape(dlg):
 -- 
 2.7.4
