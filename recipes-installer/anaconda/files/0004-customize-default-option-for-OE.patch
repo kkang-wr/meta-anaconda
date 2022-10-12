@@ -10,24 +10,28 @@ Subject: [PATCH] customize default option for OE
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase for anaconda 37.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/argument_parsing.py | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/pyanaconda/argument_parsing.py b/pyanaconda/argument_parsing.py
-index b520509..bd1eda8 100644
+index fc23edd2f3..f5a747126d 100644
 --- a/pyanaconda/argument_parsing.py
 +++ b/pyanaconda/argument_parsing.py
-@@ -462,7 +462,7 @@ def getArgumentParser(version_string, boot_cmdline=None):
-                     help=help_parser.help_text("stage2"))
+@@ -482,7 +482,7 @@ def getArgumentParser(version_string, boot_cmdline=None):
+ 
      ap.add_argument("--addrepo", dest="addRepo", default=[], metavar="NAME,ADDITIONAL_REPO_URL",
-                     action="append", help=help_parser.help_text("addrepo"))
+                     action=ParseAddRepo, help=help_parser.help_text("addrepo"))
 -    ap.add_argument("--noverifyssl", action="store_true", default=False,
 +    ap.add_argument("--noverifyssl", action="store_true", default=True,
                      help=help_parser.help_text("noverifyssl"))
      ap.add_argument("--liveinst", action="store_true", default=False,
                      help=help_parser.help_text("liveinst"))
-@@ -500,7 +500,7 @@ def getArgumentParser(version_string, boot_cmdline=None):
+@@ -515,7 +515,7 @@ def getArgumentParser(version_string, boot_cmdline=None):
      from pykickstart.constants import SELINUX_DISABLED, SELINUX_ENFORCING
      from pyanaconda.core.constants import SELINUX_DEFAULT
      ap.add_argument("--noselinux", dest="selinux", action="store_const",
