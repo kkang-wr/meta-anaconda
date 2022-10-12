@@ -18,7 +18,7 @@ index d31f70c..a774d45 100755
 -#!/usr/bin/bash
 +#!/bin/bash
  #
- # Quick script to attach to tmux where anaconda is running
+ # Quick script to attach to tmux where anaconda is running.
  #
 -- 
 2.7.4
