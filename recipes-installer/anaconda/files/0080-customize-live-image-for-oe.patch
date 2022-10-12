@@ -13,12 +13,12 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/pyanaconda/core/constants.py b/pyanaconda/core/constants.py
-index b2854196b..ca657e5d4 100644
+index 8b1feda637..26060387db 100644
 --- a/pyanaconda/core/constants.py
 +++ b/pyanaconda/core/constants.py
-@@ -52,7 +52,7 @@ DRACUT_ISODIR = "/run/install/source"
+@@ -50,7 +50,7 @@ MOUNT_DIR = "/media/realroot"
+ DRACUT_ISODIR = "/run/install/source"
  ISO_DIR = MOUNT_DIR + "/isodir"
- IMAGE_DIR = MOUNT_DIR + "/image"
  INSTALL_TREE = "/media/source"
 -SOURCES_DIR = MOUNT_DIR + "/sources"
 +SOURCES_DIR = "/run/install/sources"
