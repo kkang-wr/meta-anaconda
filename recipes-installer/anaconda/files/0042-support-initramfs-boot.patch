@@ -21,20 +21,24 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
 Rebase for anaconda 34.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 37.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/modules/storage/bootloader/utils.py | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+ pyanaconda/modules/storage/bootloader/utils.py | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
 diff --git a/pyanaconda/modules/storage/bootloader/utils.py b/pyanaconda/modules/storage/bootloader/utils.py
-index 2fdf8b921..e02684f4d 100644
+index 04b1e5abfd..d414e455c7 100644
 --- a/pyanaconda/modules/storage/bootloader/utils.py
 +++ b/pyanaconda/modules/storage/bootloader/utils.py
 @@ -21,7 +21,7 @@ from glob import glob
  from pyanaconda.modules.common.errors.installation import BootloaderInstallationError
  from pyanaconda.modules.storage.bootloader.image import LinuxBootLoaderImage
  from pyanaconda.core.configuration.anaconda import conf
--from pyanaconda.core.util import decode_bytes, execWithRedirect
-+from pyanaconda.core.util import decode_bytes, execWithRedirect, mkdirChain
+-from pyanaconda.core.util import execWithRedirect
++from pyanaconda.core.util import execWithRedirect, mkdirChain
  from pyanaconda.product import productName
  
  from pyanaconda.anaconda_loggers import get_module_logger
@@ -80,7 +84,7 @@ index 2fdf8b921..e02684f4d 100644
  
  def _write_sysconfig_kernel(sysroot, storage):
      """Write to /etc/sysconfig/kernel.
-@@ -280,6 +291,10 @@ def recreate_initrds(sysroot, kernel_versions):
+@@ -279,6 +289,10 @@ def recreate_initrds(sysroot, kernel_versions):
          log.debug("new-kernel-pkg does not exist, using dracut instead")
          use_dracut = True
  
