@@ -18,7 +18,7 @@ DEPENDS = "e2fsprogs \
            rpm \
            "
 
-SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-release \
+SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=f37-release \
            file://81-edit-sudoers.ks \
            file://81-systemd-preset-all.ks \
            file://81-add-env-file-for-sshd.ks \
@@ -43,11 +43,9 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0026-support-timezone-setting.patch \
            file://0028-do-not-support-manually-set-time.patch \
            file://0030-detect-existence-of-Xorg.patch \
-           file://0031-fix-write-network-conf-failed-while-liveinst.patch \
            file://0033-text-repository-setting-do-not-support-local-ISO-fil.patch \
            file://0034-text-repository-setting-support-http-proxy.patch \
            file://0036-do-not-support-network-setting-for-now.patch \
-           file://0037-tweak-boot-storage-sanity-check.patch \
            file://0038-support-to-get-kickstart-from-network.patch \
            file://0039-support-authentication-for-kickstart.patch \
            file://0040-support-downloading-file-from-http-ftp-server-to-tar.patch \
@@ -75,13 +73,11 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0065-bootloader.py-fix-UEFI-multilib-installation.patch \
            file://0066-fix-calling-grub-mkconfig-failed.patch \
            file://0068-not-install-chrony-unintentionally.patch \
-           file://0069-disable-location-detection-based-on-IP-address.patch \
            file://0070-remove-unsupported-icon-from-main-page-and-tweak-ico.patch \
            file://0071-disable-payloads-flatpak-ostree.patch \
            file://0072-fix-sshd-config.patch \
            file://0075-pyanaconda-payload-Fix-xserver-detection.patch \
            file://0076-limit-product-name-less-then-30-chars.patch \
-           file://0077-anaconda-enable-root-ssh-login.patch \
            file://0078-anaconda.py-use-Fedora-as-default-product.patch \
            file://0079-find-live-os-image-for-oe.patch \
            file://0080-customize-live-image-for-oe.patch \
@@ -90,7 +86,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda;protocol=https;branch=f34-relea
            file://0083-reset-default-autopart-type.patch \
            "
 
-SRCREV = "43ce5dfb0566d14926bfb60e11564a656829e92d"
+SRCREV = "8c4148afc95b1e95a317e23f0e4cedbd9760ad7d"
 
 S = "${WORKDIR}/git"
 
