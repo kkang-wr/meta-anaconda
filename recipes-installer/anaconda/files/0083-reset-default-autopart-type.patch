@@ -7,15 +7,20 @@ fix the issue and for backward compatile as well.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Update file path for anaconda 37.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
 ---
- data/product.d/fedora.conf | 4 ----
+ data/profile.d/fedora.conf | 4 ----
  1 file changed, 4 deletions(-)
 
-diff --git a/data/product.d/fedora.conf b/data/product.d/fedora.conf
-index e20091760..db7c5949e 100644
---- a/data/product.d/fedora.conf
-+++ b/data/product.d/fedora.conf
-@@ -9,10 +9,6 @@ default_on_boot = FIRST_WIRED_WITH_LINK
+diff --git a/data/profile.d/fedora.conf b/data/profile.d/fedora.conf
+index d4fe6d0f26..73c3123a36 100644
+--- a/data/profile.d/fedora.conf
++++ b/data/profile.d/fedora.conf
+@@ -14,10 +14,6 @@ default_on_boot = FIRST_WIRED_WITH_LINK
  [Bootloader]
  efi_dir = fedora
  
@@ -24,5 +29,5 @@ index e20091760..db7c5949e 100644
 -btrfs_compression = zstd:1
 -
  [User Interface]
- default_help_pages =
-     FedoraPlaceholder.txt
+ help_directory = /usr/share/anaconda/help/fedora
+ custom_stylesheet = /usr/share/anaconda/pixmaps/fedora.css
