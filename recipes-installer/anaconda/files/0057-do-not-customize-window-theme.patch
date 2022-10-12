@@ -18,24 +18,26 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Rebase for anaconda 34.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 37.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- data/window-manager/config/Makefile.am | 8 +-------
+ data/window-manager/config/Makefile.am | 6 +-----
  pyanaconda/display.py                  | 2 +-
- 2 files changed, 2 insertions(+), 8 deletions(-)
+ 2 files changed, 2 insertions(+), 6 deletions(-)
 
 diff --git a/data/window-manager/config/Makefile.am b/data/window-manager/config/Makefile.am
-index 48e04ab48..f17ab6a5a 100644
+index 90e71d9161..5d7a2b80e1 100644
 --- a/data/window-manager/config/Makefile.am
 +++ b/data/window-manager/config/Makefile.am
-@@ -27,13 +27,7 @@ dist_schema_DATA = org.gnome.desktop.wm.keybindings.gschema.override \
+@@ -26,11 +26,7 @@ dist_schema_DATA = org.gnome.desktop.wm.keybindings.gschema.override \
  # schemas they modify, so pretend that this is the case with symlinks and
  # create the compiled schema.
  install-data-hook:
 -	$(MKDIR_P) $(DESTDIR)$(schemadir)
 -	$(LN_S) -f /usr/share/glib-2.0/schemas/org.gnome.desktop.wm.keybindings.gschema.xml $(DESTDIR)$(schemadir)
 -	$(LN_S) -f /usr/share/glib-2.0/schemas/org.gnome.desktop.wm.preferences.gschema.xml $(DESTDIR)$(schemadir)
--	$(LN_S) -f /usr/share/glib-2.0/schemas/org.gnome.metacity.gschema.xml $(DESTDIR)$(schemadir)
--	$(LN_S) -f /usr/share/glib-2.0/schemas/org.gnome.metacity.enums.xml $(DESTDIR)$(schemadir)
 -	$(LN_S) -f /usr/share/glib-2.0/schemas/org.gnome.desktop.enums.xml $(DESTDIR)$(schemadir)
 -	glib-compile-schemas --strict $(DESTDIR)$(schemadir)
 +	echo "pass"
@@ -43,17 +45,17 @@ index 48e04ab48..f17ab6a5a 100644
  uninstall-local:
  	rm -f $(DESTDIR)$(schemadir)/*.xml
 diff --git a/pyanaconda/display.py b/pyanaconda/display.py
-index 0353db997..c4608b6df 100644
+index 33705843f8..ef6086044c 100644
 --- a/pyanaconda/display.py
 +++ b/pyanaconda/display.py
-@@ -193,7 +193,7 @@ def do_startup_x11_actions():
+@@ -203,7 +203,7 @@ def do_startup_x11_actions():
      if 'XDG_DATA_DIRS' in os.environ:
          xdg_data_dirs = datadir + '/window-manager:' + os.environ['XDG_DATA_DIRS']
      else:
 -        xdg_data_dirs = datadir + '/window-manager:/usr/share'
 +        xdg_data_dirs = '/usr/share'
  
-     childproc = util.startProgram(["metacity", "--display", ":1", "--sm-disable"],
+     childproc = util.startProgram(["gnome-kiosk", "--display", ":1", "--sm-disable", "--x11"],
                                    env_add={'XDG_DATA_DIRS': xdg_data_dirs})
 -- 
 2.7.4
