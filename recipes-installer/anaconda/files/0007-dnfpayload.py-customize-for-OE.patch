@@ -20,36 +20,55 @@ Rebase for anaconda 34 on 20210727.
 * remove patch for function language_groups() which has been remove from upstream
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 37 on 20230227.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- .../modules/payloads/payload/dnf/dnf_manager.py    |  39 ++-
- pyanaconda/modules/payloads/payload/dnf/utils.py   |  15 --
- pyanaconda/payload/dnf/payload.py                  | 265 +++++++++++++++++++--
- pyanaconda/payload/dnf/transaction_progress.py     |   6 +-
- 4 files changed, 282 insertions(+), 43 deletions(-)
+ .../modules/payloads/payload/dnf/dnf_manager.py    | 188 +++++++++++++++++----
+ .../modules/payloads/payload/dnf/installation.py   |  11 +-
+ .../modules/payloads/payload/dnf/requirements.py   |  21 +++
+ .../payloads/payload/dnf/transaction_progress.py   |   9 +-
+ pyanaconda/modules/payloads/payload/dnf/utils.py   |  10 --
+ .../modules/payloads/payload/dnf/validation.py     |  83 +++++++++
+ pyanaconda/payload/dnf/payload.py                  |  37 ++++
+ 7 files changed, 314 insertions(+), 45 deletions(-)
 
 diff --git a/pyanaconda/modules/payloads/payload/dnf/dnf_manager.py b/pyanaconda/modules/payloads/payload/dnf/dnf_manager.py
-index bd7d3e42f..0c27a1a69 100644
+index 3a679a656f..0e41d57171 100644
 --- a/pyanaconda/modules/payloads/payload/dnf/dnf_manager.py
 +++ b/pyanaconda/modules/payloads/payload/dnf/dnf_manager.py
-@@ -17,6 +17,8 @@
- # License and may only be used or replicated with the express permission of
- # Red Hat, Inc.
- #
-+import os
-+
+@@ -21,6 +21,10 @@ import multiprocessing
  import shutil
+ import threading
+ import traceback
++import os
++import inspect
++import collections
++import configparser
+ 
  import dnf
  import dnf.exceptions
-@@ -27,7 +29,7 @@ from pyanaconda.anaconda_loggers import get_module_logger
- from pyanaconda.core.configuration.anaconda import conf
- from pyanaconda.core.constants import DNF_DEFAULT_TIMEOUT, DNF_DEFAULT_RETRIES
+@@ -37,7 +41,7 @@ from pyanaconda.core.constants import DNF_DEFAULT_TIMEOUT, DNF_DEFAULT_RETRIES,
+     URL_TYPE_MIRRORLIST, URL_TYPE_METALINK, DNF_DEFAULT_REPO_COST
+ from pyanaconda.core.i18n import _
  from pyanaconda.core.payload import ProxyString, ProxyStringError
 -from pyanaconda.core.util import get_os_release_value
-+from pyanaconda.core.util import get_os_release_value, execWithRedirect
- from pyanaconda.modules.common.structures.payload import PackagesConfigurationData
- from pyanaconda.modules.payloads.constants import DNF_REPO_DIRS
- from pyanaconda.modules.payloads.payload.dnf.utils import get_product_release_version
-@@ -62,6 +64,7 @@ class DNFManager(object):
++from pyanaconda.core.util import get_os_release_value, execWithRedirect, execWithCapture
+ from pyanaconda.modules.common.errors.installation import PayloadInstallationError
+ from pyanaconda.modules.common.errors.payload import UnknownCompsEnvironmentError, \
+     UnknownCompsGroupError, UnknownRepositoryError
+@@ -104,11 +108,17 @@ class DNFManager(object):
+         self._md_hashes = {}
+         self._enabled_system_repositories = []
+ 
++        # OE specific
++        self.image = {}
++        self.tasks = {}
++        self.failed_scriptlets_pkgnames = collections.OrderedDict()
++
+     @property
+     def _base(self):
          """The DNF base."""
          if self.__base is None:
              self.__base = self._create_base()
@@ -57,13 +76,7 @@ index bd7d3e42f..0c27a1a69 100644
  
          return self.__base
  
-@@ -75,12 +78,13 @@ class DNFManager(object):
-         base.conf.releasever = get_product_release_version()
-         base.conf.installroot = conf.target.system_root
-         base.conf.prepend_installroot('persistdir')
-+
-         # Load variables substitutions configuration (rhbz#1920735)
-         base.conf.substitutions.update_from_etc("/")
+@@ -134,7 +144,7 @@ class DNFManager(object):
  
          # Set the platform id based on the /os/release present
          # in the installation environment.
@@ -72,10 +85,139 @@ index bd7d3e42f..0c27a1a69 100644
  
          if platform_id is not None:
              base.conf.module_platform_id = platform_id
-@@ -269,3 +273,34 @@ class DNFManager(object):
-         return exception.error_group_specs \
-             or exception.error_pkg_specs \
-             or exception.module_depsolv_errors
+@@ -177,6 +187,9 @@ class DNFManager(object):
+         self._md_hashes = {}
+         self._enabled_system_repositories = []
+ 
++        self.image = {}
++        self.tasks = {}
++
+         log.debug("The DNF base has been reset.")
+ 
+     def configure_base(self, data: PackagesConfigurationData):
+@@ -231,7 +244,8 @@ class DNFManager(object):
+ 
+         :return: a list of ids
+         """
+-        return [env.id for env in self._base.comps.environments]
++        log.info("%s %s: %s" % (self.__class__.__name__, inspect.stack()[0][3], self.tasks.keys()))
++        return sorted(self.tasks.keys())
+ 
+     def _get_environment(self, environment_name):
+         """Translate the given environment name to a DNF object.
+@@ -242,7 +256,7 @@ class DNFManager(object):
+         if not environment_name:
+             return None
+ 
+-        return self._base.comps.environment_by_pattern(environment_name)
++        return environment_name
+ 
+     def resolve_environment(self, environment_name):
+         """Translate the given environment name to a group ID.
+@@ -250,12 +264,9 @@ class DNFManager(object):
+         :param environment_name: an identifier of an environment
+         :return: a string with the environment ID or None
+         """
+-        env = self._get_environment(environment_name)
+-
+-        if not env:
+-            return None
+-
+-        return env.id
++        log.info("%s %s, environment %s" % (self.__class__.__name__, inspect.stack()[0][3], environment_name))
++        # TODO
++        return environment_name
+ 
+     def is_environment_valid(self, environment_name):
+         """Is the given environment valid?
+@@ -265,8 +276,7 @@ class DNFManager(object):
+         :param environment_name: an identifier of an environment
+         :return: True or False
+         """
+-        environment_id = self.resolve_environment(environment_name)
+-        return environment_id in self.environments
++        return environment_name in self.tasks
+ 
+     def get_environment_data(self, environment_name) -> CompsEnvironmentData:
+         """Get the data of the specified environment.
+@@ -288,24 +298,12 @@ class DNFManager(object):
+         :param env: a DNF representation of the environment
+         :return: an instance of CompsEnvironmentData
+         """
++        task = self.tasks.get(env)
+         data = CompsEnvironmentData()
+-        data.id = env.id or ""
+-        data.name = env.ui_name or ""
+-        data.description = env.ui_description or ""
++        data.id = env or ""
++        data.name = task[0] or ""
++        data.description = task[1] or ""
+ 
+-        optional = {i.name for i in env.option_ids}
+-        default = {i.name for i in env.option_ids if i.default}
+-
+-        for grp in self._base.comps.groups:
+-
+-            if grp.id in optional:
+-                data.optional_groups.append(grp.id)
+-
+-            if grp.visible:
+-                data.visible_groups.append(grp.id)
+-
+-            if grp.id in default:
+-                data.default_groups.append(grp.id)
+ 
+         return data
+ 
+@@ -315,7 +313,8 @@ class DNFManager(object):
+ 
+         :return: a list of IDs
+         """
+-        return [g.id for g in self._base.comps.groups]
++        log.info("%s %s: %s" % (self.__class__.__name__, inspect.stack()[0][3], self.tasks.keys()))
++        return []
+ 
+     def _get_group(self, group_name):
+         """Translate the given group name into a DNF object.
+@@ -360,9 +359,8 @@ class DNFManager(object):
+         :return: an instance of CompsGroupData
+         """
+         data = CompsGroupData()
+-        data.id = grp.id or ""
+-        data.name = grp.ui_name or ""
+-        data.description = grp.ui_description or ""
++        log.info("%s %s, %s" % (self.__class__.__name__, inspect.stack()[0][3], grp))
++        (data.id, data.name, data.description) = self.tasks[grp]
+         return data
+ 
+     def configure_proxy(self, url):
+@@ -703,6 +701,9 @@ class DNFManager(object):
+ 
+             # Wait for the transaction to end.
+             process.join()
++
++            for pkg in self.failed_scriptlets_pkgnames.keys():
++                self._save_rpmpostinst(pkg)
+         finally:
+             # Kill the transaction after the timeout.
+             process.join(timeout)
+@@ -1080,3 +1081,126 @@ class DNFManager(object):
+                 continue
+ 
+         return ""
++
++    def environment_description(self, environment_id):
++        log.info("%s %s, %s" % (self.__class__.__name__, inspect.stack()[0][3], environment_id))
++
++        if environment_id not in self.tasks:
++            raise NoSuchGroup(environment_id)
++
++        if environment_id in self.tasks:
++            log.info("environmentDescription %s" % self.tasks)
++            (name, description, group) = self.tasks[environment_id]
++
++            return (name, description)
++        return (environment_id, environment_id)
 +
 +    def _oe_configure(self, dnf_conf):
 +        # Refers oe-core's recipes of dnf and rpm
@@ -97,7 +239,6 @@ index bd7d3e42f..0c27a1a69 100644
 +        dnf_conf.errorlevel = dnf.const.VERBOSE_LEVEL
 +        dnf_conf.debuglevel = dnf.const.VERBOSE_LEVEL
 +
-+
 +    def oe_configure_post(self):
 +        # Refers oe-core's meta/lib/oe/package_manager.py
 +        # def _configure_rpm(self) and def _configure_dnf(self)
@@ -107,239 +248,10 @@ index bd7d3e42f..0c27a1a69 100644
 +        execWithRedirect("cp", ["-fr", "/etc/rpmrc", target_sysconf])
 +        execWithRedirect("cp", ["-rf", "/etc/dnf", target_sysconf])
 +        execWithRedirect("cp", ["-rf", "/etc/rpm", target_sysconf])
-diff --git a/pyanaconda/modules/payloads/payload/dnf/utils.py b/pyanaconda/modules/payloads/payload/dnf/utils.py
-index 341ca3d6e..56556a4bf 100644
---- a/pyanaconda/modules/payloads/payload/dnf/utils.py
-+++ b/pyanaconda/modules/payloads/payload/dnf/utils.py
-@@ -108,23 +108,8 @@ def get_installation_specs(data: PackagesConfigurationData, default_environment=
-     exclude_list = []
- 
-     # Handle the environment.
--    if data.default_environment_enabled and default_environment:
--        env = default_environment
--        log.info("selecting default environment: %s", env)
--        include_list.append("@{}".format(env))
--    elif data.environment:
--        env = data.environment
--        log.info("selected environment: %s", env)
--        include_list.append("@{}".format(env))
- 
-     # Handle the core group.
--    if not data.core_group_enabled:
--        log.info("skipping core group due to %%packages "
--                 "--nocore; system may not be complete")
--        exclude_list.append("@core")
--    else:
--        log.info("selected group: core")
--        include_list.append("@core")
- 
-     # Handle groups.
-     for group_name in data.excluded_groups:
-diff --git a/pyanaconda/payload/dnf/payload.py b/pyanaconda/payload/dnf/payload.py
-index 87d0fe031..642b753a0 100644
---- a/pyanaconda/payload/dnf/payload.py
-+++ b/pyanaconda/payload/dnf/payload.py
-@@ -30,11 +30,14 @@ import dnf.module.module_base
- import dnf.repo
- import dnf.subject
- import libdnf.conf
-+import inspect
-+import collections
- 
- from glob import glob
- 
- from pyanaconda.modules.common.structures.payload import RepoConfigurationData, \
-     PackagesConfigurationData
-+from pyanaconda.modules.common.structures.requirement import Requirement
- from pyanaconda.modules.payloads.payload.dnf.initialization import configure_dnf_logging
- from pyanaconda.modules.payloads.payload.dnf.installation import ImportRPMKeysTask, \
-     SetRPMMacrosTask
-@@ -127,6 +130,16 @@ class DNFPayload(Payload):
- 
-         # Additional packages required by installer based on used features
-         self._requirements = []
-+        # base packages
-+        for pkg in ('base-files', 'base-passwd', 'shadow'):
-+            self._requirements.append(Requirement.for_package(pkg, reason='base packages'))
-+        # Support grub-mkconfig
-+        for pkg in ('sed', 'coreutils'):
-+            self._requirements.append(Requirement.for_package(pkg, reason='support grub-mkconfig'))
 +
-+        # OE specific
-+        self.image = {}
-+        self.tasks = {}
- 
-     @property
-     def _base(self):
-@@ -226,12 +239,19 @@ class DNFPayload(Payload):
-     def setup(self):
-         self.verbose_errors = []
- 
-+        # OE specific
++    # OE specific
++    def read_buildstamp(self):
 +        self.image, self.tasks = self._read_buildstamp()
-+
-     def unsetup(self):
-         self._configure()
-         self._repoMD_list = []
-         self._install_tree_metadata = None
-         tear_down_sources(self.proxy)
- 
-+        # OE specific
-+        self.image = {}
-+        self.tasks = {}
-+
-     @property
-     def needs_network(self):
-         """Test base and additional repositories if they require network."""
-@@ -333,6 +353,17 @@ class DNFPayload(Payload):
-             data, default_environment
-         )
- 
-+        env = None
-+        if data.environment:
-+            env = data.environment
-+        elif default_environment:
-+            env = default_environment
-+        log.info("selected environment: %s", env)
-+
-+        for pkg_name in self._apply_yocto_environment(env):
-+            log.info("selected yocto package: '%s'", pkg_name)
-+            include_list.append(pkg_name)
-+
-         # Add the kernel package.
-         kernel_package = get_kernel_package(self._base, exclude_list)
- 
-@@ -457,7 +488,8 @@ class DNFPayload(Payload):
- 
-     @property
-     def environments(self):
--        return self._dnf_manager.environments
-+        log.info("%s %s: %s" % (self.__class__.__name__, inspect.stack()[0][3], self.tasks.keys()))
-+        return sorted(self.tasks.keys())
- 
-     @property
-     def environment_addons(self):
-@@ -469,8 +501,8 @@ class DNFPayload(Payload):
- 
-     @property
-     def groups(self):
--        groups = self._base.comps.groups_iter()
--        return [g.id for g in groups]
-+        log.info("%s %s: %s" % (self.__class__.__name__, inspect.stack()[0][3], self.tasks.keys()))
-+        return []
- 
-     ###
-     # METHODS FOR WORKING WITH REPOSITORIES
-@@ -758,32 +790,28 @@ class DNFPayload(Payload):
-             repo.enabled = True
- 
-     def environment_description(self, environment_id):
--        env = self._base.comps.environment_by_pattern(environment_id)
-+        log.info("%s %s, %s" % (self.__class__.__name__, inspect.stack()[0][3], environment_id))
- 
--        if env is None:
-+        if environment_id not in self.tasks:
-             raise NoSuchGroup(environment_id)
- 
--        return (env.ui_name, env.ui_description)
-+        if environment_id in self.tasks:
-+            log.info("environmentDescription %s" % self.tasks)
-+            (name, description, group) = self.tasks[environment_id]
-+
-+            return (name, description)
-+        return (environment_id, environment_id)
- 
-     def environment_id(self, environment):
-         """Return environment id for the environment specified by id or name."""
--        # the enviroment must be string or else DNF >=3 throws an assert error
--        if not isinstance(environment, str):
--            log.warning("environment_id() called with non-string "
--                        "argument: %s", environment)
--
--        env = self._base.comps.environment_by_pattern(environment)
--
--        if env is None:
--            raise NoSuchGroup(environment)
--
--        return env.id
-+        log.info("%s %s, environment %s" % (self.__class__.__name__, inspect.stack()[0][3], environment))
-+        # TODO
-+        return environment
- 
-     def environment_has_option(self, environment_id, grpid):
--        env = self._base.comps.environment_by_pattern(environment_id)
--        if env is None:
--            raise NoSuchGroup(environment_id)
--        return grpid in (id_.name for id_ in env.option_ids)
-+        log.info("%s %s, %s, %s" % (self.__class__.__name__, inspect.stack()[0][3], environment_id, grpid))
-+        # TODO
-+        return True
- 
-     def environment_option_is_default(self, environment_id, grpid):
-         env = self._base.comps.environment_by_pattern(environment_id)
-@@ -796,10 +824,9 @@ class DNFPayload(Payload):
- 
-     def group_description(self, grpid):
-         """Return name/description tuple for the group specified by id."""
--        grp = self._base.comps.group_by_pattern(grpid)
--        if grp is None:
--            raise NoSuchGroup(grpid)
--        return (grp.ui_name, grp.ui_description or "")
-+        log.info("%s %s, %s" % (self.__class__.__name__, inspect.stack()[0][3], grpid))
-+        (name, description, group) = self.tasks[grpid]
-+        return (name, description)
- 
-     def group_id(self, group_name):
-         """Translate group name to group ID.
-@@ -880,6 +907,8 @@ class DNFPayload(Payload):
- 
-         log.info('Downloading packages finished.')
- 
-+        failed_scriptlets_pkgnames = collections.OrderedDict()
-+
-         pre_msg = (N_("Preparing transaction from installation source"))
-         progress_message(pre_msg)
- 
-@@ -911,12 +940,19 @@ class DNFPayload(Payload):
-             elif token == 'quit':
-                 msg = ("Payload error - DNF installation has ended up abruptly: %s" % msg)
-                 raise PayloadError(msg)
-+            elif token == 'warn':
-+                if msg.startswith("Error in POSTIN scriptlet in rpm package"):
-+                    failed_scriptlets_pkgnames[msg.split()[-1]] = True
-             elif token == 'error':
-                 raise PayloadInstallError("DNF error: %s" % msg)
- 
-             (token, msg) = queue_instance.get()
- 
-         process.join()
-+
-+        for pkg in failed_scriptlets_pkgnames.keys():
-+            self._save_rpmpostinst(pkg)
-+
-         # Don't close the mother base here, because we still need it.
-         if os.path.exists(self._download_location):
-             log.info("Cleaning up downloaded packages: "
-@@ -1540,6 +1576,185 @@ class DNFPayload(Payload):
-         )
-         task.run()
- 
-+        self._dnf_manager.oe_configure_post()
-+
-+        # For the generation of anaconda-ks.cfg
-+        pkg_data = self.get_packages_data()
-+        for pkg in self._list_installed():
-+            if pkg not in pkg_data.packages:
-+                pkg_data.packages.append(pkg)
-+        self.set_packages_data(pkg_data)
-+
-+        util.execWithRedirect("depmod",
-+                              ["-a"],
-+                              root=conf.target.system_root)
-+
-     @property
-     def kernel_version_list(self):
-         return get_kernel_version_list()
 +
 +    def _read_buildstamp(self):
 +        image = {}
@@ -391,15 +303,193 @@ index 87d0fe031..642b753a0 100644
 +
 +        return image, tasks
 +
++    # Refer upstream oe-core meta/lib/oe/package_manager.py
++    def _save_rpmpostinst(self, pkg):
++        def _script_num_prefix(path):
++            files = os.listdir(path)
++            numbers = set()
++            numbers.add(99)
++            for f in files:
++                numbers.add(int(f.split("-")[0]))
++            return max(numbers) + 1
++
++        log.info("Saving postinstall script of %s" % (pkg))
++
++        target_rootfs = conf.target.system_root
++        args = ["-q", "--root=%s" % target_rootfs, "--queryformat", "%{postin}", pkg]
++
++        output = execWithCapture('rpm', args, log_output=False)
++        log.info(output)
++
++        target_path = "%s/etc/rpm-postinsts" % target_rootfs
++        execWithRedirect("mkdir", ["-p", target_path])
++        num = _script_num_prefix(target_path)
++        saved_script_name = os.path.join(target_path, "%d-%s" % (num, pkg))
++        with open(saved_script_name, 'w') as f:
++            f.write(output)
++        os.chmod(saved_script_name, 0o755)
+diff --git a/pyanaconda/modules/payloads/payload/dnf/installation.py b/pyanaconda/modules/payloads/payload/dnf/installation.py
+index 4e596239ab..2883b1a651 100644
+--- a/pyanaconda/modules/payloads/payload/dnf/installation.py
++++ b/pyanaconda/modules/payloads/payload/dnf/installation.py
+@@ -31,7 +31,7 @@ from pyanaconda.modules.common.structures.packages import PackagesConfigurationD
+ from pyanaconda.modules.common.task import Task
+ from pyanaconda.modules.payloads.payload.dnf.requirements import collect_remote_requirements, \
+     collect_language_requirements, collect_platform_requirements, \
+-    collect_driver_disk_requirements, apply_requirements
++    collect_driver_disk_requirements, apply_requirements, collect_oe_requirements
+ from pyanaconda.modules.payloads.payload.dnf.utils import pick_download_location
+ from pyanaconda.modules.payloads.payload.dnf.validation import CheckPackagesSelectionTask
+ 
+@@ -131,7 +131,8 @@ class ResolvePackagesTask(CheckPackagesSelectionTask):
+         return collect_remote_requirements() \
+             + collect_language_requirements(self._dnf_manager) \
+             + collect_platform_requirements(self._dnf_manager) \
+-            + collect_driver_disk_requirements()
++            + collect_driver_disk_requirements() \
++            + collect_oe_requirements()
+ 
+     def _collect_required_specs(self):
+         """Collect specs for the required software."""
+@@ -243,6 +244,12 @@ class InstallPackagesTask(Task):
+         self.report_progress(_("Preparing transaction from installation source"))
+         self._dnf_manager.install_packages(self.report_progress)
+ 
++    def report_progress(self, message, step_number=None, step_size=None):
++        super().report_progress(message, step_number, step_size)
++
++        if message.startswith("Error in POSTIN scriptlet in rpm package"):
++            self._dnf_manager.failed_scriptlets_pkgnames[message.split()[-1]] = True
++
+ 
+ class WriteRepositoriesTask(Task):
+     """The installation task for writing repositories on the target system."""
+diff --git a/pyanaconda/modules/payloads/payload/dnf/requirements.py b/pyanaconda/modules/payloads/payload/dnf/requirements.py
+index b5e365af1b..7521c5d0f5 100644
+--- a/pyanaconda/modules/payloads/payload/dnf/requirements.py
++++ b/pyanaconda/modules/payloads/payload/dnf/requirements.py
+@@ -127,6 +127,27 @@ def collect_driver_disk_requirements(path="/run/install/dd_packages"):
+     return requirements
+ 
+ 
++def collect_oe_requirements():
++    """Collect the requirements for oe
++    """
++    requirements = []
++
++    # base packages
++    for pkg in ('base-files', 'base-passwd', 'shadow'):
++        requirements.append(Requirement.for_package(
++            pkg,
++            reason='base packages'
++        ))
++    # Support grub-mkconfig
++    for pkg in ('sed', 'coreutils'):
++        requirements.append(Requirement.for_package(
++            pkg,
++            reason='support grub-mkconfig'
++        ))
++
++    return requirements
++
++
+ def apply_requirements(requirements, include_list, exclude_list):
+     """Apply the provided requirements.
+ 
+diff --git a/pyanaconda/modules/payloads/payload/dnf/transaction_progress.py b/pyanaconda/modules/payloads/payload/dnf/transaction_progress.py
+index b277156819..f992debae1 100644
+--- a/pyanaconda/modules/payloads/payload/dnf/transaction_progress.py
++++ b/pyanaconda/modules/payloads/payload/dnf/transaction_progress.py
+@@ -55,6 +55,9 @@ def process_transaction_progress(queue, callback):
+             break  # Installation finished successfully
+         elif token == 'quit':
+             raise RuntimeError("The transaction process has ended abruptly: " + msg)
++        elif token == 'warn':
++            if msg.startswith("Error in POSTIN scriptlet in rpm package"):
++                callback(msg)
+         elif token == 'error':
+             raise PayloadInstallationError("An error occurred during the transaction: " + msg)
+ 
+@@ -140,7 +143,11 @@ class TransactionProgress(dnf.callback.TransactionProgress):
+ 
+         :param message: a string that describes the error
+         """
+-        self._queue.put(('error', message))
++        token = "error"
++        if message.startswith("Error in POSTIN scriptlet in rpm package"):
++            token = "warn"
++        self._queue.put((token, message))
++        log.info("error: %s" % message)
+ 
+     def quit(self, message):
+         """Report the end of the transaction and close the queue.
+diff --git a/pyanaconda/modules/payloads/payload/dnf/utils.py b/pyanaconda/modules/payloads/payload/dnf/utils.py
+index f7895016e9..f99f3b8b1f 100644
+--- a/pyanaconda/modules/payloads/payload/dnf/utils.py
++++ b/pyanaconda/modules/payloads/payload/dnf/utils.py
+@@ -108,18 +108,8 @@ def get_installation_specs(data: PackagesSelectionData, default_environment=None
+     exclude_list = []
+ 
+     # Handle the environment.
+-    if data.default_environment_enabled and default_environment:
+-        log.info("Selecting default environment '%s'.", default_environment)
+-        include_list.append("@{}".format(default_environment))
+-    elif data.environment:
+-        include_list.append("@{}".format(data.environment))
+ 
+     # Handle the core group.
+-    if not data.core_group_enabled:
+-        log.info("Skipping @core group; system may not be complete.")
+-        exclude_list.append("@core")
+-    else:
+-        include_list.append("@core")
+ 
+     # Handle groups.
+     for group_name in data.excluded_groups:
+diff --git a/pyanaconda/modules/payloads/payload/dnf/validation.py b/pyanaconda/modules/payloads/payload/dnf/validation.py
+index 509f7f7032..4b3b571492 100644
+--- a/pyanaconda/modules/payloads/payload/dnf/validation.py
++++ b/pyanaconda/modules/payloads/payload/dnf/validation.py
+@@ -17,6 +17,7 @@
+ #
+ from contextlib import contextmanager
+ 
++from pyanaconda.core import util
+ from pyanaconda.anaconda_loggers import get_module_logger
+ from pyanaconda.modules.common.structures.packages import PackagesSelectionData
+ from pyanaconda.modules.common.structures.validation import ValidationReport
+@@ -80,6 +81,17 @@ class CheckPackagesSelectionTask(Task):
+             self._selection, default_environment
+         )
+ 
++        env = None
++        if self._selection.environment:
++            env = self._selection.environment
++        elif default_environment:
++            env = default_environment
++        log.info("selected environment: %s", env)
++
++        for pkg_name in self._apply_yocto_environment(env):
++            log.info("selected yocto package: '%s'", pkg_name)
++            include_list.append(pkg_name)
++
+         self._include_list.extend(include_list)
+         self._exclude_list.extend(exclude_list)
+ 
+@@ -127,3 +139,74 @@ class CheckPackagesSelectionTask(Task):
+             report.error_messages.append(str(e))
+         except InvalidSelectionError as e:
+             report.error_messages.append(str(e))
++
 +    def _apply_yocto_environment(self, env):
 +        if not env:
 +            return []
 +
-+        (image_name, description) = self.environment_description(env)
++        (image_name, description) = self._dnf_manager.environment_description(env)
 +        log.info("image_name %s, des %s" % (image_name, description))
 +        image_id = image_name.split()[0]
 +        (image_summary, image_description, package_install,
-+            package_install_attemptonly, image_linguas) = self.image[image_id]
++            package_install_attemptonly, image_linguas) = self._dnf_manager.image[image_id]
 +        log.info("package_install %s, attempt %s, linguas %s" %
 +                 (package_install, package_install_attemptonly, image_linguas))
 +
@@ -407,7 +497,7 @@ index 87d0fe031..642b753a0 100644
 +        self._select_yocto_linguas(image_linguas)
 +
 +        # -dbg/-doc/-dev
-+        for group in self.tasks[env][2].split():
++        for group in self._dnf_manager.tasks[env][2].split():
 +            self._select_yocto_group(group)
 +
 +        # Installing packages
@@ -421,7 +511,7 @@ index 87d0fe031..642b753a0 100644
 +        glob = self._yocto_complementary_glob(group_id)
 +
 +        # get all available languages in repos
-+        available_packs = self._base.sack.query().available().filter(
++        available_packs = self._dnf_manager._base.sack.query().available().filter(
 +                            name__glob="*-%s" % glob)
 +        allpkgnames = [p.name for p in available_packs]
 +        log.info("allpkgnames %d" % len(allpkgnames))
@@ -444,55 +534,10 @@ index 87d0fe031..642b753a0 100644
 +
 +    def _try_install_package(self, pkg_name):
 +        try:
-+            return self._base.install(pkg_name, strict=False)
++            return self._dnf_manager._base.install(pkg_name, strict=False)
 +        except dnf.exceptions.MarkingError:
 +            msg = "Payload error - No such package: %s" % pkg_name
 +            raise PayloadError(msg)
-+
-+    # Refer upstream oe-core meta/lib/oe/package_manager.py
-+    def _save_rpmpostinst(self, pkg):
-+        def _script_num_prefix(path):
-+            files = os.listdir(path)
-+            numbers = set()
-+            numbers.add(99)
-+            for f in files:
-+                numbers.add(int(f.split("-")[0]))
-+            return max(numbers) + 1
-+
-+        log.info("Saving postinstall script of %s" % (pkg))
-+
-+        target_rootfs = conf.target.system_root
-+        args = ["-q", "--root=%s" % target_rootfs, "--queryformat", "%{postin}", pkg]
-+
-+        output = util.execWithCapture('rpm', args, log_output=False)
-+        log.info(output)
-+
-+        target_path = "%s/etc/rpm-postinsts" % target_rootfs
-+        util.execWithRedirect("mkdir", ["-p", target_path])
-+        num = _script_num_prefix(target_path)
-+        saved_script_name = os.path.join(target_path, "%d-%s" % (num, pkg))
-+        open(saved_script_name, 'w').write(output)
-+        os.chmod(saved_script_name, 0o755)
-+
-+    def _list_installed(self):
-+        output = util.execWithCapture(
-+                      'dnf',
-+                      [
-+                        'repoquery',
-+                        '--installed',
-+                        '--installroot='+conf.target.system_root,
-+                        '--queryformat=Package:%{name}'
-+                      ],
-+                      log_output=False
-+                 )
-+        output = output.rstrip()
-+        lines = output.splitlines()
-+        installed = []
-+        for line in lines:
-+            if not line.startswith("Package:"):
-+                continue
-+            installed.append(line.replace("Package:", ""))
-+        return installed
 +
 +    def _yocto_complementary_glob(self, group):
 +        complementary_glob = {}
@@ -506,19 +551,67 @@ index 87d0fe031..642b753a0 100644
 +            return complementary_glob[group]
 +
 +        return group
-diff --git a/pyanaconda/payload/dnf/transaction_progress.py b/pyanaconda/payload/dnf/transaction_progress.py
-index 07c88ea9a..df860224c 100644
---- a/pyanaconda/payload/dnf/transaction_progress.py
-+++ b/pyanaconda/payload/dnf/transaction_progress.py
-@@ -84,4 +84,8 @@ class TransactionProgress(dnf.callback.TransactionProgress):
-         """Report an error that occurred during the transaction. Message is a
-         string which describes the error.
-         """
--        self._queue.put(('error', message))
-+        token = "error"
-+        if message.startswith("Error in POSTIN scriptlet in rpm package"):
-+            token = "warn"
-+        self._queue.put((token, message))
-+        log.info("error: %s" % message)
+diff --git a/pyanaconda/payload/dnf/payload.py b/pyanaconda/payload/dnf/payload.py
+index 5312825fa1..a6c951aafd 100644
+--- a/pyanaconda/payload/dnf/payload.py
++++ b/pyanaconda/payload/dnf/payload.py
+@@ -49,6 +49,7 @@ from pyanaconda.core.constants import INSTALL_TREE, ISO_DIR, PAYLOAD_TYPE_DNF, \
+     SOURCE_TYPE_CDN, MULTILIB_POLICY_ALL, REPO_ORIGIN_SYSTEM, SOURCE_TYPE_CLOSEST_MIRROR
+ from pyanaconda.core.i18n import _
+ from pyanaconda.core.payload import parse_hdd_url
++from pyanaconda.core.util import execWithRedirect, execWithCapture
+ from pyanaconda.errors import errorHandler as error_handler, ERROR_RAISE
+ from pyanaconda.flags import flags
+ from pyanaconda.modules.common.constants.services import SUBSCRIPTION
+@@ -278,6 +279,9 @@ class DNFPayload(Payload):
+     def setup(self):
+         self.verbose_errors = []
+ 
++        # OE specific
++        self._dnf_manager.read_buildstamp()
++
+     def unsetup(self):
+         self._dnf_manager.reset_base()
+         tear_down_sources(self.proxy)
+@@ -795,6 +799,39 @@ class DNFPayload(Payload):
+         )
+         task.run()
+ 
++        self._dnf_manager.oe_configure_post()
++
++        # For the generation of anaconda-ks.cfg
++        pkg_data = self.get_packages_selection()
++        for pkg in self._list_installed():
++            if pkg not in pkg_data.packages:
++                pkg_data.packages.append(pkg)
++        self.set_packages_selection(pkg_data)
++
++        execWithRedirect("depmod",
++                              ["-a"],
++                              root=conf.target.system_root)
++
+     @property
+     def kernel_version_list(self):
+         return get_kernel_version_list()
++
++    def _list_installed(self):
++        output = execWithCapture(
++                     'dnf',
++                     [
++                       'repoquery',
++                       '--installed',
++                       '--installroot='+conf.target.system_root,
++                       '--queryformat=Package:%{name}'
++                     ],
++                     log_output=False
++                 )
++        output = output.rstrip()
++        lines = output.splitlines()
++        installed = []
++        for line in lines:
++            if not line.startswith("Package:"):
++                continue
++            installed.append(line.replace("Package:", ""))
++        return installed
 -- 
 2.7.4
