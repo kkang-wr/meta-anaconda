@@ -22,33 +22,37 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Rebase for anaconda 34.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 37.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/installation.py |   6 +++
  pyanaconda/kickstart.py    | 100 +++++++++++++++++++++++++++++++++++++++++++++
  2 files changed, 106 insertions(+)
 
 diff --git a/pyanaconda/installation.py b/pyanaconda/installation.py
-index 0548b539b..2cb222ab6 100644
+index dff213b09d..782859360c 100644
 --- a/pyanaconda/installation.py
 +++ b/pyanaconda/installation.py
-@@ -144,6 +144,12 @@ def _prepare_configuration(payload, ksdata):
-     # Anaconda addon configuration
-     addon_config = TaskQueue("Anaconda addon configuration", N_("Configuring addons"))
+@@ -184,6 +184,12 @@ class RunInstallationTask(InstallationTask):
+             _("Configuring addons")
+         )
  
-+    addon_config.append(Task(
-+        "Configure download",
-+        ksdata.download.execute,
-+        (ksdata,)
-+    ))
++        addon_config.append(Task(
++            "Configure download",
++            ksdata.download.execute,
++            (ksdata,)
++        ))
 +
-     boss_proxy = BOSS.get_proxy()
-     for service_name, object_path in boss_proxy.CollectInstallSystemTasks():
-         task_proxy = DBus.get_proxy(service_name, object_path)
+         boss_proxy = BOSS.get_proxy()
+         for service_name, object_path in boss_proxy.CollectInstallSystemTasks():
+             task_proxy = DBus.get_proxy(service_name, object_path)
 diff --git a/pyanaconda/kickstart.py b/pyanaconda/kickstart.py
-index 5ba8ef7eb..07cc3a886 100644
+index 9a6f32f777..dfef11a180 100644
 --- a/pyanaconda/kickstart.py
 +++ b/pyanaconda/kickstart.py
-@@ -26,6 +26,7 @@ import sys
+@@ -25,6 +25,7 @@ import sys
  import tempfile
  import time
  import warnings
@@ -56,8 +60,8 @@ index 5ba8ef7eb..07cc3a886 100644
  
  from contextlib import contextmanager
  
-@@ -47,6 +48,8 @@ from pykickstart.constants import KS_SCRIPT_POST, KS_SCRIPT_PRE, KS_SCRIPT_TRACE
- from pykickstart.errors import KickstartError, KickstartParseWarning, KickstartDeprecationWarning, KickstartAuthError
+@@ -46,6 +46,8 @@ from pykickstart.constants import KS_SCRIPT_POST, KS_SCRIPT_PRE, KS_SCRIPT_TRACE
+ from pykickstart.errors import KickstartError, KickstartParseWarning, KickstartAuthError
  from pykickstart.ko import KickstartObject
  from pykickstart.parser import KickstartParser
 +from pykickstart.base import KickstartCommand, BaseData
@@ -65,8 +69,8 @@ index 5ba8ef7eb..07cc3a886 100644
  from pykickstart.parser import Script as KSScript
  from pykickstart.sections import NullSection, PostScriptSection, PreScriptSection, \
      PreInstallScriptSection, OnErrorScriptSection, TracebackScriptSection, Section
-@@ -308,6 +311,101 @@ class AnacondaSection(Section):
-         Section.finalize(self)
+@@ -213,6 +216,101 @@ class RepoData(COMMANDS.RepoData):
+             return ''
  
  
 +class DownloadData(BaseData):
@@ -167,7 +171,7 @@ index 5ba8ef7eb..07cc3a886 100644
  ###
  ### HANDLERS
  ###
-@@ -338,6 +436,7 @@ class AnacondaKickstartSpecification(KickstartSpecification):
+@@ -241,12 +339,14 @@ class AnacondaKickstartSpecification(KickstartSpecification):
          "text": COMMANDS.DisplayMode,
          "updates": COMMANDS.Updates,
          "vnc": COMMANDS.Vnc,
@@ -175,8 +179,7 @@ index 5ba8ef7eb..07cc3a886 100644
      }
  
      commands_data = {
-@@ -345,6 +444,7 @@ class AnacondaKickstartSpecification(KickstartSpecification):
-         "ModuleData": COMMANDS.ModuleData,
+         "DriverDiskData": COMMANDS.DriverDiskData,
          "RepoData": RepoData,
          "SshPwData": COMMANDS.SshPwData,
 +        "DownloadData": DownloadData,
