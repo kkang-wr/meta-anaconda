@@ -10,43 +10,50 @@ which always writes fstab after instal, make sure the generated
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase for anaconda 37.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/installation.py | 15 +++++----------
- 1 file changed, 5 insertions(+), 10 deletions(-)
+ pyanaconda/installation.py | 18 +++++-------------
+ 1 file changed, 5 insertions(+), 13 deletions(-)
 
 diff --git a/pyanaconda/installation.py b/pyanaconda/installation.py
-index a08c6b1be..4174c3df4 100644
+index 782859360c..0ce48bca8c 100644
 --- a/pyanaconda/installation.py
 +++ b/pyanaconda/installation.py
-@@ -267,10 +267,6 @@ def _prepare_installation(payload, ksdata):
-     early_storage = TaskQueue("Early storage configuration", N_("Configuring storage"))
-     early_storage.append_dbus_tasks(STORAGE, storage_proxy.InstallWithTasks())
+@@ -351,10 +351,6 @@ class RunInstallationTask(InstallationTask):
+         )
+         early_storage.append_dbus_tasks(STORAGE, storage_proxy.InstallWithTasks())
  
--    if payload.type == PAYLOAD_TYPE_DNF:
--        conf_task = storage_proxy.WriteConfigurationWithTask()
--        early_storage.append_dbus_tasks(STORAGE, [conf_task])
+-        if payload.type == PAYLOAD_TYPE_DNF:
+-            conf_task = storage_proxy.WriteConfigurationWithTask()
+-            early_storage.append_dbus_tasks(STORAGE, [conf_task])
 -
-     installation_queue.append(early_storage)
+         installation_queue.append(early_storage)
  
-     # Run %pre-install scripts with the filesystem mounted and no packages
-@@ -307,12 +303,11 @@ def _prepare_installation(payload, ksdata):
-     payload_install.append(Task("Install the payload", payload.install))
-     installation_queue.append(payload_install)
+         # Run %pre-install scripts with the filesystem mounted and no packages
+@@ -405,15 +401,11 @@ class RunInstallationTask(InstallationTask):
+         ))
+         installation_queue.append(payload_install)
  
--    # for some payloads storage is configured after the payload is installed
--    if payload.type != PAYLOAD_TYPE_DNF:
--        late_storage = TaskQueue("Late storage configuration", N_("Configuring storage"))
--        conf_task = storage_proxy.WriteConfigurationWithTask()
--        late_storage.append_dbus_tasks(STORAGE, [conf_task])
--        installation_queue.append(late_storage)
-+    # Always write configuration at late storage
-+    late_storage = TaskQueue("Late storage configuration", N_("Configuring storage"))
-+    conf_task = storage_proxy.WriteConfigurationWithTask()
-+    late_storage.append_dbus_tasks(STORAGE, [conf_task])
-+    installation_queue.append(late_storage)
+-        # for some payloads storage is configured after the payload is installed
+-        if payload.type != PAYLOAD_TYPE_DNF:
+-            late_storage = TaskQueue(
+-                "Late storage configuration",
+-                _("Configuring storage")
+-            )
+-            conf_task = storage_proxy.WriteConfigurationWithTask()
+-            late_storage.append_dbus_tasks(STORAGE, [conf_task])
+-            installation_queue.append(late_storage)
++        # Always write configuration at late storage
++        late_storage = TaskQueue("Late storage configuration", _("Configuring storage"))
++        conf_task = storage_proxy.WriteConfigurationWithTask()
++        late_storage.append_dbus_tasks(STORAGE, [conf_task])
++        installation_queue.append(late_storage)
  
-     # Do bootloader.
-     bootloader_proxy = STORAGE.get_proxy(BOOTLOADER)
+         # Do bootloader.
+         bootloader_proxy = STORAGE.get_proxy(BOOTLOADER)
 -- 
 2.27.0
 
