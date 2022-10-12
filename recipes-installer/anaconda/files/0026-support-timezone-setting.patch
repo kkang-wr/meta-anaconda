@@ -16,40 +16,49 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Rebase for anaconda 34.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 37:
+* replace pyanaconda.core.util.mkdirChain with pyanaconda.core.path.make_directories
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/modules/timezone/installation.py | 25 +++++++------------------
- 1 file changed, 7 insertions(+), 18 deletions(-)
+ pyanaconda/modules/timezone/installation.py | 26 ++++++++------------------
+ 1 file changed, 8 insertions(+), 18 deletions(-)
 
 diff --git a/pyanaconda/modules/timezone/installation.py b/pyanaconda/modules/timezone/installation.py
-index d6dfd7bf7..a30d70289 100644
+index 0cd75106c7..600c3407de 100644
 --- a/pyanaconda/modules/timezone/installation.py
 +++ b/pyanaconda/modules/timezone/installation.py
-@@ -17,6 +17,7 @@
+@@ -17,9 +17,10 @@
  #
  import os
  import os.path
 +import shutil
  
  from pyanaconda import ntp
- from pyanaconda.core import util
-@@ -74,6 +75,9 @@ class ConfigureTimezoneTask(Task):
+-from pyanaconda.core import service, util
++from pyanaconda.core import service, util, path
+ from pyanaconda.core.configuration.anaconda import conf
+ from pyanaconda.timezone import NTP_SERVICE
+ from pyanaconda.anaconda_loggers import get_module_logger
+@@ -107,6 +108,9 @@ class ConfigureTimezoneTask(Task):
          rooted_tz_file = os.path.normpath(self._sysroot + tz_file)
          relative_path = os.path.normpath("../" + tz_file)
          link_path = os.path.normpath(self._sysroot + "/etc/localtime")
 +        if not os.access(rooted_tz_file, os.R_OK) and os.access(tz_file, os.R_OK):
-+            util.mkdirChain(os.path.dirname(rooted_tz_file))
++            path.make_directories(os.path.dirname(rooted_tz_file))
 +            shutil.copyfile(tz_file, rooted_tz_file)
  
          if not os.access(rooted_tz_file, os.R_OK):
              log.error("Timezone to be linked (%s) doesn't exist", rooted_tz_file)
-@@ -100,24 +104,9 @@ class ConfigureTimezoneTask(Task):
-             # there is no HW clock on s390(x)
+@@ -133,23 +137,9 @@ class ConfigureTimezoneTask(Task):
+             # there is no Hardware clock on s390(x)
              return
  
 -        try:
 -            with open(os.path.normpath(self._sysroot + "/etc/adjtime"), "r") as fobj:
 -                lines = fobj.readlines()
--        except IOError:
+-        except OSError:
 -            lines = ["0.0 0 0.0\n", "0\n"]
 -
 -        try:
@@ -60,16 +69,15 @@ index d6dfd7bf7..a30d70289 100644
 -                    fobj.write("UTC\n")
 -                else:
 -                    fobj.write("LOCAL\n")
--        except IOError as ioerr:
--            msg = "Error while writing /etc/adjtime file: {}".format(ioerr.strerror)
--            raise TimezoneConfigurationError(msg) from ioerr
--
+-        except OSError as e:
+-            msg = "Error while writing /etc/adjtime file: {}".format(e.strerror)
+-            raise TimezoneConfigurationError(msg) from e
 +        log.info("timezone %s" % self._timezone)
 +        with open(self._sysroot + "/etc/timezone", "w") as fobj:
 +            fobj.write('%s\n' % self._timezone)
  
+ 
  class ConfigureNTPTask(Task):
-     """Installation task for NTP configuration."""
 -- 
 2.7.4
 
