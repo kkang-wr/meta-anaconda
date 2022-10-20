@@ -13,16 +13,20 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Rebase for anaconda 34.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 37 on 20221020.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/product.py               | 4 ++++
  pyanaconda/ui/gui/spokes/welcome.py | 4 ++--
  2 files changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/pyanaconda/product.py b/pyanaconda/product.py
-index 9dbfe1fc8..7ba2a52d3 100644
+index b5e97d7ddc..57d79efd91 100644
 --- a/pyanaconda/product.py
 +++ b/pyanaconda/product.py
-@@ -66,6 +66,10 @@ productVersion = trim_product_version_for_ui(productVersion)
+@@ -56,6 +56,10 @@ productVersion = trim_product_version_for_ui(productVersion)
  
  
  def distributionText():
@@ -34,19 +38,19 @@ index 9dbfe1fc8..7ba2a52d3 100644
          "productName": productName.upper(),
          "productVersion": productVersion.upper()
 diff --git a/pyanaconda/ui/gui/spokes/welcome.py b/pyanaconda/ui/gui/spokes/welcome.py
-index 0e17d8106..038c00100 100644
+index 9ed05bd1fe..e1b014a597 100644
 --- a/pyanaconda/ui/gui/spokes/welcome.py
 +++ b/pyanaconda/ui/gui/spokes/welcome.py
-@@ -39,7 +39,7 @@ from pyanaconda import flags
- from pyanaconda import geoloc
+@@ -36,7 +36,7 @@ from pyanaconda.product import distributionText, isFinal, productName, productVe
+ from pyanaconda import flags
  from pyanaconda.core.i18n import _, C_
  from pyanaconda.core.util import ipmi_abort
 -from pyanaconda.core.constants import DEFAULT_LANG, WINDOW_TITLE_TEXT
 +from pyanaconda.core.constants import DEFAULT_LANG, WINDOW_TITLE_TEXT, shortProductName
  from pyanaconda.modules.common.constants.services import TIMEZONE, LOCALIZATION
  from pyanaconda.modules.common.util import is_module_available
- from pyanaconda.anaconda_loggers import get_module_logger
-@@ -267,7 +267,7 @@ class WelcomeLanguageSpoke(StandaloneSpoke, LangLocaleHandler):
+ from pyanaconda.modules.common.structures.timezone import GeolocationData
+@@ -266,7 +266,7 @@ class WelcomeLanguageSpoke(StandaloneSpoke, LangLocaleHandler):
          welcomeLabel = self.builder.get_object("welcomeLabel")
  
          welcomeLabel.set_text(_("WELCOME TO %(name)s %(version)s.") %
