@@ -78,7 +78,6 @@ SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=f37-r
            file://0072-fix-sshd-config.patch \
            file://0075-pyanaconda-payload-Fix-xserver-detection.patch \
            file://0076-limit-product-name-less-then-30-chars.patch \
-           file://0078-anaconda.py-use-Fedora-as-default-product.patch \
            file://0079-find-live-os-image-for-oe.patch \
            file://0080-customize-live-image-for-oe.patch \
            file://0081-always-write-fstab-after-install.patch \
