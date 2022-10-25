@@ -83,6 +83,7 @@ inherit autotools-brokensep features_check gettext gobject-introspection python3
 REQUIRED_DISTRO_FEATURES = "systemd x11"
 
 EXTRA_OECONF += "--disable-selinux \
+                 --disable-webui \
                  --with-sysroot=${PKG_CONFIG_SYSROOT_DIR} \
                  "
 
