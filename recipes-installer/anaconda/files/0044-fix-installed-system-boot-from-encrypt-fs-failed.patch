@@ -35,6 +35,11 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
 Rebase for anaconda 34.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Update context because 0042-support-initramfs-boot.patch updated for
+anaconda 37.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/modules/storage/bootloader/utils.py | 5 +++++
  1 file changed, 5 insertions(+)
@@ -45,7 +50,7 @@ index d25c51ee3..d53538d3a 100644
 +++ b/pyanaconda/modules/storage/bootloader/utils.py
 @@ -294,6 +294,11 @@ def recreate_initrds(sysroot, kernel_versions):
      for subdir in ["log", "tmp"]:
-         mkdirChain(conf.target.system_root + "/var/volatile/%s" % subdir)
+         make_directories(conf.target.system_root + "/var/volatile/%s" % subdir)
  
 +    with open(conf.target.system_root + "/etc/dracut.conf.d/cryptsetup.conf", "w") as f:
 +        f.write('add_drivers+=" aesni_intel"\n')
