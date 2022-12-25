@@ -1,0 +1,26 @@
+It replaces metacity with gnome-kiosk in upstream. Revert it and turn back to
+metacity.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ pyanaconda/display.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pyanaconda/display.py b/pyanaconda/display.py
+index ef6086044c..52c90f17c9 100644
+--- a/pyanaconda/display.py
++++ b/pyanaconda/display.py
+@@ -205,9 +205,9 @@ def do_startup_x11_actions():
+     else:
+         xdg_data_dirs = '/usr/share'
+ 
+-    childproc = util.startProgram(["gnome-kiosk", "--display", ":1", "--sm-disable", "--x11"],
++    childproc = util.startProgram(["metacity", "--display", ":1", "--sm-disable"],
+                                   env_add={'XDG_DATA_DIRS': xdg_data_dirs})
+-    WatchProcesses.watch_process(childproc, "gnome-kiosk")
++    WatchProcesses.watch_process(childproc, "metacity")
+ 
+ 
+ def set_x_resolution(runres):

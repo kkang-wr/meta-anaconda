@@ -83,6 +83,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=f37-r
            file://0081-always-write-fstab-after-install.patch \
            file://0082-fix-grub-efi-boot-failure.patch \
            file://0083-reset-default-autopart-type.patch \
+           file://0084-turn-back-to-use-metacity.patch \
            "
 
 SRCREV = "8c4148afc95b1e95a317e23f0e4cedbd9760ad7d"
