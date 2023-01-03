@@ -6,17 +6,7 @@ SECTION = "devel"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-DEPENDS = "e2fsprogs \
-           gdk-pixbuf-native \
-           gettext \
-           glade \
-           libarchive \
-           libxklavier \
-           libxml2-native \
-           pango \
-           python3 \
-           rpm \
-           "
+DEPENDS = "gdk-pixbuf-native e2fsprogs gettext glade libxklavier rpm"
 
 SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=f37-release \
            file://81-edit-sudoers.ks \
@@ -140,7 +130,6 @@ RDEPENDS:${PN}-misc += "bash python3-core"
 
 RDEPENDS:${PN} = "bash \
                   btrfs-tools \
-                  btrfs-tools \
                   ca-certificates \
                   chrony \
                   dmidecode \
@@ -163,23 +152,17 @@ RDEPENDS:${PN} = "bash \
                   libarchive \
                   libgnomekbd \
                   libpwquality \
-                  librsvg \
                   librsvg-gtk \
                   libtimezonemap \
                   libxkbcommon \
                   localedef \
-                  lvm2 \
                   mdadm \
-                  module-init-tools \
                   network-manager-applet \
-                  networkmanager \
                   nfs-utils-client \
                   ntfs-3g \
                   ntfsprogs \
                   openssh \
-                  parted \
                   procps \
-                  python3-blivet \
                   python3-blivetgui \
                   python3-core \
                   python3-coverage \
@@ -188,40 +171,21 @@ RDEPENDS:${PN} = "bash \
                   python3-langtable \
                   python3-libreport \
                   python3-meh \
-                  python3-misc \
-                  python3-modules \
                   python3-ntplib \
                   python3-ordered-set \
-                  python3-pid \
                   python3-productmd \
                   python3-pydbus \
-                  python3-pygobject \
-                  python3-pykickstart \
-                  python3-pyparted \
                   python3-pytz \
                   python3-requests-file \
                   python3-requests-ftp \
-                  python3-rpm \
                   python3-simpleline \
                   python3-systemd \
                   python3-wrapt \
+                  python3-zoneinfo \
                   rsync \
-                  shadow \
                   squashfs-tools \
                   tigervnc \
                   tzdata \
-                  tzdata-africa \
-                  tzdata-americas \
-                  tzdata-antarctica \
-                  tzdata-arctic \
-                  tzdata-asia \
-                  tzdata-atlantic \
-                  tzdata-australia \
-                  tzdata-europe \
-                  tzdata-misc \
-                  tzdata-pacific \
-                  tzdata-posix \
-                  tzdata-right \
                   usermode \
                   util-linux \
                   util-linux-swaponoff \
