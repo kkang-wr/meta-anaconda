@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 DEPENDS = "gdk-pixbuf-native e2fsprogs gettext glade libxklavier rpm"
 
 SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=f37-release \
+           file://fedora.css \
            file://81-edit-sudoers.ks \
            file://81-systemd-preset-all.ks \
            file://81-add-env-file-for-sshd.ks \
@@ -97,6 +98,7 @@ do_install:append() {
     install -m 644 ${WORKDIR}/81-add-env-file-for-sshd.ks ${D}${datadir}/anaconda/post-scripts
     install -m 644 ${S}/widgets/src/resources/*.svg ${D}${datadir}/anaconda/pixmaps
     install -m 644 ${S}/widgets/src/resources/*.png ${D}${datadir}/anaconda/pixmaps
+    install -m 644 ${WORKDIR}/fedora.css ${D}${datadir}/anaconda/pixmaps
 }
 
 python __anonymous () {

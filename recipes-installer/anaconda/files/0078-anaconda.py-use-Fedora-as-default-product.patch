@@ -10,21 +10,26 @@ for oe.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 37.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- anaconda.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ anaconda.py | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/anaconda.py b/anaconda.py
-index cefe6849f..07cc35fba 100755
+index 2b3b42d19a..441309d816 100755
 --- a/anaconda.py
 +++ b/anaconda.py
-@@ -204,7 +204,7 @@ if __name__ == "__main__":
-         requested_variant=opts.variant_name,
-         buildstamp_product=product.productName,
-         buildstamp_variant=product.productVariant,
--        default_product=util.get_os_release_value("NAME")
-+        default_product='Fedora'
-     )
+@@ -208,8 +208,7 @@ if __name__ == "__main__":
+         )
+     else:
+         conf.set_from_detected_profile(
+-            util.get_os_release_value("ID"),
+-            util.get_os_release_value("VARIANT_ID"),
++            'fedora'
+         )
  
      conf.set_from_files()
 -- 
