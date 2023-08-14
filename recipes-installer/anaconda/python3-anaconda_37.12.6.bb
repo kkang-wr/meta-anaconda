@@ -180,7 +180,6 @@ RDEPENDS:${PN} = "bash \
                   python3-ntplib \
                   python3-ordered-set \
                   python3-productmd \
-                  python3-pydbus \
                   python3-pytz \
                   python3-requests-file \
                   python3-requests-ftp \
