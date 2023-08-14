@@ -5,7 +5,6 @@ SRC_URI:append = " \
     file://liveinstall.scc \
     file://efivarfs.scc \
     file://multipath.scc \
-    file://ide.scc \
 "
 
 KERNEL_FEATURES:append = " \
