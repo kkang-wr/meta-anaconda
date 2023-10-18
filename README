@@ -162,7 +162,7 @@ Building the target installer
            Edit conf/local.conf to use:
            $ echo 'PACKAGE_CLASSES = "package_rpm"' >> conf/local.conf
            $ echo 'DISTRO = "anaconda"' >> conf/local.conf
-           $ echo 'INSTALLER_TARGET_BUILD = "<target_build>/tmp-glibc/deploy/images/qemux86/core-image-minimal-qemux86.ext4"' >> conf/local.conf
+           $ echo 'INSTALLER_TARGET_BUILD = "<target_build>/tmp-glibc/deploy/images/qemux86/core-image-minimal-qemux86.rootfs.ext4"' >> conf/local.conf
 
            Edit conf/bblayers.conf to include other layers
            BBLAYERS ?= " \

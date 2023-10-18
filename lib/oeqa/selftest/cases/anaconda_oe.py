@@ -146,7 +146,7 @@ class TestAnacondaOE(OESelftestTestCase):
         ks_file = os.path.join(self.layer_path, 'example/ks-imagecopy.cfg')
         features = 'TMPDIR .= "_host"\n'
         features += 'DISTRO = "%s"\n' % self.anaconda_distro
-        features += 'INSTALLER_TARGET_BUILD = "%s/%s-%s.ext4"\n' % (self.target_deploy_dir_image, self.target_recipe, self.machine)
+        features += 'INSTALLER_TARGET_BUILD = "%s/%s-%s.rootfs.ext4"\n' % (self.target_deploy_dir_image, self.target_recipe, self.machine)
         features += 'KICKSTART_FILE = "%s"\n' % ks_file
         features += 'SYSLINUX_TIMEOUT = "10"\n'
         features += 'APPEND:append = " textinst"\n'
@@ -164,7 +164,7 @@ class TestAnacondaOE(OESelftestTestCase):
     def test_testanaconda_imagecopy_install(self):
         features = 'TMPDIR .= "_host"\n'
         features += 'DISTRO = "%s"\n' % self.anaconda_distro
-        features += 'INSTALLER_TARGET_BUILD = "%s/%s-%s.ext4"\n' % (self.target_deploy_dir_image, self.target_recipe, self.machine)
+        features += 'INSTALLER_TARGET_BUILD = "%s/%s-%s.rootfs.ext4"\n' % (self.target_deploy_dir_image, self.target_recipe, self.machine)
         self.logger.info('extra local.conf:\n%s' % features)
         self.append_config(features)
 
