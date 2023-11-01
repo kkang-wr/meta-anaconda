@@ -14,7 +14,7 @@ CUSTOMIZE_LOGOS ??= "yocto-compat-logos"
 IMAGE_INSTALL = "\
     packagegroup-core-boot \
     packagegroup-core-ssh-openssh \
-    ${@['', 'packagegroup-installer-x11-anaconda'][bool(d.getVar('XSERVER', True))]} \
+    ${@['', 'packagegroup-installer-x11-anaconda'][bool(d.getVar('XSERVER'))]} \
     python3-anaconda \
     anaconda-init \
     kernel-modules \

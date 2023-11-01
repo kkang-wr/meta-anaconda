@@ -16,7 +16,7 @@ IMAGE_INSTALL = "\
     ${CUSTOMIZE_LOGOS} \
     python3-anaconda \
     anaconda-init \
-    ${@['', 'packagegroup-installer-x11-anaconda'][bool(d.getVar('XSERVER', True))]} \
+    ${@['', 'packagegroup-installer-x11-anaconda'][bool(d.getVar('XSERVER'))]} \
     packagegroup-core-boot \
     packagegroup-core-ssh-openssh \
 "

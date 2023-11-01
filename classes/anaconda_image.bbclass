@@ -313,14 +313,14 @@ _EOF
 }
 
 python __anonymous() {
-    if "selinux" in d.getVar("DISTRO_FEATURES", True).split():
+    if "selinux" in d.getVar("DISTRO_FEATURES").split():
         raise bb.parse.SkipPackage("Unable to build the installer when selinux is enabled.")
 
     if bb.data.inherits_class('image', d):
-        if d.getVar("DISTRO", True) != "anaconda":
+        if d.getVar("DISTRO") != "anaconda":
             raise bb.parse.SkipPackage("Set DISTRO = 'anaconda' in local.conf")
 
-        target_builds = d.getVar('INSTALLER_TARGET_BUILD', True)
+        target_builds = d.getVar('INSTALLER_TARGET_BUILD')
         if not target_builds:
             errmsg = "No INSTALLER_TARGET_BUILD is found,\n"
             errmsg += "set INSTALLER_TARGET_BUILD = '<target-build-topdir>' and\n"
@@ -343,7 +343,7 @@ python __anonymous() {
 
         # While do package management install
         if count > 0:
-            target_images = d.getVar('INSTALLER_TARGET_IMAGE', True)
+            target_images = d.getVar('INSTALLER_TARGET_IMAGE')
             if not target_images:
                 errmsg = "The INSTALLER_TARGET_BUILD is a dir, but not found INSTALLER_TARGET_IMAGE,\n"
                 errmsg += "set INSTALLER_TARGET_IMAGE = '<target-image-pn>' to do RPMs install"
@@ -355,7 +355,7 @@ python __anonymous() {
                 raise bb.parse.SkipPackage(errmsg)
 
         # The count of INSTALLER_TARGET_BUILD and WRL_INSTALLER_CONF must match when set.
-        wrlinstaller_confs = d.getVar('WRL_INSTALLER_CONF', True)
+        wrlinstaller_confs = d.getVar('WRL_INSTALLER_CONF')
         if wrlinstaller_confs:
             if len(wrlinstaller_confs.split()) != len(target_builds.split()):
                 raise bb.parse.SkipPackage("The count of INSTALLER_TARGET_BUILD and WRL_INSTALLER_CONF not match!")
@@ -364,7 +364,7 @@ python __anonymous() {
                     raise bb.parse.SkipPackage("The installer conf %s in WRL_INSTALLER_CONF doesn't exist!" % wrlinstaller_conf)
 
         # The count of INSTALLER_TARGET_BUILD and KICKSTART_FILE must match when set.
-        kickstart_files = d.getVar('KICKSTART_FILE', True)
+        kickstart_files = d.getVar('KICKSTART_FILE')
         if kickstart_files:
             if len(kickstart_files.split()) != len(target_builds.split()):
                 raise bb.parse.SkipPackage("The count of INSTALLER_TARGET_BUILD and KICKSTART_FILE not match!")
