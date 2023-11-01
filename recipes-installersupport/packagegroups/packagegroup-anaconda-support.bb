@@ -32,5 +32,3 @@ RDEPENDS:${PN} = " \
 "
 
 COMPATIBLE_HOST = '(x86_64.*|i.86.*)-(linux.*|freebsd.*)'
-COMPATIBLE_HOST:armv7a = 'null'
-COMPATIBLE_HOST:armv7ve = 'null'
