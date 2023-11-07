@@ -3,11 +3,11 @@ DESCRIPTION = "This is a text UI framework originally which \
 was a part of the Anaconda installer project."
 HOMEPAGE = "https://github.com/rhinstaller/python-simpleline"
 SECTION = "devel"
-LICENSE = "GPL-2.0-only"
-LIC_FILES_CHKSUM = "file://COPYING;md5=5f4f48e95324081879552f19cd16c54a"
+LICENSE = "LGPL-3.0-only"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=8350171b4e0d605dd7f117e75eb5b4cd"
 
 SRC_URI = "git://github.com/rhinstaller/python-simpleline;protocol=https;branch=master"
-SRCREV = "1c21ffdeda9eed27e5ad8ec16aee467f8daecd50"
+SRCREV = "cf7a049623432acbdb8ec23eeadbfa666761e109"
 S = "${WORKDIR}/git"
 
 inherit setuptools3_legacy
