@@ -24,6 +24,10 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
 Rebase for anaconda 37 on 20230227.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 38 on 20231107.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  .../modules/payloads/payload/dnf/dnf_manager.py    | 188 +++++++++++++++++----
  .../modules/payloads/payload/dnf/installation.py   |  11 +-
@@ -35,7 +39,7 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  7 files changed, 314 insertions(+), 45 deletions(-)
 
 diff --git a/pyanaconda/modules/payloads/payload/dnf/dnf_manager.py b/pyanaconda/modules/payloads/payload/dnf/dnf_manager.py
-index 3a679a656f..0e41d57171 100644
+index 32c7c66bf1..23ff5976b0 100644
 --- a/pyanaconda/modules/payloads/payload/dnf/dnf_manager.py
 +++ b/pyanaconda/modules/payloads/payload/dnf/dnf_manager.py
 @@ -21,6 +21,10 @@ import multiprocessing
@@ -329,7 +333,7 @@ index 3a679a656f..0e41d57171 100644
 +            f.write(output)
 +        os.chmod(saved_script_name, 0o755)
 diff --git a/pyanaconda/modules/payloads/payload/dnf/installation.py b/pyanaconda/modules/payloads/payload/dnf/installation.py
-index 4e596239ab..2883b1a651 100644
+index 4e596239ab..2eabc8bcea 100644
 --- a/pyanaconda/modules/payloads/payload/dnf/installation.py
 +++ b/pyanaconda/modules/payloads/payload/dnf/installation.py
 @@ -31,7 +31,7 @@ from pyanaconda.modules.common.structures.packages import PackagesConfigurationD
@@ -365,7 +369,7 @@ index 4e596239ab..2883b1a651 100644
  class WriteRepositoriesTask(Task):
      """The installation task for writing repositories on the target system."""
 diff --git a/pyanaconda/modules/payloads/payload/dnf/requirements.py b/pyanaconda/modules/payloads/payload/dnf/requirements.py
-index b5e365af1b..7521c5d0f5 100644
+index ee1f517ce2..c5536a9698 100644
 --- a/pyanaconda/modules/payloads/payload/dnf/requirements.py
 +++ b/pyanaconda/modules/payloads/payload/dnf/requirements.py
 @@ -127,6 +127,27 @@ def collect_driver_disk_requirements(path="/run/install/dd_packages"):
@@ -424,10 +428,10 @@ index b277156819..f992debae1 100644
      def quit(self, message):
          """Report the end of the transaction and close the queue.
 diff --git a/pyanaconda/modules/payloads/payload/dnf/utils.py b/pyanaconda/modules/payloads/payload/dnf/utils.py
-index f7895016e9..f99f3b8b1f 100644
+index c478a5770a..f23b5ec36c 100644
 --- a/pyanaconda/modules/payloads/payload/dnf/utils.py
 +++ b/pyanaconda/modules/payloads/payload/dnf/utils.py
-@@ -108,18 +108,8 @@ def get_installation_specs(data: PackagesSelectionData, default_environment=None
+@@ -109,18 +109,8 @@ def get_installation_specs(data: PackagesSelectionData, default_environment=None
      exclude_list = []
  
      # Handle the environment.
@@ -447,7 +451,7 @@ index f7895016e9..f99f3b8b1f 100644
      # Handle groups.
      for group_name in data.excluded_groups:
 diff --git a/pyanaconda/modules/payloads/payload/dnf/validation.py b/pyanaconda/modules/payloads/payload/dnf/validation.py
-index 509f7f7032..4b3b571492 100644
+index 509f7f7032..1317b19f6a 100644
 --- a/pyanaconda/modules/payloads/payload/dnf/validation.py
 +++ b/pyanaconda/modules/payloads/payload/dnf/validation.py
 @@ -17,6 +17,7 @@
@@ -552,20 +556,20 @@ index 509f7f7032..4b3b571492 100644
 +
 +        return group
 diff --git a/pyanaconda/payload/dnf/payload.py b/pyanaconda/payload/dnf/payload.py
-index 5312825fa1..a6c951aafd 100644
+index a4daaa6e0a..a9def2beed 100644
 --- a/pyanaconda/payload/dnf/payload.py
 +++ b/pyanaconda/payload/dnf/payload.py
 @@ -49,6 +49,7 @@ from pyanaconda.core.constants import INSTALL_TREE, ISO_DIR, PAYLOAD_TYPE_DNF, \
-     SOURCE_TYPE_CDN, MULTILIB_POLICY_ALL, REPO_ORIGIN_SYSTEM, SOURCE_TYPE_CLOSEST_MIRROR
+     REPO_ORIGIN_TREEINFO
  from pyanaconda.core.i18n import _
  from pyanaconda.core.payload import parse_hdd_url
 +from pyanaconda.core.util import execWithRedirect, execWithCapture
  from pyanaconda.errors import errorHandler as error_handler, ERROR_RAISE
  from pyanaconda.flags import flags
  from pyanaconda.modules.common.constants.services import SUBSCRIPTION
-@@ -278,6 +279,9 @@ class DNFPayload(Payload):
-     def setup(self):
-         self.verbose_errors = []
+@@ -305,6 +306,9 @@ class DNFPayload(Payload):
+         return repo_id == constants.BASE_REPO_NAME \
+             or repo_id in constants.DEFAULT_REPOS
  
 +        # OE specific
 +        self._dnf_manager.read_buildstamp()
@@ -573,7 +577,7 @@ index 5312825fa1..a6c951aafd 100644
      def unsetup(self):
          self._dnf_manager.reset_base()
          tear_down_sources(self.proxy)
-@@ -795,6 +799,39 @@ class DNFPayload(Payload):
+@@ -834,6 +838,39 @@ class DNFPayload(Payload):
          )
          task.run()
  

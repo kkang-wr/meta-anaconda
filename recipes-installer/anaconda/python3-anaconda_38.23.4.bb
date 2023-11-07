@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = "gdk-pixbuf-native e2fsprogs gettext glade libxklavier rpm"
 
-SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=f37-release \
+SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=fedora-38 \
            file://fedora.css \
            file://81-edit-sudoers.ks \
            file://81-systemd-preset-all.ks \
@@ -20,7 +20,6 @@ SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=f37-r
            file://0007-dnfpayload.py-customize-for-OE.patch \
            file://0009-dynamic-detect-workable-locale.patch \
            file://0010-reboot-unconditionally.patch \
-           file://0011-disable-audit.patch \
            file://0012-bootloader.py-Change-grub2-settings-to-match-oe-core.patch \
            file://0013-tweak-detect-kernel-version.patch \
            file://0016-kickstart-not-support-Authselect-Firewall-Firstboot.patch \
@@ -44,7 +43,6 @@ SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=f37-r
            file://0044-fix-installed-system-boot-from-encrypt-fs-failed.patch \
            file://0045-installation-destination-disable-iSCSI-network-disks.patch \
            file://0046-update-region-while-city-changes.patch \
-           file://0047-remove-incorrect-prefix-of-addon-repo-url.patch \
            file://0048-fix-write-sysconfig-network-failed.patch \
            file://0049-pyanaconda-ui-gui-utils.py-tweak-mouse-arrow.patch \
            file://0052-invoke-grub-install-to-generate-efi-filesystem.patch \
@@ -54,7 +52,6 @@ SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=f37-r
            file://0056-Add-dracut-args-for-home-to-bootloader.patch \
            file://0057-do-not-customize-window-theme.patch \
            file://0058-tweak-product-short-name.patch \
-           file://0059-disable-dmraid.patch \
            file://0060-tweak-shebang-of-bash.patch \
            file://0061-Tweak-label-name.patch \
            file://0062-Mount-var-volatile-during-install.patch \
@@ -74,11 +71,9 @@ SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=f37-r
            file://0081-always-write-fstab-after-install.patch \
            file://0082-fix-grub-efi-boot-failure.patch \
            file://0083-reset-default-autopart-type.patch \
-           file://0084-Sort-RPM-versions-via-rpm.labelCompare-and-not-via-p.patch \
-           file://0085-Use-another-type-to-make-new-GCC-warnings-go-away.patch \
            "
 
-SRCREV = "8c4148afc95b1e95a317e23f0e4cedbd9760ad7d"
+SRCREV = "55bc10f4e8a30eb6f21246ceaca1565d67f0c99e"
 
 S = "${WORKDIR}/git"
 

@@ -23,15 +23,19 @@ Update for anaconda 32. The source code has been moved from users.py to
 core/users.py. Update accordingly.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 38 on 20231107.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/core/users.py | 12 ++++++------
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/pyanaconda/core/users.py b/pyanaconda/core/users.py
-index db34444a31..45e371d8c6 100644
+index 25a6076a0d..f31a04acc7 100644
 --- a/pyanaconda/core/users.py
 +++ b/pyanaconda/core/users.py
-@@ -266,13 +266,13 @@ def create_group(group_name, gid=None, root=None):
+@@ -258,12 +258,12 @@ def create_group(group_name, gid=None, root=None):
      if _getgrnam(group_name, root):
          raise ValueError("Group %s already exists" % group_name)
  
@@ -41,13 +45,12 @@ index db34444a31..45e371d8c6 100644
          args.extend(["-g", str(gid)])
  
      args.append(group_name)
-     with _ensure_login_defs(root):
--        status = util.execWithRedirect("groupadd", args)
-+        status = util.execWithRedirect("groupadd", args, root=root)
+-    status = util.execWithRedirect("groupadd", args)
++    status = util.execWithRedirect("groupadd", args, root=root)
  
      if status == 4:
          raise ValueError("GID %s already exists" % gid)
-@@ -329,7 +329,7 @@ def create_user(username, password=False, is_crypted=False, lock=False,
+@@ -355,7 +355,7 @@ def create_user(username, password=False, is_crypted=False, lock=False,
      if check_user_exists(username, root):
          raise ValueError("User %s already exists" % username)
  
@@ -56,16 +59,16 @@ index db34444a31..45e371d8c6 100644
  
      # Split the groups argument into a list of (username, gid or None) tuples
      # the gid, if any, is a string since that makes things simpler
-@@ -397,7 +397,7 @@ def create_user(username, password=False, is_crypted=False, lock=False,
+@@ -422,7 +422,7 @@ def create_user(username, password=False, is_crypted=False, lock=False,
+         args.extend(["-c", gecos])
  
      args.append(username)
-     with _ensure_login_defs(root):
--        status = util.execWithRedirect("useradd", args)
-+        status = util.execWithRedirect("useradd", args, root=root)
+-    status = util.execWithRedirect("useradd", args)
++    status = util.execWithRedirect("useradd", args, root=root)
  
      if status == 4:
          raise ValueError("UID %s already exists" % uid)
-@@ -468,7 +468,7 @@ def set_user_password(username, password, is_crypted, lock, root="/"):
+@@ -478,7 +478,7 @@ def set_user_password(username, password, is_crypted, lock, root="/"):
              password = "!" + password
              log.info("user account %s locked", username)
  
@@ -74,7 +77,7 @@ index db34444a31..45e371d8c6 100644
          proc.communicate(("%s:%s\n" % (username, password)).encode("utf-8"))
          if proc.returncode != 0:
              raise OSError("Unable to set password for new user: status=%s" % proc.returncode)
-@@ -476,7 +476,7 @@ def set_user_password(username, password, is_crypted, lock, root="/"):
+@@ -486,7 +486,7 @@ def set_user_password(username, password, is_crypted, lock, root="/"):
      # Reset sp_lstchg to an empty string. On systems with no rtc, this
      # field can be set to 0, which has a special meaning that the password
      # must be reset on the next login.

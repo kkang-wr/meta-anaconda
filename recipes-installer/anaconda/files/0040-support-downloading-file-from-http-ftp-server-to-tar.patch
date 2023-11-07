@@ -26,13 +26,17 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
 Rebase for anaconda 37.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 38 on 20231107.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/installation.py |   6 +++
  pyanaconda/kickstart.py    | 100 +++++++++++++++++++++++++++++++++++++++++++++
  2 files changed, 106 insertions(+)
 
 diff --git a/pyanaconda/installation.py b/pyanaconda/installation.py
-index dff213b09d..782859360c 100644
+index 9c1372f606..803687d11d 100644
 --- a/pyanaconda/installation.py
 +++ b/pyanaconda/installation.py
 @@ -184,6 +184,12 @@ class RunInstallationTask(InstallationTask):
@@ -49,7 +53,7 @@ index dff213b09d..782859360c 100644
          for service_name, object_path in boss_proxy.CollectInstallSystemTasks():
              task_proxy = DBus.get_proxy(service_name, object_path)
 diff --git a/pyanaconda/kickstart.py b/pyanaconda/kickstart.py
-index 9a6f32f777..dfef11a180 100644
+index 9f235c1d58..df31b8e44c 100644
 --- a/pyanaconda/kickstart.py
 +++ b/pyanaconda/kickstart.py
 @@ -25,6 +25,7 @@ import sys
@@ -60,7 +64,7 @@ index 9a6f32f777..dfef11a180 100644
  
  from contextlib import contextmanager
  
-@@ -46,6 +46,8 @@ from pykickstart.constants import KS_SCRIPT_POST, KS_SCRIPT_PRE, KS_SCRIPT_TRACE
+@@ -45,6 +46,8 @@ from pykickstart.constants import KS_SCRIPT_POST, KS_SCRIPT_PRE, KS_SCRIPT_TRACE
  from pykickstart.errors import KickstartError, KickstartParseWarning, KickstartAuthError
  from pykickstart.ko import KickstartObject
  from pykickstart.parser import KickstartParser
@@ -69,9 +73,9 @@ index 9a6f32f777..dfef11a180 100644
  from pykickstart.parser import Script as KSScript
  from pykickstart.sections import NullSection, PostScriptSection, PreScriptSection, \
      PreInstallScriptSection, OnErrorScriptSection, TracebackScriptSection, Section
-@@ -213,6 +216,101 @@ class RepoData(COMMANDS.RepoData):
-             return ''
- 
+@@ -181,6 +184,101 @@ class UselessObject(KickstartObject):
+         """Generate this part of a kickstart file from the DBus module."""
+         return ""
  
 +class DownloadData(BaseData):
 +    removedKeywords = BaseData.removedKeywords
@@ -171,7 +175,7 @@ index 9a6f32f777..dfef11a180 100644
  ###
  ### HANDLERS
  ###
-@@ -241,12 +339,14 @@ class AnacondaKickstartSpecification(KickstartSpecification):
+@@ -208,11 +306,13 @@ class AnacondaKickstartSpecification(KickstartSpecification):
          "text": COMMANDS.DisplayMode,
          "updates": COMMANDS.Updates,
          "vnc": COMMANDS.Vnc,
@@ -180,7 +184,6 @@ index 9a6f32f777..dfef11a180 100644
  
      commands_data = {
          "DriverDiskData": COMMANDS.DriverDiskData,
-         "RepoData": RepoData,
          "SshPwData": COMMANDS.SshPwData,
 +        "DownloadData": DownloadData,
      }

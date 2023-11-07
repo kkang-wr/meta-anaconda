@@ -13,15 +13,18 @@ Update for anaconda 32.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 
+Rebase for anaconda 38 on 20231107.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/startup_utils.py | 13 ++++++++++---
  1 file changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/pyanaconda/startup_utils.py b/pyanaconda/startup_utils.py
-index bff65308e..3a4ba77d9 100644
+index 07afd098ec..608dc84a6e 100644
 --- a/pyanaconda/startup_utils.py
 +++ b/pyanaconda/startup_utils.py
-@@ -355,8 +355,11 @@ def find_kickstart(options):
+@@ -373,8 +373,11 @@ def find_kickstart(options):
      :param options: command line/boot options
      :returns: a path to a kickstart file or None
      """
@@ -33,9 +36,9 @@ index bff65308e..3a4ba77d9 100644
 +           not options.ksfile.startswith("https://") and \
 +           not options.ksfile.startswith("ftp://"):
              stdout_log.error("Kickstart file %s is missing.", options.ksfile)
-             util.ipmi_report(constants.IPMI_ABORTED)
+             ipmi_report(IPMI_ABORTED)
              sys.exit(1)
-@@ -373,8 +376,12 @@ def find_kickstart(options):
+@@ -391,8 +394,12 @@ def find_kickstart(options):
      else:
          ks_files = ["/usr/share/anaconda/interactive-defaults.ks"]
  
