@@ -10,5 +10,4 @@ inherit features_check gnomebase gobject-introspection gsettings gettext
 
 REQUIRED_DISTRO_FEATURES = "x11"
 
-SRC_URI[archive.md5sum] = "98040022484406e7ebe25f82cef93344"
-SRC_URI[archive.sha256sum] = "f7ca02631576e9b88aee1b1bae37ac1488b80ee7975f20a97f29e761a7172679"
+SRC_URI[archive.sha256sum] = "22dc59566d73c0065350f5a97340e62ecc7b08c4df19183804bb8be24c8fe870"
