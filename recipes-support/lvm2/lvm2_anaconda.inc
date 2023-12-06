@@ -1,1 +1,1 @@
-PACKAGECONFIG:append = ' thin-provisioning-tools'
+PACKAGECONFIG:append:class-target = ' dbus thin-provisioning-tools'
