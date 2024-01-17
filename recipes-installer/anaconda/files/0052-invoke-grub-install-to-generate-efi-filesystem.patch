@@ -19,15 +19,20 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
 Rebase for anaconda 34.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 38. util.execInSysroot() has been removed and use
+execWithRedirect() instead.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/modules/storage/bootloader/efi.py | 17 +++++++++++++++++
  1 file changed, 17 insertions(+)
 
 diff --git a/pyanaconda/modules/storage/bootloader/efi.py b/pyanaconda/modules/storage/bootloader/efi.py
-index 158287b1e..87ae27f2c 100644
+index 2f1afd9306..a61c884f05 100644
 --- a/pyanaconda/modules/storage/bootloader/efi.py
 +++ b/pyanaconda/modules/storage/bootloader/efi.py
-@@ -126,6 +126,23 @@ class EFIBase(object):
+@@ -128,6 +128,23 @@ class EFIBase(object):
              self.remove_efi_boot_target()
          self.add_efi_boot_target()
  
@@ -39,12 +44,12 @@ index 158287b1e..87ae27f2c 100644
 +            f.write('grub-mkimage -c /tmp/load.cfg $@ search_fs_uuid\n')
 +        os.chmod(conf.target.system_root + "/tmp/grub-mkimage-wrapper.sh", 0o755)
 +
-+        rc = util.execInSysroot("grub-install", ["--removable",
-+                                                  "--efi-directory=/boot/efi/",
-+                                                  "--boot-directory=%s" % self.config_dir,
-+                                                  "--grub-mkimage=/tmp/grub-mkimage-wrapper.sh",
-+                                                  "/boot/efi/"
-+                                                 ])
++        rc = util.execWithRedirect("grub-install",
++                                   ["--removable", "--efi-directory=/boot/efi/",
++                                    "--boot-directory=%s" % self.config_dir,
++                                    "--grub-mkimage=/tmp/grub-mkimage-wrapper.sh",
++                                    "/boot/efi/"],
++                                   root=conf.target.system_root)
 +        if rc:
 +            raise BootLoaderError("boot loader install failed")
 +

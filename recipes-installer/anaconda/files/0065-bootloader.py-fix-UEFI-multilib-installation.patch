@@ -27,38 +27,44 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
 Rebase for anaconda 34.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Replace the last util.getSysroot() with conf.target.system_root, and
+rebase since 0052-invoke-grub-install-to-generate-efi-filesystem.patch
+updated.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/modules/storage/bootloader/efi.py | 14 ++++++++++++++
  1 file changed, 14 insertions(+)
 
 diff --git a/pyanaconda/modules/storage/bootloader/efi.py b/pyanaconda/modules/storage/bootloader/efi.py
-index 87ae27f2c..d25243173 100644
+index a61c884f05..819b9f82a6 100644
 --- a/pyanaconda/modules/storage/bootloader/efi.py
 +++ b/pyanaconda/modules/storage/bootloader/efi.py
-@@ -134,10 +134,24 @@ class EFIBase(object):
+@@ -136,10 +136,24 @@ class EFIBase(object):
              f.write('grub-mkimage -c /tmp/load.cfg $@ search_fs_uuid\n')
          os.chmod(conf.target.system_root + "/tmp/grub-mkimage-wrapper.sh", 0o755)
  
 +        if self._is_32bit_firmware:
-+            if os.path.exists(conf.target.system_root+"/usr/lib/grub/i386-efi"):
++            if os.path.exists(conf.target.system_root + "/usr/lib/grub/i386-efi"):
 +                mod_path = "/usr/lib/grub/i386-efi"
 +            else:
 +                raise BootLoaderError("GRUB2 32-bit libdir not eixst")
 +        else:
-+            if os.path.exists(conf.target.system_root+"/usr/lib64/grub/x86_64-efi"):
++            if os.path.exists(conf.target.system_root + "/usr/lib64/grub/x86_64-efi"):
 +                mod_path = "/usr/lib64/grub/x86_64-efi"
-+            elif os.path.exists(util.getSysroot()+"/usr/lib/grub/x86_64-efi"):
++            elif os.path.exists(conf.target.system_root + "/usr/lib/grub/x86_64-efi"):
 +                mod_path = "/usr/lib/grub/x86_64-efi"
 +            else:
 +                raise BootLoaderError("GRUB2 64-bit libdir not eixst")
 +
-         rc = util.execInSysroot("grub-install", ["--removable",
-                                                   "--efi-directory=/boot/efi/",
-                                                   "--boot-directory=%s" % self.config_dir,
-                                                   "--grub-mkimage=/tmp/grub-mkimage-wrapper.sh",
-+                                                  "--directory=%s" % mod_path,
-                                                   "/boot/efi/"
-                                                  ])
+         rc = util.execWithRedirect("grub-install",
+                                    ["--removable", "--efi-directory=/boot/efi/",
+                                     "--boot-directory=%s" % self.config_dir,
+                                     "--grub-mkimage=/tmp/grub-mkimage-wrapper.sh",
++                                    "--directory=%s" % mod_path,
+                                     "/boot/efi/"],
+                                    root=conf.target.system_root)
          if rc:
 -- 
 2.7.4
